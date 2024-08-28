@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
@@ -19,30 +19,31 @@ const authOptions = {
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
-      credentials: {},
-
-      async authorize(credentials, req) {
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
         const { email, password } = credentials;
 
         try {
-          const user = await prisma.user.findFirst({
+          const user = await prisma.user.findUnique({
             where: { email: email },
           });
 
-          if (user) {
-            // Check password
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (passwordMatch) {
-              return user;
-            } else {
-              throw new Error("Invalid password!");
-            }
-          } else {
-            throw new Error("Invalid email address!");
+          if (!user) {
+            throw new Error("No user found with this email!");
           }
+
+          const isPasswordCorrect = await bcrypt.compare(password, user.password);
+          if (!isPasswordCorrect) {
+            throw new Error("Incorrect password!");
+          }
+
+          return user;
         } catch (error) {
-          console.error("Error processing the request:", error);
-          throw error;
+          console.error("Error during authorization:", error);
+          throw new Error("Authorization failed!");
         }
       },
     }),
@@ -57,46 +58,43 @@ const authOptions = {
     error: "/login",
   },
   callbacks: {
-async signIn({ user, account, profile, email }) {
-      try {
-        // Check if the user exists in the database
-        const existingUser = await prisma.user.findUnique({
-          where: {
-            email: profile.email,
-          },
-        });
-
-        if (existingUser) {
-          // User exists, proceed with sign-in
-          return true;
-        } else {
-          // User doesn't exist, create a new user account
-          const newUser = await prisma.user.create({
-            data: {
-              email: profile.email,
-              name: profile.name || profile.login,
-              
-            },
+    async signIn({ user, account }) {
+      if (account.provider === "github") {
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
           });
 
-          // After creating the user, proceed with sign-in
+          if (!existingUser) {
+            // Create a new user if not already in the database
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || user.login,
+                image: user.image || user.avatar_url, // Store GitHub avatar
+              },
+            });
+          }
+
           return true;
+        } catch (error) {
+          console.error("Error during GitHub sign-in:", error);
+          return false;
         }
-      } catch (error) {
-        console.error("Error during sign-in:", error);
-        return false;
       }
+
+      // For credentials provider, simply allow sign-in to proceed
+      return true;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.userRole;
+        token.id = user.id;
+        token.role = user.userRole || "user"; // Default role
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user = token;
-      }
+      session.user = token;
       return session;
     },
   },
