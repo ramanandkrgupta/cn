@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,16 +16,21 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userRole, setUserRole] = useState("FREE"); // Default user role is "FREE"
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validate user input
-    const userInput = { name, email, mobile, password, confirmPassword };
+    const userInput = {
+      email,
+      name,
+      password,
+      mobile,
+      role: userRole,
+    };
 
     try {
-      // Perform client-side validation using your UserValidation schema
       const validation = UserValidation.UserRegister.safeParse(userInput);
 
       if (!validation.success) {
@@ -37,13 +40,12 @@ const RegisterPage = () => {
       } else if (password !== confirmPassword) {
         toast.error("Passwords do not match");
       } else {
-        // If validation is successful, make the API request
-        const response = await fetch('/api/user/register', {
-          method: 'POST',
+        const response = await fetch("/api/user/register", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name, email, mobile, password }),
+          body: JSON.stringify(userInput),
         });
 
         const data = await response.json();
@@ -52,7 +54,7 @@ const RegisterPage = () => {
           toast.error(data.message || "Registration failed");
         } else {
           toast.success("Successfully registered! Redirecting to login...");
-          router.push('/login');
+          router.push("/login");
         }
       }
     } catch (error) {
@@ -136,12 +138,12 @@ const RegisterPage = () => {
               />
               <div className="flex gap-1 mr-5 md:mr-0">
                 <FormButtons
-                  primaryLabel={isLoading ? "Please wait..." : "Register"}
-                  secondaryLabel="Back"
+                  primaryLabel={isLoading ? "Registering..." : "Register"}
+                  secondaryLabel="Login"
                   onPrimaryClick={handleSubmit}
-                  onSecondaryClick={() => router.back()}
-                  primaryClassName="btn_registerFormPrimary"
-                  secondaryClassName="btn_registerFormSecondary"
+                  onSecondaryClick={() => router.push("/login")}
+                  primaryClassName="btn_registerForm"
+                  secondaryClassName="btn_registerForm"
                 />
               </div>
             </form>
