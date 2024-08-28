@@ -27,7 +27,11 @@ const RegisterPage = () => {
     };
 
     try {
-      const response = await axios.post("/api/user/register", userInput);
+      const response = await axios.post("/api/user/register", userInput, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (response.status === 201) {
         toast.success("Successfully registered! Redirecting to login...");
