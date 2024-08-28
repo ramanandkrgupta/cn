@@ -61,7 +61,26 @@ const LoginPage = () => {
     }
   };
 
-  
+  const handleGitHubLogin = async () => {
+    setIsLoading(true);
+    try {
+      // Trigger the GitHub sign-in process
+      const response = await signIn("github", { redirect: false });
+
+      if (response.error) {
+        toast.error(response.error);
+      } else {
+        // Redirect to the dashboard on successful login
+        toast.success("Successfully Logged in with GitHub");
+        window.location.href = "/dashboard";
+      }
+    } catch (error) {
+      console.error("GitHub Login Error: " + error);
+      toast.error("Failed to login with GitHub");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="flex items-center justify-center">
@@ -116,7 +135,17 @@ const LoginPage = () => {
               </div>
             </form>
 
-            
+            {/* GitHub Login Button */}
+            <div className="flex justify-center mt-4">
+              <button
+                type="button"
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleGitHubLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Login with GitHub"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
