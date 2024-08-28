@@ -22,19 +22,15 @@ const LoginPage = () => {
     setIsLoading(true);
 
     // Validate user input using the schema
-    const userInput = {
-      email,
-      password,
-    };
+    const userInput = { email, password };
 
     try {
       // Validate the user input
       const validation = UserValidation.UserLogin.safeParse(userInput);
 
       // If validation fails, return error message
-      if (validation.success === false) {
-        const { issues } = validation.error;
-        issues.forEach((err) => {
+      if (!validation.success) {
+        validation.error.issues.forEach((err) => {
           toast.error(err.message);
         });
       } else {
@@ -61,35 +57,11 @@ const LoginPage = () => {
     }
   };
 
-  const handleGitHubLogin = async () => {
-    setIsLoading(true);
-    try {
-      // Trigger the GitHub sign-in process
-      const response = await signIn("github", { redirect: false });
-
-      if (response.error) {
-        toast.error(response.error);
-      } else {
-        // Redirect to the dashboard on successful login
-        toast.success("Successfully Logged in with GitHub");
-        window.location.href = "/dashboard";
-      }
-    } catch (error) {
-      console.error("GitHub Login Error: " + error);
-      toast.error("Failed to login with GitHub");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <section className="flex items-center justify-center">
       <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
         <div>
-          <a
-            href="/"
-            className="flex items-center mb-6 text-2xl font-semibold text-white"
-          >
+          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-white">
             <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
             College Notes
           </a>
@@ -135,15 +107,15 @@ const LoginPage = () => {
               </div>
             </form>
 
-            {/* GitHub Login Button */}
+            {/* Register Button */}
             <div className="flex justify-center mt-4">
               <button
                 type="button"
                 className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={toast.success("coming soon")}
+                onClick={() => router.push('/register')}
                 disabled={isLoading}
               >
-                {isLoading ? "Loading..." : "Login with GitHub"}
+                {isLoading ? "Loading..." : "Register"}
               </button>
             </div>
           </div>
