@@ -11,10 +11,6 @@ import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
 
-const LoginPage = () => {
-({ error }) => {
-  console.log("Auth error:", error);
-
 
   const router = useRouter();
   const [email, setEmail] = useState("");
