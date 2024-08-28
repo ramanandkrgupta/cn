@@ -11,7 +11,7 @@ import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
 
-
+const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
