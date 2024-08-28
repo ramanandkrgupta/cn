@@ -1,156 +1,77 @@
-"use client";
+import bcrypt from "bcrypt";
+import NextAuth from "next-auth/next";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 
-import Image from "next/image";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { toast } from "sonner";
+import prisma from "@/libs/prisma";
 
-import { logo } from "@/public/assets";
-import FormButtons from "@/components/ui/FormButtons";
-import FormField from "@/components/ui/FormField";
-import { UserValidation } from "@/libs/validations/user";
+const authOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    // GitHub Provider
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
 
-const LoginPage = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+    // Credentials Provider
+    CredentialsProvider({
+      id: "credentials",
+      name: "credentials",
+      credentials: {},
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+      async authorize(credentials, req) {
+        const { email, password } = credentials;
 
-    // Validate user input using the schema
-    const userInput = {
-      email,
-      password,
-    };
+        try {
+          const user = await prisma.user.findFirst({
+            where: { email: email },
+          });
 
-    try {
-      // Validate the user input
-      const validation = UserValidation.UserLogin.safeParse(userInput);
-
-      // If validation fails, return error message
-      if (validation.success === false) {
-        const { issues } = validation.error;
-        issues.forEach((err) => {
-          toast.error(err.message);
-        });
-      } else {
-        // If validation is successful, make the API request
-        const response = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        });
-
-        if (response.error) {
-          toast.error(response.error);
-        } else {
-          // Redirect to the dashboard on successful login
-          toast.success("Successfully Logged in");
-          window.location.href = "/dashboard";
+          if (user) {
+            // Check password
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (passwordMatch) {
+              return user;
+            } else {
+              throw new Error("Invalid password!");
+            }
+          } else {
+            throw new Error("Invalid email address!");
+          }
+        } catch (error) {
+          console.error("Error processing the request:", error);
+          throw error;
         }
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.userRole;
       }
-    } catch (error) {
-      console.error("NEXT_AUTH Error: " + error);
-      toast.error("Something went wrong during login attempt");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGitHubLogin = async () => {
-    setIsLoading(true);
-    try {
-      // Trigger the GitHub sign-in process
-      const response = await signIn("github", { redirect: false });
-
-      if (response.error) {
-        toast.error(response.error);
-      } else {
-        // Redirect to the dashboard on successful login
-        toast.success("Successfully Logged in with GitHub");
-        window.location.href = "/dashboard";
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user = token;
       }
-    } catch (error) {
-      console.error("GitHub Login Error: " + error);
-      toast.error("Failed to login with GitHub");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <section className="flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
-        <div>
-          <a
-            href="/"
-            className="flex items-center mb-6 text-2xl font-semibold text-white"
-          >
-            <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
-            College Notes
-          </a>
-        </div>
-        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-[#1c1c24] border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
-              Sign in to your account
-            </h1>
-
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <FormField
-                label="Your email"
-                type="email"
-                name="email"
-                value={email}
-                placeholder="name@example.com"
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <FormField
-                label="Your Password"
-                type="password"
-                name="password"
-                value={password}
-                placeholder="••••••••"
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <div className="flex gap-1 mr-5 md:mr-0">
-                <FormButtons
-                  primaryLabel={isLoading ? "Please wait..." : "Login"}
-                  secondaryLabel="Back"
-                  onPrimaryClick={handleSubmit}
-                  onSecondaryClick={() => router.back()}
-                  primaryClassName="btn_loginFormPrimary"
-                  secondaryClassName="btn_loginFormSecondary"
-                />
-              </div>
-            </form>
-
-            {/* GitHub Login Button */}
-            <div className="flex justify-center mt-4">
-              <button
-                type="button"
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleGitHubLogin}
-                disabled={isLoading}
-              >
-                {isLoading ? "Loading..." : "Login with GitHub"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+      return session;
+    },
+  },
 };
 
-export default LoginPage;
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
