@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #13131a;
+  --secondary: #1c1c24;
+}
+html,
+body {
+  background-color: var(--primary) !important;
+}
+
+/* Disable touch highlighting for all elements */
+
+* {
+  -webkit-tap-highlight-color: transparent; /* For iOS Safari */
+  -webkit-touch-callout: none; /* Disable callout, iOS long-press menu */
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; /* Disable text selection on all elements */
+}
+
+/* Disable touch highlighting for all elements */
+
+/* scroll-bar 28, 28, 36*/
+
+*::-webkit-scrollbar {
+  width: 17px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--primary);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--secondary);
+  border-radius: 14px;
+  border: 3px solid var(--primary);
+}
+
+/* scroll-bar*/
+
+/* loading */
+.loader {
+  width: 68px;
+  height: 68px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+.loader::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 3px solid;
+  border-color: #86efac transparent;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* loading */
+
+/* skeleton */
+.skeleton {
+  animation: skeleton-loading 2s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: theme("colors.gray.300");
+  }
+  100% {
+    background-color: theme("colors.gray.500");
+  }
+}
+/* skeleton */
+
+/* search button*/
+.search-colour {
+  animation: search-loading 1s linear infinite alternate;
+}
+
+@keyframes search-loading {
+  0% {
+    background-color: theme("colors.green.300");
+  }
+  100% {
+    background-color: theme("colors.green.500");
+  }
+}
+/* search button*/
+
+/*sweetAlert custom*/
+
+.bordered-alert {
+  border: 1px solid #fff !important;
+}
+
+/*sweetAlert custom*/
+
+.select_header {
+  @apply font-epilogue font-bold sm:font-semibold text-[20px] text-green-300 text-left;
+}
+
+/* admin  button and input*/
+.btn_table {
+  @apply btn btn-xs sm:btn-sm border border-transparent font-semibold text-white bg-gray-700 hover:bg-gray-600  transition-all;
+}
+
+.btn_form {
+  @apply inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+}
+
+.input_form {
+  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1;
+}
+
+.label_form {
+  @apply text-gray-900 text-sm font-medium;
+}
+/* admin table button and input*/
+
+/*login page button*/
+.btn_loginFormSecondary {
+  @apply flex items-center px-5 py-2 text-sm text-white transition-colors duration-200 bg-[#1c1c24] border rounded-lg gap-x-2 sm:w-auto;
+}
+.btn_loginFormPrimary {
+  @apply btn bg-[#32CD32] hover:bg-green-500 min-w-[75%] text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center;
+}
+
+.input_loinForm {
+  @apply border sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white;
+}
+
+.label_loinForm {
+  @apply block mb-2 text-sm font-medium md:font-semibold text-white;
+}
+/*login page button*/
+
+.btn_sidebar {
+  @apply flex items-center px-4 py-2 transition-colors duration-300 transform rounded-lg text-gray-400 hover:bg-gray-800 hover:text-gray-200;
+}
+
+.social-icon {
+  @apply w-6 md:w-4 hover:text-white;
+}

@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  email       String    @unique
+  name        String?
+  password    String
+  phoneNumber String
+  subjects    subject[]
+  posts       post[]
+  userRole    Role      @default(USER)
+  video       video[]
+}
+
+model subject {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?   @relation(fields: [userId], references: [id])
+  userId        String? @db.ObjectId
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  videos        video[] // New relation to video model
+}
+
+model post {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @db.ObjectId
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  title         String
+  description   String
+  category      String?
+premium   Boolean  @default(false) // Add this line
+  file_url      String?
+  file_name     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model video {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @db.ObjectId
+  title         String
+  url           String
+  sequence      Int
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  category      String?
+  subject       subject  @relation(fields: [subjectId], references: [id])
+  subjectId     String   @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  FREE
+  PRO
+
+}
