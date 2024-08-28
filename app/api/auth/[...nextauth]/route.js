@@ -57,6 +57,36 @@ const authOptions = {
     error: "/login",
   },
   callbacks: {
+async signIn({ user, account, profile, email }) {
+      try {
+        // Check if the user exists in the database
+        const existingUser = await prisma.user.findUnique({
+          where: {
+            email: profile.email,
+          },
+        });
+
+        if (existingUser) {
+          // User exists, proceed with sign-in
+          return true;
+        } else {
+          // User doesn't exist, create a new user account
+          const newUser = await prisma.user.create({
+            data: {
+              email: profile.email,
+              name: profile.name || profile.login,
+              
+            },
+          });
+
+          // After creating the user, proceed with sign-in
+          return true;
+        }
+      } catch (error) {
+        console.error("Error during sign-in:", error);
+        return false;
+      }
+    },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.userRole;
