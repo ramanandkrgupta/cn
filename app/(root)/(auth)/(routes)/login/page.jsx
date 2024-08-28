@@ -140,7 +140,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleGitHubLogin}
+                onClick={signIn("github")}
                 disabled={isLoading}
               >
                 {isLoading ? "Loading..." : "Login with GitHub"}
