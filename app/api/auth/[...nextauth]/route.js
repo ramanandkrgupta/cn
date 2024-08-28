@@ -2,12 +2,20 @@ import bcrypt from "bcrypt";
 import NextAuth from "next-auth/next";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 
 import prisma from "@/libs/prisma";
 
 const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // GitHub Provider
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+
+    // Credentials Provider
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
@@ -18,17 +26,13 @@ const authOptions = {
 
         try {
           const user = await prisma.user.findFirst({
-            where: {
-              email: email,
-            },
+            where: { email: email },
           });
 
           if (user) {
-            // check password
+            // Check password
             const passwordMatch = await bcrypt.compare(password, user.password);
-
             if (passwordMatch) {
-              // If everything is successful, return the user
               return user;
             } else {
               throw new Error("Invalid password!");
@@ -45,7 +49,7 @@ const authOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, //30 days
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
