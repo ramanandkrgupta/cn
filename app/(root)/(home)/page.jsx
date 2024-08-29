@@ -1,6 +1,6 @@
 import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
-import Notification { from "@/components/Notification";
+import Notification from "@/components/Notification";
 
 export default function Home() {
   return (
