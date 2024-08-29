@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { IonIcon } from '@ionic/react';
 import { homeOutline, personOutline, chatbubbleOutline, cameraOutline, settingsOutline } from 'ionicons/icons';
 
-const NavBar = () => {
+const NewNavBar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleActiveLink = (index) => {
@@ -51,4 +51,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default NewNavBar;
