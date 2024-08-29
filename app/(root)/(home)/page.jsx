@@ -1,6 +1,6 @@
 import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
-import Notification from "@/components/Notification";
+import StickyBottomMenu from "@/components/Notification";
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
 
       {/* Notification Section */}
       <div className="w-full my-4">
-        <Notification />
+        <StickyBottomMenu />
       </div>
 
       {/* Feed Section */}
