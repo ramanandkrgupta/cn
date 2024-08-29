@@ -15,7 +15,7 @@ const RegisterPage = () => {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     // Validate user input using the schema
-    const userInput = { name, email, mobile, password, confirmPassword };
+    const userInput = { name, email, phoneNumber, password, confirmPassword };
 
     try {
       // Validate the user input
@@ -47,6 +47,8 @@ const RegisterPage = () => {
         if (response.status === 201) {
           toast.success("Successfully registered! Redirecting to login...");
           router.push("/login");
+        } else if (response.statusText === "FAILED") {
+          toast.error("User with this email already exists");
         } else {
           toast.error("Registration failed");
         }
@@ -100,10 +102,10 @@ const RegisterPage = () => {
               <FormField
                 label="Your Mobile"
                 type="tel"
-                name="mobile"
-                value={mobile}
+                name="phoneNumber"
+                value={phoneNumber}
                 placeholder="1234567890"
-                onChange={(e) => setMobile(e.target.value)}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 autoComplete="tel"
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
