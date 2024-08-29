@@ -1,47 +1,108 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ensure the container takes up full viewport height */
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-.content {
-  flex: 1; /* Make the content take up available space */
-  padding: 20px;
-}
-
-.menu {
-  position: fixed; /* Fix the menu to the bottom */
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #fff; /* Or your desired background */
-  padding: 10px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Add a shadow for visual separation */
-  z-index: 10; /* Ensure the menu is above the content */
-  transition: transform 0.3s ease; /* Smooth transition for sticky behavior */
-}
-
-.sticky {
-  transform: translateY(0); /* Adjust position if needed */
-}
-
-.menuList {
-  list-style: none;
-  display: flex;
-  justify-content: space-around; /* Evenly space menu items */
-  padding: 0;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-.menuItem {
-  flex: 1;
+:root {
+  --clr: #222327;
+}
+
+.navigation {
+  width: 400px;
+  height: 70px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.navigation ul {
+  display: flex;
+  width: 350px;
+}
+
+.navigation ul li {
+  position: relative;
+  list-style: none;
+  width: 70px;
+  height: 70px;
+  z-index: 1;
+}
+
+.navigation ul li a {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
   text-align: center;
+  font-weight: 500;
 }
 
-.menuLink {
-  text-decoration: none;
-  color: #333; /* Adjust color as needed */
-  font-weight: bold;
-  padding: 10px;
+.navigation ul li a .icon {
+  position: relative;
   display: block;
+  line-height: 75px;
+  font-size: 1.5em;
+  text-align: center;
+  transition: 0.5s;
+  color: var(--clr);
+}
+
+.navigation ul li.active a .icon {
+  transform: translateY(-32px);
+}
+
+.navigation ul li a .text {
+  position: absolute;
+  color: var(--clr);
+  font-weight: 400;
+  font-size: 0.75em;
+  letter-spacing: 0.05em;
+  transition: 0.05s;
+  opacity: 0;
+}
+
+.navigation ul li.active a .text {
+  opacity: 1;
+  transform: translateY(10px);
+}
+
+.indicator {
+  position: absolute;
+  top: -50%;
+  width: 70px;
+  height: 70px;
+  background: #29fd53;
+  border-radius: 50%;
+  border: 6px solid var(--clr);
+  transition: 0.5s;
+}
+
+.indicator::before,
+.indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  box-shadow: 0px -10px 0 0 var(--clr);
+}
+
+.indicator::before {
+  left: -22px;
+  border-top-right-radius: 20px;
+}
+
+.indicator::after {
+  right: -22px;
+  border-top-left-radius: 20px;
 }
