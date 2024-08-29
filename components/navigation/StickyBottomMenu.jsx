@@ -14,7 +14,7 @@ const StickyBottomMenu = () => {
   const menuItems = [
     { icon: HomeIcon, text: 'Home' },
     { icon: UserIcon, text: 'Profile' },
-    { icon: ShareIcon, text: 'Messages' },
+    { icon: ShareIcon, text: 'Share' },
     { icon: ArrowUpOnSquareIcon, text: 'Photos' },
     { icon: DocumentTextIcon, text: 'Settings' },
   ];
