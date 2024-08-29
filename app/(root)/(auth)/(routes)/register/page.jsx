@@ -29,13 +29,16 @@ const RegisterPage = () => {
 
     try {
       // Validate the user input
-      const validation = UserValidation.UserRegister.safeParse(userInput);
+      const validation = UserValidation.registration.safeParse(userInput);
 
       // If validation fails, return error message
       if (!validation.success) {
         validation.error.issues.forEach((err) => {
           toast.error(err.message);
         });
+        console.error("Validation errors:", validation.error.issues);
+      } else if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
       } else {
         // If validation is successful, make the API request
         const response = await axios.post("/api/user/register", userInput, {
