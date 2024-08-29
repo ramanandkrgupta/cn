@@ -10,6 +10,12 @@ export async function POST(req) {
     }
 
     const { name, email, phoneNumber, password } = requestBody;
+
+    // Validate request body
+    if (!name || !email || !phoneNumber || !password) {
+        return new Response("Missing required fields", { status: 400 });
+    }
+
     const userRole = "FREE";
     try {
         // Check if a user already exists by email
