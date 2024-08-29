@@ -1,50 +1,41 @@
 "use client"
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './StickyBottomMenu.module.css';
+import React, { useState } from 'react';
+import { IonIcon } from 'ionicons';
 
 const StickyBottomMenu = () => {
-  const [isSticky, setIsSticky] = useState(false);
-  const menuRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  const menuItems = [
+    { icon: 'home-outline', text: 'Home' },
+    { icon: 'person-outline', text: 'Profile' },
+    { icon: 'chatbubble-outline', text: 'Messages' },
+    { icon: 'camera-outline', text: 'Photos' },
+    { icon: 'settings-outline', text: 'Settings' }
+  ];
 
-  const handleSticky = () => {
-    if (menuRef.current) {
-      if (window.scrollY > 100) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-    }
+  const handleClick = (index) => {
+    setActiveIndex(index);
   };
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleSticky);
-    return () => window.removeEventListener('scroll', handleSticky);
-  }, []);
-
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        {/* Your main content goes here */}
-      </div>
-      <div className={`${styles.menu} ${isSticky ? styles.sticky : ''}`} ref={menuRef}>
-        <ul className={styles.menuList}>
-          <li className={styles.menuItem}>
-            <a href="#" className={styles.menuLink}>Home</a>
+    <div className="navigation">
+      <ul>
+        {menuItems.map((item, index) => (
+          <li
+            key={index}
+            className={`list ${index === activeIndex ? 'active' : ''}`}
+            onClick={() => handleClick(index)}
+          >
+            <a href="#">
+              <span className="icon">
+                <IonIcon name={item.icon} />
+              </span>
+              <span className="text">{item.text}</span>
+            </a>
           </li>
-          <li className={styles.menuItem}>
-            <a href="#" className={styles.menuLink}>Activity</a>
-          </li>
-          <li className={styles.menuItem}>
-            <a href="#" className={styles.menuLink}>Promotion</a>
-          </li>
-          <li className={styles.menuItem}>
-            <a href="#" className={styles.menuLink}>Wallet</a>
-          </li>
-          <li className={styles.menuItem}>
-            <a href="#" className={styles.menuLink}>Account</a>
-          </li>
-        </ul>
-      </div>
+        ))}
+        <div className="indicator" style={{ transform: `translateX(calc(70px * ${activeIndex}))` }}></div>
+      </ul>
     </div>
   );
 };
