@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';  // Correct import
 import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const BottomMenuBar = () => {
@@ -15,7 +15,7 @@ const BottomMenuBar = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2 shadow-lg">
+    <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2 shadow-lg z-10">
       {menuItems.map((item) => {
         const Icon = item.icon;
         const isActive = currentPath === item.path;
