@@ -31,9 +31,7 @@ const NewNavBar = () => {
           {menuItems.map((item, index) => (
             <li
               key={index}
-              className={`relative list-none w-16 h-16 z-10 ${
-                activeIndex === index ? "active" : ""
-              }`}
+              className="relative list-none flex-1 z-10"
               onClick={() => handleActiveLink(index)}
             >
               <a
@@ -62,7 +60,7 @@ const NewNavBar = () => {
         </ul>
         <div
           className="absolute top-0 left-0 w-16 h-16 bg-green-500 rounded-full border-8 border-gray-900 transition-transform duration-300 ease-in-out"
-          style={{ transform: `translateX(${activeIndex * 4.75}rem)` }}
+          style={{ left: `calc(${activeIndex} * 20%)`, transform: 'translateX(-50%)' }}
         >
           <div className="absolute top-1/2 left-[-22px] w-5 h-5 bg-transparent rounded-tr-[20px] shadow-[0px_-10px_0_0_#222327]"></div>
           <div className="absolute top-1/2 right-[-22px] w-5 h-5 bg-transparent rounded-tl-[20px] shadow-[0px_-10px_0_0_#222327]"></div>
