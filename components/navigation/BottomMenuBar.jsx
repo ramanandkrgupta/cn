@@ -1,38 +1,44 @@
 "use client"
-import React from 'react';
-import { useRouter } from 'next/navigation';  // Correct import
+import React, { useState } from 'react';
 import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import styles from './StickyBottomMenu.module.css';
 
-const BottomMenuBar = () => {
-  const router = useRouter();
-  const currentPath = router.pathname;
+const StickyBottomMenu = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const menuItems = [
-    { name: 'Blog', icon: DocumentTextIcon, path: '/blog' },
-    { name: 'Share', icon: ShareIcon, path: '/share' },
-    { name: 'Home', icon: HomeIcon, path: '/' },
-    { name: 'Upload', icon: ArrowUpOnSquareIcon, path: '/upload' },
-    { name: 'Account', icon: UserIcon, path: '/account' },
+    { icon: HomeIcon, text: 'Home' },
+    { icon: UserIcon, text: 'Profile' },
+    { icon: ShareIcon, text: 'Messages' },
+    { icon: ArrowUpOnSquareIcon, text: 'Photos' },
+    { icon: DocumentTextIcon, text: 'Settings' }
   ];
 
+  const handleClick = (index) => {
+    setActiveIndex(index);
+  };
+
   return (
-    <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center pr-10 pl-10 py-2 shadow-lg z-10">
-      {menuItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = currentPath === item.path;
-        return (
-          <div
-            key={item.name}
-            className={`flex flex-col items-center cursor-pointer ${isActive ? 'bg-gray-700' : ''}`}
-            onClick={() => router.push(item.path)}
+    <div className={styles.navigation}>
+      <ul>
+        {menuItems.map((item, index) => (
+          <li
+            key={index}
+            className={`${styles.list} ${index === activeIndex ? styles.active : ''}`}
+            onClick={() => handleClick(index)}
           >
-            <Icon className="h-6 w-6" />
-            <span className={`text-xs ${isActive ? 'font-bold' : ''}`}>{item.name}</span>
-          </div>
-        );
-      })}
+            <a href="#">
+              <span className={styles.icon}>
+                <item.icon className="h-6 w-6 text-gray-800" />
+              </span>
+              <span className={styles.text}>{item.text}</span>
+            </a>
+          </li>
+        ))}
+        <div className={styles.indicator} style={{ transform: `translateX(calc(70px * ${activeIndex}))` }}></div>
+      </ul>
     </div>
   );
 };
 
-export default BottomMenuBar;
+export default StickyBottomMenu;
