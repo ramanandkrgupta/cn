@@ -1,29 +1,35 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const BottomMenuBar = () => {
+  const router = useRouter();
+  const currentPath = router.pathname;
+
+  const menuItems = [
+    { name: 'Blog', icon: DocumentTextIcon, path: '/blog' },
+    { name: 'Share', icon: ShareIcon, path: '/share' },
+    { name: 'Home', icon: HomeIcon, path: '/' },
+    { name: 'Upload', icon: ArrowUpOnSquareIcon, path: '/upload' },
+    { name: 'Account', icon: UserIcon, path: '/account' },
+  ];
+
   return (
     <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2 shadow-lg">
-      <div className="flex flex-col items-center">
-        <DocumentTextIcon className="h-6 w-6" />
-        <span className="text-xs">Blog</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <ShareIcon className="h-6 w-6" />
-        <span className="text-xs">Share</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <HomeIcon className="h-10 w-10" />
-        <span className="text-sm font-bold">Home</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <ArrowUpOnSquareIcon className="h-6 w-6" />
-        <span className="text-xs">Upload</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <UserIcon className="h-6 w-6" />
-        <span className="text-xs">Account</span>
-      </div>
+      {menuItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentPath === item.path;
+        return (
+          <div
+            key={item.name}
+            className={`flex flex-col items-center cursor-pointer ${isActive ? 'bg-gray-700' : ''}`}
+            onClick={() => router.push(item.path)}
+          >
+            <Icon className="h-6 w-6" />
+            <span className={`text-xs ${isActive ? 'font-bold' : ''}`}>{item.name}</span>
+          </div>
+        );
+      })}
     </div>
   );
 };
