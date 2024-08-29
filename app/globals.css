@@ -217,3 +217,57 @@ body {
 }
 
 /*menu*/
+
+
+
+.navigation {
+  @apply w-[400px] h-[70px] relative flex justify-center items-center rounded-[10px];
+  background: #fff;
+}
+.navigation ul {
+  @apply flex w-[350px];
+}
+.navigation ul li {
+  @apply relative w-[70px] h-[70px] z-[1];
+  list-style: none;
+}
+.navigation ul li a {
+  @apply relative flex justify-center items-center flex-col w-full text-center font-medium;
+}
+.navigation ul li a .icon {
+  @apply relative block leading-[75px] text-[1.5em] text-center transition-[0.5s] text-[color:var(--clr)];
+}
+.navigation ul li.active a .icon {
+  @apply -translate-y-8;
+}
+.navigation ul li a .text {
+  @apply absolute text-[color:var(--clr)] font-normal text-[0.75em] tracking-wider transition-[0.05s] opacity-0;
+}
+.navigation ul li.active a .text {
+  @apply opacity-100 translate-y-2.5;
+}
+.indicator {
+  @apply absolute w-[70px] h-[70px] border-[color:var(--clr)] transition-[0.5s] rounded-[50%] border-[6px] border-solid -top-2/4 before:content-[''] before:absolute before:left-[-22px] before:w-5 before:h-5 before:shadow-[0px_-10px_0_0_var(--clr)] before:rounded-tr-[20px] before:top-2/4 after:content-[''] after:absolute after:right-[-22px] after:w-5 after:h-5 after:shadow-[0px_-10px_0_0_var(--clr)] after:rounded-tl-[20px] after:top-2/4;
+  background: #29fd53;
+}
+.indicator::before {
+  background: transparent;
+}
+.indicator::after {
+  background: transparent;
+}
+.navigation ul li:nth-child(1).active ~ .indicator {
+  @apply translate-x-[calc(70px_*_0];
+}
+.navigation ul li:nth-child(2).active ~ .indicator {
+  @apply translate-x-[calc(70px_*_1];
+}
+.navigation ul li:nth-child(3).active ~ .indicator {
+  @apply translate-x-[calc(70px_*_2];
+}
+.navigation ul li:nth-child(4).active ~ .indicator {
+  @apply translate-x-[calc(70px_*_3];
+}
+.navigation ul li:nth-child(5).active ~ .indicator {
+  @apply translate-x-[calc(70px_*_4];
+}
