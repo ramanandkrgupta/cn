@@ -2,6 +2,11 @@ import { getSession } from 'next-auth/react';
 import prisma from '@/libs/prisma';
 
 export default async function handler(req, res) {
+  // Check if the method is GET, if not, return 405
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
   const session = await getSession({ req });
 
   if (!session) {
