@@ -16,7 +16,7 @@ export default function Home() {
       </div>
 
       {/* Feed Section */}
-      <div className="w-full px-4 md:px-8 ">
+      <div className="w-full md:px-8 ">
         <Feed
           label="Discover Courses"
           styleHead="mt-3"
