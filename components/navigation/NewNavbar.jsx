@@ -26,12 +26,16 @@ const NewNavBar = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900">
-      <div className="flex justify-center items-center bg-white rounded-t-lg p-2 w-full h-20">
-        <ul className="flex w-full justify-between">
+      <div className="flex justify-center items-center bg-white rounded-t-lg p-2 w-full h-20 relative">
+        <div
+          className="transition-transform duration-500 ease-in-out bg-green-500 rounded-full w-16 h-16 absolute"
+          style={{ transform: `translateX(${activeIndex * 100}%)` }}
+        ></div>
+        <ul className="flex w-full justify-between relative z-10">
           {menuItems.map((item, index) => (
             <li
               key={index}
-              className={`relative list-none flex-1 flex justify-center items-center h-full z-10 ${
+              className={`relative list-none flex-1 flex justify-center items-center h-full ${
                 activeIndex === index ? "active" : ""
               }`}
               onClick={() => handleActiveLink(index)}
