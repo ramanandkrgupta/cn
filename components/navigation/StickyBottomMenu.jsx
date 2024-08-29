@@ -1,40 +1,48 @@
 "use client"
 import React, { useState } from 'react';
-import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import {
+  HomeIcon,
+  ArrowUpOnSquareIcon,
+  UserIcon,
+  ShareIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/24/outline';
 
 const StickyBottomMenu = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   const menuItems = [
-    { icon: 'HomeIcon', text: 'Home' },
-    { icon: 'UserIcon', text: 'Profile' },
-    { icon: 'ArrowUpOnSquareIcon', text: 'Upload' },
-    { icon: 'DocumentTextIcon', text: 'Blog' },
-    { icon: 'ShareIcon', text: 'Share' }
+    { icon: HomeIcon, text: 'Home' },
+    { icon: UserIcon, text: 'Profile' },
+    { icon: ShareIcon, text: 'Messages' },
+    { icon: ArrowUpOnSquareIcon, text: 'Photos' },
+    { icon: DocumentTextIcon, text: 'Settings' },
   ];
 
-  const handleClick = (index) => {
-    setActiveIndex(index);
-  };
-
   return (
-    <div className="navigation">
-      <ul>
+    <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-lg z-50">
+      <ul className="flex justify-around">
         {menuItems.map((item, index) => (
-          <li
-            key={index}
-            className={`list ${index === activeIndex ? 'active' : ''}`}
-            onClick={() => handleClick(index)}
-          >
-            <a href="#">
-              <span className="icon">
-                <IonIcon name={item.icon} />
+          <li key={index} className="w-full">
+            <button
+              onClick={() => setActiveIndex(index)}
+              className="flex flex-col items-center justify-center w-full py-2"
+            >
+              <item.icon
+                className={`h-6 w-6 mb-1 transition-transform ${
+                  index === activeIndex ? 'text-green-500 transform -translate-y-2' : 'text-gray-600'
+                }`}
+              />
+              <span
+                className={`text-xs transition-opacity ${
+                  index === activeIndex ? 'text-green-500 opacity-100' : 'opacity-0'
+                }`}
+              >
+                {item.text}
               </span>
-              <span className="text">{item.text}</span>
-            </a>
+            </button>
           </li>
         ))}
-        <div className="indicator" style={{ transform: `translateX(calc(70px * ${activeIndex}))` }}></div>
       </ul>
     </div>
   );
