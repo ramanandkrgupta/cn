@@ -1,4 +1,5 @@
 import { Toaster } from "sonner";
+import BottomMenuBar from "@/components/navigation";
 
 import "../globals.css";
 import { EdgeStoreProvider } from "@/libs/edgestore";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }) {
           <EdgeStoreProvider>
             <Toaster richColors closeButton position="top-center" />
             {children}
+<BottomMenuBar />
           </EdgeStoreProvider>
         </AuthProvider>
       </body>
