@@ -16,7 +16,7 @@ const BottomMenuBar = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2 shadow-lg z-10">
+    <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center pr-10 pl-10 py-2 shadow-lg z-10">
       {menuItems.map((item) => {
         const Icon = item.icon;
         const isActive = currentPath === item.path;
