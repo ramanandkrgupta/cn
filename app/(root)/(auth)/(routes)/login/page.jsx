@@ -103,4 +103,31 @@ const LoginPage = () => {
               <div className="flex gap-1 mr-5 md:mr-0">
                 <FormButtons
                   primaryLabel={isLoading ? "Please wait..." : "Login"}
-                  secondary
+                  secondaryLabel="Back"
+                  onPrimaryClick={handleSubmit}
+                  onSecondaryClick={() => router.back()}
+                  primaryClassName="btn_loginFormPrimary"
+                  secondaryClassName="btn_loginFormSecondary"
+                />
+              </div>
+            </form>
+
+            {/* Register Button */}
+            <div className="flex justify-center mt-4">
+              <button
+                type="button"
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => router.push('/register')}
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Register"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default LoginPage;
