@@ -1,5 +1,5 @@
 import { Toaster } from "sonner";
-import BottomMenuBar from "@/components/navigation";
+import { BottomMenuBar } from "@/components/navigation";
 
 import "../globals.css";
 import { EdgeStoreProvider } from "@/libs/edgestore";
