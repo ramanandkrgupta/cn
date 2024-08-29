@@ -15,7 +15,7 @@ import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 
-const Navbar = () => {
+const NewNavBar = () => {
   const { data: fetchedData, error } = usePost();
   const setData = usePostStore((state) => state.setPosts);
 
@@ -203,4 +203,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NewNavBar;
