@@ -1,6 +1,6 @@
 import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
-import StickyBottomMenu from "@/components/Navigation/StickyBottomMenu";
+import StickyBottomMenu from "@/components/navigation/StickyBottomMenu";
 
 export default function Home() {
   return (
