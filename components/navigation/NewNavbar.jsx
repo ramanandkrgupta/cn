@@ -26,10 +26,10 @@ const NewNavBar = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900">
-      <div className="flex justify-center items-center bg-white rounded-t-lg p-2 w-full h-20 relative">
+      <div className="flex justify-center items-center bg-white rounded-t-lg p-2 w-full h-16 relative">
         <div
-          className="transition-transform duration-500 ease-in-out bg-green-500 rounded-full w-16 h-16 absolute"
-          style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          className="transition-transform duration-500 ease-in-out bg-green-500 rounded-full w-12 h-12 absolute"
+          style={{ transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 1.5}rem))` }}
         ></div>
         <ul className="flex w-full justify-between relative z-10">
           {menuItems.map((item, index) => (
