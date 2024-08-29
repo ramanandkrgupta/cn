@@ -1,7 +1,6 @@
 "use client"
 import React, { useState } from 'react';
 import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import styles from './StickyBottomMenu.module.css';
 
 const StickyBottomMenu = () => {
   const [activeIndex, setActiveIndex] = useState(0);
