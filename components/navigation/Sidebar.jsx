@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { navlinks } from "@/constants";
 import { logo, sun } from "@/public/assets";
@@ -11,23 +12,8 @@ import ShareDialogBox from "../models/ShareDialogBox";
 
 const Sidebar = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const [isActive, setIsActive] = useState("Home");
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    // Always set "Home" as active if the user is on the home page
-    if (pathname === "/") {
-      setIsActive("Home");
-    } else {
-      // Update the active state based on the current pathname
-      const activeLink = navlinks.find((link) => pathname.startsWith(link.link));
-      if (activeLink) {
-        setIsActive(activeLink.name);
-      }
-    }
-  }, [pathname]);
-
   return (
     <aside className="flex justify-between items-center flex-col sticky top-5 h-[89vh]">
       <Link href="/">
@@ -45,7 +31,7 @@ const Sidebar = () => {
               >
                 <Icon
                   {...data}
-                  isActive={isActive === data.name}
+                  isActive={isActive}
                   handleClick={() => {
                     setIsActive(data.name);
                     data.btn ? setIsOpen(true) : router.push(data.link);
