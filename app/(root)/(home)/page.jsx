@@ -4,7 +4,7 @@ import Notification from "@/components/Notification";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center sm:mb-5">
       {/* Banner Section */}
       <div className="w-full">
         <Banner />
@@ -16,7 +16,7 @@ export default function Home() {
       </div>
 
       {/* Feed Section */}
-      <div className="w-full px-4 md:px-8 sm:mb-10">
+      <div className="w-full px-4 md:px-8 ">
         <Feed
           label="Discover Courses"
           styleHead="mt-3"
