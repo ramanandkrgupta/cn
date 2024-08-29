@@ -13,7 +13,8 @@ export default function HomeLayout({ children }) {
         </div>
 
       </div>
-<BottomMenuBar/>
+
     </section>
+<BottomMenuBar/>
   );
 }
