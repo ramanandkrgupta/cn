@@ -33,24 +33,29 @@ const LoginPage = () => {
         validation.error.issues.forEach((err) => {
           toast.error(err.message);
         });
-      } else {
-        // If validation is successful, make the API request
-        const response = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        });
+        setIsLoading(false);
+        return;
+      }
 
-        if (response.error) {
-          toast.error(response.error);
-        } else {
-          // Redirect to the dashboard on successful login
-          toast.success("Successfully Logged in");
-          window.location.href = "/dashboard";
-        }
+      // If validation is successful, make the API request
+      const response = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      console.log("SignIn Response:", response);
+
+      if (response.error) {
+        toast.error(response.error);
+        console.error("SignIn Error:", response.error);
+      } else {
+        // Redirect to the dashboard on successful login
+        toast.success("Successfully Logged in");
+        window.location.href = "/dashboard";
       }
     } catch (error) {
-      console.error("NEXT_AUTH Error: " + error);
+      console.error("NEXT_AUTH Error:", error);
       toast.error("Something went wrong during login attempt");
     } finally {
       setIsLoading(false);
@@ -98,31 +103,4 @@ const LoginPage = () => {
               <div className="flex gap-1 mr-5 md:mr-0">
                 <FormButtons
                   primaryLabel={isLoading ? "Please wait..." : "Login"}
-                  secondaryLabel="Back"
-                  onPrimaryClick={handleSubmit}
-                  onSecondaryClick={() => router.back()}
-                  primaryClassName="btn_loginFormPrimary"
-                  secondaryClassName="btn_loginFormSecondary"
-                />
-              </div>
-            </form>
-
-            {/* Register Button */}
-            <div className="flex justify-center mt-4">
-              <button
-                type="button"
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/register')}
-                disabled={isLoading}
-              >
-                {isLoading ? "Loading..." : "Register"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-export default LoginPage;
+                  secondary
