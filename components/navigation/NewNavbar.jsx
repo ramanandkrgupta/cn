@@ -1,7 +1,7 @@
 "use client"
 // components/StickyNavbar.js
 import { useState } from 'react';
-import { HomeIcon, ReceiptRefundIcon, PlusCircleIcon, BellIcon, UserIcon } from '@heroicons/react/outline';
+import { HomeIcon, ReceiptRefundIcon, PlusCircleIcon, BellIcon, UserIcon } from '@heroicons/react/24/outline';
 
 const NewNavbar = () => {
     const [activeIndex, setActiveIndex] = useState(2); // default active is the third item
