@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { IonIcon } from 'react-ionicons';
+import { IonIcon } from "@ionic/react";
 import {
   homeOutline,
   folderOutline,
