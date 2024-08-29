@@ -162,3 +162,58 @@ body {
 .social-icon {
   @apply w-6 md:w-4 hover:text-white;
 }
+
+
+
+/*menu*/
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the container takes up full viewport height */
+}
+
+.content {
+  flex: 1; /* Make the content take up available space */
+  padding: 20px;
+}
+
+.menu {
+  position: fixed; /* Fix the menu to the bottom */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff; /* Or your desired background */
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Add a shadow for visual separation */
+  z-index: 10; /* Ensure the menu is above the content */
+  transition: transform 0.3s ease; /* Smooth transition for sticky behavior */
+}
+
+.sticky {
+  transform: translateY(0); /* Adjust position if needed */
+}
+
+.menuList {
+  list-style: none;
+  display: flex;
+  justify-content: space-around; /* Evenly space menu items */
+  padding: 0;
+  margin: 0;
+}
+
+.menuItem {
+  flex: 1;
+  text-align: center;
+}
+
+.menuLink {
+  text-decoration: none;
+  color: #333; /* Adjust color as needed */
+  font-weight: bold;
+  padding: 10px;
+  display: block;
+}
+
+/*menu*/
