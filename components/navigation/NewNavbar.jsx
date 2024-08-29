@@ -26,10 +26,12 @@ const NewNavBar = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900">
-      <div className="flex justify-center items-center bg-white rounded-t-lg p-2 w-full h-16 relative">
+      <div className="flex justify-center items-center bg-white rounded-t-2xl shadow-lg p-2 w-full h-20 relative">
         <div
-          className="transition-transform duration-500 ease-in-out bg-green-500 rounded-full w-12 h-12 absolute"
-          style={{ transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 1.5}rem))` }}
+          className="transition-transform duration-500 ease-in-out bg-green-500 rounded-full w-14 h-14 absolute -top-7"
+          style={{
+            transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 1.5}rem))`,
+          }}
         ></div>
         <ul className="flex w-full justify-between relative z-10">
           {menuItems.map((item, index) => (
@@ -45,14 +47,14 @@ const NewNavBar = () => {
                 className="flex flex-col items-center justify-center text-center"
               >
                 <span
-                  className={`block text-2xl transition-transform duration-500 ${
-                    activeIndex === index ? "transform -translate-y-2" : ""
+                  className={`block text-3xl text-gray-800 transition-transform duration-500 ${
+                    activeIndex === index ? "transform -translate-y-4" : ""
                   }`}
                 >
                   <IonIcon icon={item.icon} />
                 </span>
                 <span
-                  className={`text-sm font-medium transition-opacity duration-500 ${
+                  className={`mt-1 text-sm font-medium transition-opacity duration-500 ${
                     activeIndex === index
                       ? "opacity-100 translate-y-2"
                       : "opacity-0"
