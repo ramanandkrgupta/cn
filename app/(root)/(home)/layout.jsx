@@ -11,8 +11,9 @@ export default function HomeLayout({ children }) {
           <Navbar />
           {children}
         </div>
-      </div>
 <BottomMenuBar/>
+      </div>
+
     </section>
   );
 }
