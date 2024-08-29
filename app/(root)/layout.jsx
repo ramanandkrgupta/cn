@@ -1,5 +1,4 @@
 import { Toaster } from "sonner";
-import NewNavBar from "@/components/navigation/NewNavbar";
 
 import "../globals.css";
 import { EdgeStoreProvider } from "@/libs/edgestore";
@@ -63,7 +62,7 @@ export default function RootLayout({ children }) {
             
           </EdgeStoreProvider>
         </AuthProvider>
-<NewNavBar />
+
       </body>
     </html>
   );
