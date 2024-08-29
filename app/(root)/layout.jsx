@@ -32,10 +32,10 @@ export const metadata = {
     "paschub",
   ],
   authors: [
-    { name: "Mohammed shabin k" },
+    { name: "Ramanand Kumar Gupta" },
     {
-      name: "Mohammed shabin k",
-      url: "https://www.linkedin.com/in/-shabink/",
+      name: "Ramanand Kumar Gupta",
+      url: "https://www.linkedin.com/in/ramanand-kumar-saw/",
     },
   ],
   icons: [
@@ -57,8 +57,10 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <EdgeStoreProvider>
             <Toaster richColors closeButton position="top-center" />
-            {children}
-<BottomMenuBar />
+            <main className="pb-16"> {/* Add padding-bottom to avoid content hiding behind BottomMenuBar */}
+              {children}
+            </main>
+            <BottomMenuBar />
           </EdgeStoreProvider>
         </AuthProvider>
       </body>
