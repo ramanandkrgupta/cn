@@ -1,5 +1,5 @@
 import { Toaster } from "sonner";
-import { StickyBottomMenu } from "@/components/navigation";
+import { BottomMenuBar } from "@/components/navigation";
 
 import "../globals.css";
 import { EdgeStoreProvider } from "@/libs/edgestore";
@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
             <main className="pb-16"> {/* Add padding-bottom to avoid content hiding behind BottomMenuBar */}
               {children}
             </main>
-            <StickyBottomMenu />
+            <BottomMenuBar />
           </EdgeStoreProvider>
         </AuthProvider>
       </body>
