@@ -18,49 +18,50 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    // Validate user input using the schema
-    const userInput = { email, password };
+  // Validate user input using the schema
+  const userInput = { email, password };
 
-    try {
-      // Validate the user input
-      const validation = UserValidation.UserLogin.safeParse(userInput);
+  try {
+    // Validate the user input
+    const validation = UserValidation.UserLogin.safeParse(userInput);
 
-      // If validation fails, return error message
-      if (!validation.success) {
-        validation.error.issues.forEach((err) => {
-          toast.error(err.message);
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // If validation is successful, make the API request
-      const response = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+    // If validation fails, return error message
+    if (!validation.success) {
+      validation.error.issues.forEach((err) => {
+        toast.error(err.message);
       });
-
-      console.log("SignIn Response:", response);
-
-      if (response.error) {
-        toast.error(response.error);
-        console.error("SignIn Error:", response.error);
-      } else {
-        // Redirect to the dashboard on successful login
-        toast.success("Successfully Logged in");
-        window.location.href = "/dashboard";
-      }
-    } catch (error) {
-      console.error("NEXT_AUTH Error:", error);
-      toast.error("Something went wrong during login attempt");
-    } finally {
       setIsLoading(false);
+      return;
     }
-  };
+
+    // If validation is successful, make the API request
+    const response = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    console.log("SignIn Response:", response);
+
+    if (response.error) {
+      toast.error(response.error);
+      console.error("SignIn Error:", response.error);
+    } else {
+      // Redirect to the dashboard on successful login
+      toast.success("Successfully Logged in");
+      window.location.href = "/dashboard";
+    }
+  } catch (error) {
+    console.error("NEXT_AUTH Error:", error);
+    toast.error("Something went wrong during login attempt");
+    console.error("Full Error Response:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <section className="flex items-center justify-center">
