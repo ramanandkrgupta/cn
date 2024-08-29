@@ -1,16 +1,16 @@
 "use client"
 import React, { useState } from 'react';
-import { IonIcon } from 'ionicons';
+import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const StickyBottomMenu = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   
   const menuItems = [
-    { icon: 'home-outline', text: 'Home' },
-    { icon: 'person-outline', text: 'Profile' },
-    { icon: 'chatbubble-outline', text: 'Messages' },
-    { icon: 'camera-outline', text: 'Photos' },
-    { icon: 'settings-outline', text: 'Settings' }
+    { icon: 'HomeIcon', text: 'Home' },
+    { icon: 'UserIcon', text: 'Profile' },
+    { icon: 'ArrowUpOnSquareIcon', text: 'Upload' },
+    { icon: 'DocumentTextIcon', text: 'Blog' },
+    { icon: 'ShareIcon', text: 'Share' }
   ];
 
   const handleClick = (index) => {
