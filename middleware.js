@@ -6,15 +6,17 @@ export default withAuth(
     const { token } = req.nextauth;
 
     if (!token) {
-      // If there's no token, redirect to the login page
+      console.log("No token found, redirecting to login");
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
+    console.log("Token found:", token);
+
     if (token.role === "ADMIN" || token.role === "MANAGER") {
-      // Allow access to the routes for ADMIN and MANAGER
+      console.log("Authorized role:", token.role);
       return NextResponse.next();
     } else {
-      // Redirect unauthorized users to a forbidden page or a different route
+      console.log("Unauthorized role:", token.role);
       return NextResponse.redirect(new URL("/forbidden", req.url));
     }
   },
