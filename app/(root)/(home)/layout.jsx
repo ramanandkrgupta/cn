@@ -1,4 +1,4 @@
-import { Navbar, Sidebar, BottomMenuBar } from "@/components/navigation";
+import { Navbar, Sidebar } from "@/components/navigation";
 
 export default function HomeLayout({ children }) {
   return (
