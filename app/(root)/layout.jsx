@@ -60,9 +60,10 @@ export default function RootLayout({ children }) {
             <main className="pb-16"> {/* Add padding-bottom to avoid content hiding behind BottomMenuBar */}
               {children}
             </main>
-            <NewNavBar />
+            
           </EdgeStoreProvider>
         </AuthProvider>
+<NewNavBar />
       </body>
     </html>
   );
