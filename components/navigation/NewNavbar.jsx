@@ -1,51 +1,42 @@
 "use client"
-import React, { useState } from 'react';
-import { IonIcon } from "@ionic/react";
-import {
-  homeOutline,
-  folderOutline,
-  addCircleOutline,
-  personOutline,
-  imageOutline,
-} from 'ionicons/icons';
+// components/StickyNavbar.js
+import { useState } from 'react';
+import { HomeIcon, ReceiptRefundIcon, PlusCircleIcon, BellIcon, UserIcon } from '@heroicons/react/outline';
 
 const NewNavbar = () => {
-  const [activeIndex, setActiveIndex] = useState(2); // Default active icon (index 2)
+    const [activeIndex, setActiveIndex] = useState(2); // default active is the third item
 
-  const menuItems = [
-    { icon: homeOutline, name: 'Home' },
-    { icon: folderOutline, name: 'Folder' },
-    { icon: addCircleOutline, name: 'Add' },
-    { icon: personOutline, name: 'Profile' },
-    { icon: imageOutline, name: 'Images' },
-  ];
+    const menuItems = [
+        { title: 'Home', icon: HomeIcon },
+        { title: 'Receipt', icon: ReceiptRefundIcon },
+        { title: 'Add', icon: PlusCircleIcon },
+        { title: 'Noti', icon: BellIcon },
+        { title: 'Account', icon: UserIcon },
+    ];
 
-  const handleActiveLink = (index) => {
-    setActiveIndex(index);
-  };
+    const handleItemClick = (index) => {
+        setActiveIndex(index);
+    };
 
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-200 text-center max-w-xl mx-auto rounded-t-2xl p-2">
-      <div className="flex justify-around">
-        {menuItems.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => handleActiveLink(index)}
-            className={`flex flex-col items-center cursor-pointer transition-transform duration-500 ${
-              activeIndex === index
-                ? 'transform scale-125 -translate-y-4 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-full p-2'
-                : 'text-gray-700'
-            }`}
-          >
-            <IonIcon icon={item.icon} className="text-3xl" />
-            <span className={`text-xs ${activeIndex === index ? 'block' : 'hidden'}`}>
-              {item.name}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    return (
+        <div className="fixed bottom-0 left-0 w-full bg-indigo-800 h-20 flex items-center justify-around shadow-lg rounded-t-2xl z-50">
+            {menuItems.map((item, index) => {
+                const Icon = item.icon;
+                const isActive = index === activeIndex;
+                
+                return (
+                    <div
+                        key={index}
+                        className={`relative flex flex-col items-center text-center cursor-pointer transition-transform duration-500 ${isActive ? 'transform -translate-y-3 text-white' : 'text-indigo-400'}`}
+                        onClick={() => handleItemClick(index)}
+                    >
+                        <Icon className={`h-7 w-7 ${isActive ? 'text-white' : 'text-indigo-400'}`} />
+                        {isActive && <span className="text-sm mt-1">{item.title}</span>}
+                    </div>
+                );
+            })}
+        </div>
+    );
 };
 
 
