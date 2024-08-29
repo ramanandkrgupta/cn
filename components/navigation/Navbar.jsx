@@ -158,36 +158,36 @@ const NavBar = () => {
         >
           <ul className="mb-4 p-3">
             {navlinks.map((data) => (
-              <li
-                key={data.name}
-                className={`flex p-4 ${
-                  activeLink && activeLink.name === data.name && "bg-[#3a3a43]"
-                } hover:bg-[#2c2f32] rounded-full`}
-                onClick={() => {
-                  setToggleDrawer(false);
-                  data.btn ? setIsOpen(true) : router.push(data.link);
-                }}
-              >
-                <Image
-                  src={data.imgUrl}
-                  alt={data.name}
-                  className={`w-[24px] h-[24px] object-contain ${
-                    activeLink && activeLink.name === data.name
-                      ? "grayscale-0"
-                      : "grayscale"
-                  }`}
-                />
-                <p
-                  className={`ml-[20px] font-epilogue font-semibold text-[14px] ${
-                    activeLink && activeLink.name === data.name
-                      ? "text-[#1dc071]"
-                      : "text-[#808191]"
-                  }`}
-                >
-                  {data.name}
-                </p>
-              </li>
-            ))}
+  <li
+    key={data.name}
+    className={`flex p-4 ${
+      activeLink && activeLink.name === data.name && "bg-[#3a3a43]"
+    } hover:bg-[#2c2f32] rounded-full`}
+    onClick={() => {
+      setToggleDrawer(false);
+      data.btn ? setIsOpen(true) : router.push(data.link);
+    }}
+  >
+    <Image
+      src={data.imgUrl}
+      alt={data.name}
+      className={`w-[24px] h-[24px] object-contain ${
+        activeLink && activeLink.name === data.name
+          ? "grayscale-0"
+          : "grayscale"
+      }`}
+    />
+    <p
+      className={`ml-[20px] font-epilogue font-semibold text-[14px] ${
+        activeLink && activeLink.name === data.name
+          ? "text-[#1dc071]"
+          : "text-[#808191]"
+      }`}
+    >
+      {data.name}
+    </p>
+  </li>
+))}
           </ul>
         </div>
       </div>
