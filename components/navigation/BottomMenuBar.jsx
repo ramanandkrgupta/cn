@@ -1,11 +1,11 @@
 import React from 'react';
-import { HomeIcon, UploadIcon, UserIcon, ShareIcon, BlogIcon } from '@heroicons/react/outline';
+import { HomeIcon, ArrowUpOnSquareIcon, UserIcon, ShareIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const BottomMenuBar = () => {
   return (
     <div className="fixed bottom-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2 shadow-lg">
       <div className="flex flex-col items-center">
-        <BlogIcon className="h-6 w-6" />
+        <DocumentTextIcon className="h-6 w-6" />
         <span className="text-xs">Blog</span>
       </div>
       <div className="flex flex-col items-center">
@@ -17,7 +17,7 @@ const BottomMenuBar = () => {
         <span className="text-sm font-bold">Home</span>
       </div>
       <div className="flex flex-col items-center">
-        <UploadIcon className="h-6 w-6" />
+        <ArrowUpOnSquareIcon className="h-6 w-6" />
         <span className="text-xs">Upload</span>
       </div>
       <div className="flex flex-col items-center">
