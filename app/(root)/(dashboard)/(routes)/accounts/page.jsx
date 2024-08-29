@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
-const adminAccountPage = () => {
+const AdminAccountPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
@@ -31,7 +31,7 @@ const adminAccountPage = () => {
     };
 
     fetchUser();
-  }, [status]);
+  }, [status, router]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -50,7 +50,7 @@ const adminAccountPage = () => {
         <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
         <p><strong>Role:</strong> {user.userRole}</p>
       </div>
-
+      
       {user.userRole === 'MANAGER' || user.userRole === 'ADMIN' ? (
         <div className="mt-4">
           <h2 className="text-xl font-bold mb-2">Admin Actions</h2>
@@ -66,4 +66,4 @@ const adminAccountPage = () => {
   );
 };
 
-export default adminAccountPage;
+export default AdminAccountPage;
