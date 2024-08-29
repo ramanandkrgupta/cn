@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
-const AccountPage = () => {
+const adminAccountPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
@@ -66,4 +66,4 @@ const AccountPage = () => {
   );
 };
 
-export default AccountPage;
+export default adminAccountPage;
