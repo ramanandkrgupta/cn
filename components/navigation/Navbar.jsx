@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link"; // Import Link if you are using it
+import { useSession, signOut } from "next-auth/react"; // Import useSession and signOut from next-auth/react
 
 import Search from "../Search";
 import { navlinks } from "@/constants";
@@ -14,12 +15,12 @@ import { close, logo, menu } from "@/public/assets";
 import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
-import { handleSignOutButton } from "@/libs/utils";
 
 const NavBar = () => {
   const { data: fetchedData, error } = usePost();
   const setData = usePostStore((state) => state.setPosts);
 
+  const { data: session } = useSession(); // Fetch session data
   const router = useRouter();
   const sidebarRef = useRef(null);
   const menuButtonRef = useRef(null);
@@ -192,7 +193,7 @@ const NavBar = () => {
             {session && session.user && (
               <li
                 className="flex p-4 hover:bg-[#2c2f32] rounded-full cursor-pointer"
-                onClick={handleSignOutButton}
+                onClick={() => signOut()}
               >
                 <Image
                   src={logoutIcon} // Replace this with the actual path to your logout icon
