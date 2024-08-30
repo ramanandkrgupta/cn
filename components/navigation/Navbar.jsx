@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link"; // Import Link if you are using it
-import { useSession } from "next-auth/react"; // Import useSession and signOut from next-auth/react
+import { useSession, signIn } from "next-auth/react"; // Import useSession and signOut from next-auth/react
 
 import { handleSignOutButton } from "@/libs/utils";
 
@@ -166,7 +166,7 @@ const NavBar = () => {
                 key={data.name}
                 className={`flex p-4 ${
                   activeLink && activeLink.name === data.name && "bg-[#3a3a43]"
-                } hover:bg-[#2c2f32] rounded-full`}
+                } hover:bg-[#2c2f32] rounded-full ${data.name === 'Share' && 'hidden'}`}
                 onClick={() => {
                   setToggleDrawer(false);
                   data.btn ? setIsOpen(true) : router.push(data.link);
@@ -192,7 +192,7 @@ const NavBar = () => {
                 </p>
               </li>
             ))}
-            {session && session.user && (
+            {session && session.user ? (
               <li
                 className="flex p-4 hover:bg-[#2c2f32] rounded-full cursor-pointer"
                 onClick={() => handleSignOutButton()}
@@ -204,6 +204,20 @@ const NavBar = () => {
                 />
                 <p className="ml-[20px] font-epilogue font-semibold text-[14px] text-[#808191]">
                   Logout
+                </p>
+              </li>
+            ) : (
+              <li
+                className="flex p-4 hover:bg-[#2c2f32] rounded-full cursor-pointer"
+                onClick={() => signIn()}
+              >
+                <Image
+                  src={logout} // Replace this with the actual path to your login icon
+                  alt="Login"
+                  className="w-[24px] h-[24px] object-contain grayscale"
+                />
+                <p className="ml-[20px] font-epilogue font-semibold text-[14px] text-[#808191]">
+                  Login
                 </p>
               </li>
             )}
