@@ -56,10 +56,10 @@ const AccountPage = () => {
                   <h2 className="text-2xl font-bold mb-4">Account Details</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-gray-700"><strong>Name:</strong> {user.name}</p><CheckBadgeIcon className="h-5 w-25 text-green-500" />
+                      <p className="text-gray-700 flex"><strong>Name:</strong> {user.name} <CheckBadgeIcon className="h-5 w-25 text-green-500" /></p>
                       <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
                       <p className="text-gray-700"><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
-                      <p className="text-gray-700"><strong>Role:</strong> {user.userRole || 'N/A'}</p>
+                      <p className="text-gray-700"><strong>Plan:</strong> {user.userRole || 'N/A'}</p>
                     </div>
                     
                   </div>
