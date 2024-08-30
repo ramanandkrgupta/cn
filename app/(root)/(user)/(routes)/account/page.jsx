@@ -1,8 +1,6 @@
 "use client";
 
 import { Tab } from "@headlessui/react";
-import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
@@ -16,37 +14,21 @@ const Tabs = ["Account Details", "Playground", "Show Data"];
 const AccountPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (status === 'loading') return; // Do nothing while loading
-    if (status === 'unauthenticated') {
-      router.push('/login'); // Redirect to login if not authenticated
-    }
-
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('/api/user/account');
-        setUser(response.data);
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-        toast.error('Failed to load account details.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [status, router]);
-
-  if (loading) {
+  if (status === 'loading') {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
+  if (status === 'unauthenticated') {
+    router.push('/login'); // Redirect to login if not authenticated
+    return null;
+  }
+
+  if (!session || !session.user) {
     return <div>No user data found.</div>;
   }
+
+  const { user } = session;
 
   return (
     <div className="container mx-auto p-4">
@@ -88,12 +70,12 @@ const AccountPage = () => {
           </Tab.Panel>
           <Tab.Panel>
             <div className="space-y-3">
-              <AddSubject userEmail={session.user.email} />
-              <ChangePassword sessionData={session.user.email} />
+              <AddSubject userEmail={user.email} />
+              <ChangePassword sessionData={user.email} />
             </div>
           </Tab.Panel>
           <Tab.Panel>
-            <ShowData userID={session.user.sub} />
+            <ShowData userID={user.sub} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
