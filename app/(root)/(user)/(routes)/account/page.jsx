@@ -30,11 +30,11 @@ const AccountPage = () => {
   const { user } = session;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen ">
       
-      <div className="container mx-auto p-4 flex gap-6">
+      <div className="container mx-auto p-1 flex gap-6">
         
-        <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
+        <div className="flex-1 p-1 rounded-lg shadow-md">
           <Tab.Group>
             <Tab.List className="flex space-x-1 border-b-2">
               {Tabs.map((tab, index) => (
@@ -56,14 +56,12 @@ const AccountPage = () => {
                   <h2 className="text-2xl font-bold mb-4">Account Details</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-gray-700"><strong>Name:</strong> {user.name}</p>
+                      <p className="text-gray-700"><strong>Name:</strong> {user.name}</p><CheckBadgeIcon className="h-5 w-25 text-green-500" />
                       <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
                       <p className="text-gray-700"><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
                       <p className="text-gray-700"><strong>Role:</strong> {user.userRole || 'N/A'}</p>
                     </div>
-                    <div className="flex items-center justify-center">
-                      <CheckBadgeIcon className="h-24 w-24 text-green-500" />
-                    </div>
+                    
                   </div>
                 </div>
 
