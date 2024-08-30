@@ -3,7 +3,6 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
-
 import prisma from "@/libs/prisma";
 
 const authOptions = {
@@ -40,7 +39,12 @@ const authOptions = {
             throw new Error("Incorrect password!");
           }
 
-          return user;
+          // Include phoneNumber and userRole in the returned user object
+          return {
+            ...user,
+            phoneNumber: user.phoneNumber,
+            userRole: user.userRole,
+          };
         } catch (error) {
           console.error("Error during authorization:", error);
           throw new Error("Authorization failed!");
@@ -72,6 +76,8 @@ const authOptions = {
                 email: user.email,
                 name: user.name || user.login,
                 image: user.image || user.avatar_url, // Store GitHub avatar
+                phoneNumber: user.phoneNumber || '', // Default to empty string if not provided
+                userRole: user.userRole || 'user', // Default role
               },
             });
           }
@@ -90,11 +96,16 @@ const authOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.userRole || "user"; // Default role
+        token.phoneNumber = user.phoneNumber || ''; // Include phoneNumber
       }
       return token;
     },
     async session({ session, token }) {
-      session.user = token;
+      session.user = {
+        ...token,
+        phoneNumber: token.phoneNumber,
+        userRole: token.role,
+      };
       return session;
     },
   },
