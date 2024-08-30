@@ -17,7 +17,7 @@ export default withAuth(
       return NextResponse.next();
     } else {
       console.log("Unauthorized role:", token.role);
-      return NextResponse.redirect(new URL("/forbidden", req.url));
+      return NextResponse.redirect(new URL("/account", req.url));
     }
   },
   {
