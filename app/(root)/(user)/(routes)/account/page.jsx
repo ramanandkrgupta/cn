@@ -3,8 +3,8 @@
 import { Tab } from "@headlessui/react";
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import Navbar from '@/components/navigation/Navbar'; // Adjust the import path
-import AccountSidebar from '@/components/user/AccountSidebar'; // Adjust the import path
+ // Adjust the import path
+ // Adjust the import path
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import ChangePassword from '@/components/admin/components/ChangePassword';
 
@@ -31,9 +31,9 @@ const AccountPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      
       <div className="container mx-auto p-4 flex gap-6">
-        <AccountSidebar userRole={user.userRole} />
+        
         <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
           <Tab.Group>
             <Tab.List className="flex space-x-1 border-b-2">
