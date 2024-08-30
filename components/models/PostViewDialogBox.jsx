@@ -105,9 +105,6 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                         : "Premium File - Upgrade to Download"
                       : "Download"}
                   </button>
-                  {data.premium && session && session.user && session.user.role !== "PRO" && (
-                    
-                  )}
                   <button
                     type="button"
                     className="flex-1 rounded-full items-center mt-4 py-2.5 px-4 text-white bg-black hover:bg-gray-700 w-full"
@@ -115,16 +112,17 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   >
                     <ShareIcon className="h-6 w-6" />
                   </button>
-                </div>
-
-              </Dialog.Panel>
-            </Transition.Child>
-<p className="text-sm mt-2">
+                  {data.premium && session && session.user && session.user.role !== "PRO" && (
+                    <p className="text-sm mt-2">
                       <a href="/plans" className="text-blue-500 underline">
                         Upgrade to PRO
                       </a>{" "}
                       to download premium files.
                     </p>
+                  )}
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>
