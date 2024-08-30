@@ -95,7 +95,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   <div className="flex w-full gap-2">
                     <button
                       type="button"
-                      className="flex-1 rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-4 capitalize"
+                      className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-4 capitalize mt-4 w-full"
                       onClick={() =>
                         handleDownload(data.file_url, data.file_name)
                       }
@@ -108,7 +108,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     </button>
                     <button
                       type="button"
-                      className="flex-1 rounded-full items-center py-2.5 px-4 text-white bg-black hover:bg-gray-700"
+                      className="flex-1 rounded-full items-center mt-4 py-2.5 px-4 text-white bg-black hover:bg-gray-700 w-full"
                       onClick={() => handlesharebtn(SharePost)}
                     >
                       <ShareIcon className="h-6 w-6" />
