@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Navbar from '@/components/navigation/Navbar'; // Adjust the import path
 import accountSidebar from '@/components/user/accountSidebar.jsx'; // Adjust the import path
-import AddSubject from '@/components/admin/components/AddSubject';
-import ShowData from '@/components/admin/components/ShowData';
+import { checkbadgeIcon } from '@heroicons/react/24/outline';
+
 import ChangePassword from '@/components/admin/components/ChangePassword';
 
-const Tabs = ["Account Details", "Playground", "Show Data"];
+const Tabs = ["Account Details", "Setting"];
 
 const AccountPage = () => {
   const router = useRouter();
@@ -54,7 +54,7 @@ const AccountPage = () => {
             <Tab.Panels className="mt-3">
               <Tab.Panel>
                 <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                  <p><strong>Name:</strong> {user.name}</p>
+                  <p><strong>Name:</strong> {user.name} icon: HomeIcon </p>
                   <p><strong>Email:</strong> {user.email}</p>
                   <p><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
                   <p><strong>Role:</strong> {user.userRole || 'N/A'}</p>
@@ -74,13 +74,11 @@ const AccountPage = () => {
               </Tab.Panel>
               <Tab.Panel>
                 <div className="space-y-3">
-                  <AddSubject userEmail={user.email} />
+                  
                   <ChangePassword sessionData={user.email} />
                 </div>
               </Tab.Panel>
-              <Tab.Panel>
-                <ShowData userID={user.sub} />
-              </Tab.Panel>
+              
             </Tab.Panels>
           </Tab.Group>
         </div>
