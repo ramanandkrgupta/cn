@@ -1,4 +1,4 @@
-"use client"
+
 import { getSession } from 'next-auth/react';
 import prisma from '@/libs/prisma';
 
