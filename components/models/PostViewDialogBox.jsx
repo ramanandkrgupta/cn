@@ -106,12 +106,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       : "Download"}
                   </button>
                   {data.premium && session && session.user && session.user.role !== "PRO" && (
-                    <p className="text-sm mt-2">
-                      <a href="/plans" className="text-blue-500 underline">
-                        Upgrade to PRO
-                      </a>{" "}
-                      to download premium files.
-                    </p>
+                    
                   )}
                   <button
                     type="button"
@@ -121,6 +116,12 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <ShareIcon className="h-6 w-6" />
                   </button>
                 </div>
+<p className="text-sm mt-2">
+                      <a href="/plans" className="text-blue-500 underline">
+                        Upgrade to PRO
+                      </a>{" "}
+                      to download premium files.
+                    </p>
               </Dialog.Panel>
             </Transition.Child>
           </div>
