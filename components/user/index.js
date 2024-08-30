@@ -1,1 +1,1 @@
-export { default as accountSidebar } from "./accountSidebar";
+export { default as AccountSidebar } from "./AccountSidebar";

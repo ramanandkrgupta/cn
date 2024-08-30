@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const accountSidebar = ({ userRole }) => {
+const AccountSidebar = ({ userRole }) => {
   return (
     <div className="sidebar">
       <ul>
@@ -24,4 +24,4 @@ const accountSidebar = ({ userRole }) => {
   );
 };
 
-export default accountSidebar;
+export default AccountSidebar;
