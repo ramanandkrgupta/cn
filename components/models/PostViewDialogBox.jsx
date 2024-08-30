@@ -116,14 +116,15 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <ShareIcon className="h-6 w-6" />
                   </button>
                 </div>
+
+              </Dialog.Panel>
+            </Transition.Child>
 <p className="text-sm mt-2">
                       <a href="/plans" className="text-blue-500 underline">
                         Upgrade to PRO
                       </a>{" "}
                       to download premium files.
                     </p>
-              </Dialog.Panel>
-            </Transition.Child>
           </div>
         </div>
       </Dialog>
