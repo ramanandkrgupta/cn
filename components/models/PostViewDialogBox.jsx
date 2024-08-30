@@ -5,20 +5,32 @@ import { Fragment } from "react";
 import { saveAs } from "file-saver";
 import { Dialog, Transition } from "@headlessui/react";
 import { ShareIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { useSession, signIn } from "next-auth/react";
 
 import { handlesharebtn } from "@/libs/utils";
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
+  const { data: session } = useSession(); // Get session data
+
   function closeModal() {
     setIsOpen(false);
   }
 
   const handleDownload = (url, filename) => {
     if (data.premium) {
-      toast("This is a premium file. You need a premium membership to download it.");
+      if (session && session.user) {
+        if (session.user.role === "PRO") {
+          saveAs(url, `cn-${filename}`);
+          toast("Successfully downloaded");
+        } else {
+          toast("This is a premium file. You need a premium membership to download it.");
+        }
+      } else {
+        toast("Please log in to download premium files.");
+      }
     } else {
       saveAs(url, `cn-${filename}`);
-      toast("successfully downloaded");
+      toast("Successfully downloaded");
     }
   };
 
@@ -82,13 +94,12 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                 <div className="mt-4 flex justify-center gap-1">
                   <button
                     type="button"
-                    className="rounded-full  items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-4 capitalize mt-4 w-full"
+                    className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-4 capitalize mt-4 w-full"
                     onClick={() =>
                       handleDownload(data.file_url, data.file_name)
                     }
                   >
                     {data.premium ? "Premium File - Upgrade to Download" : "Download"}
-    
                   </button>
                   <button
                     type="button"
