@@ -52,8 +52,8 @@ const AccountPage = () => {
             <div className="bg-gray-100 p-4 rounded-lg shadow-md">
               <p><strong>Name:</strong> {user.name}</p>
               <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
-              <p><strong>Role:</strong> {user.userRole}</p>
+              <p><strong>Phone Number:</strong> {session.user.phoneNumber} || Na</p>
+              <p><strong>Role:</strong> {session.user.userRole} || Na</p>
             </div>
 
             {user.userRole === 'MANAGER' || user.userRole === 'ADMIN' ? (
