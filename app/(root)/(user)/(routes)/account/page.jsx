@@ -4,7 +4,7 @@ import { Tab } from "@headlessui/react";
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Navbar from '@/components/navigation/Navbar'; // Adjust the import path
-import accountSidebar from '@/components/user/accountSidebar'; // Adjust the import path
+import accountSidebar from '@/components/user/accountSidebar.jsx'; // Adjust the import path
 import AddSubject from '@/components/admin/components/AddSubject';
 import ShowData from '@/components/admin/components/ShowData';
 import ChangePassword from '@/components/admin/components/ChangePassword';
