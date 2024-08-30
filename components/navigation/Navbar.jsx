@@ -11,7 +11,7 @@ import Search from "../Search";
 import { navlinks } from "@/constants";
 import { usePost } from "@/libs/hooks/usePost";
 import { filterPosts } from "@/libs/hooks/usefilter";
-import { close, logo, menu } from "@/public/assets";
+import { close, logo, menu, logout } from "@/public/assets";
 import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
@@ -196,7 +196,7 @@ const NavBar = () => {
                 onClick={() => signOut()}
               >
                 <Image
-                  src={logoutIcon} // Replace this with the actual path to your logout icon
+                  src={logout} // Replace this with the actual path to your logout icon
                   alt="Logout"
                   className="w-[24px] h-[24px] object-contain grayscale"
                 />
