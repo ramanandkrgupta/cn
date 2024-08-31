@@ -50,9 +50,9 @@ const AccountPage = () => {
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://bgmi-taupe.vercel.app/create-order',
+        url: '/api/user/create-order',
         headers: { 
-          'Host': 'bgmi-taupe.vercel.app', 
+           
           'Access-Control-Allow-Origin': '*/*', 
           'Content-Type': 'application/x-www-form-urlencoded'
         },
