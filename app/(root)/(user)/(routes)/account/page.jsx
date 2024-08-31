@@ -35,9 +35,9 @@ const AccountPage = () => {
 
   try {
     const order_id = `order_${new Date().getTime()}`;
-    const response = await axios.post('https://beta.collegenotes.tech/api/create-order', {
+    const response = await axios.post('https://khilaadixpro.shop/api/create-order', {
       customer_mobile: user.phoneNumber,
-      user_token: '12a6aa5daf26fda8cc431c01361de5a2',
+      user_token: '4a213056d570c6930f3ee43f44010cfb',
       amount: 49.00,
       order_id: order_id,
       redirect_url: `${window.location.origin}/payment-success`,
