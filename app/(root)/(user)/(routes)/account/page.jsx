@@ -6,7 +6,6 @@ import { useSession } from 'next-auth/react';
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import ChangePassword from '@/components/admin/components/ChangePassword';
 import axios from 'axios';
-import qs from 'qs';
 
 const Tabs = ["Account Details", "Settings"];
 
@@ -36,7 +35,7 @@ const AccountPage = () => {
 
     try {
       const order_id = `order_${new Date().getTime()}`;
-      const data = qs.stringify({
+      const data = {
         customer_mobile: user.phoneNumber,
         user_token: '271a4848bbd962e07b62466ec7fec8ae',
         amount: '1',
@@ -45,18 +44,17 @@ const AccountPage = () => {
         remark1: 'Subscription',
         remark2: 'PRO Plan',
         route: '1'
-      });
+      };
 
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
         url: '/api/user/create-order',
         headers: { 
-           
           'Access-Control-Allow-Origin': '*/*', 
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/json'
         },
-        data: data
+        data: JSON.stringify(data)
       };
 
       const response = await axios.request(config);
