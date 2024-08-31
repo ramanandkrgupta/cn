@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import https from 'https';
 import qs from 'qs';
 
-
+// Middleware to parse the request body
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
 
 export async function POST(req) {
-  const { customer_mobile, user_token, amount, order_id, redirect_url, remark1, remark2, route } = req.body;
+  const { customer_mobile, user_token, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
   if (!customer_mobile || !user_token || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
-    return res.status(400).send('Missing required parameters.');
+    return new NextResponse('Missing required parameters.', { status: 400 });
   }
 
   const data = qs.stringify({
@@ -38,14 +42,12 @@ export async function POST(req) {
 
   try {
     const response = await axios.request(config);
-    res.json(response.data);
+    return new NextResponse(JSON.stringify(response.data), { status: 200 });
   } catch (error) {
     console.error(error.message, error.stack);
-    res.status(500).send('An error occurred while creating the order');
+    return new NextResponse('An error occurred while creating the order', { status: 500 });
   }
 }
-  
-
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -57,5 +59,3 @@ export async function OPTIONS() {
     },
   });
 }
-
-
