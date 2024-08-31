@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+export function GET(){
+    res.JSON("try post")
+}
 
 export async function POST(req) {
   const body = await req.text();
