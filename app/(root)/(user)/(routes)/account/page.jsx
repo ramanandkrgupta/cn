@@ -29,11 +29,15 @@ const AccountPage = () => {
   const { user } = session;
 
   const handleSubscribe = async () => {
+    if (user.userRole === 'PRO') {
+      return;
+    }
+
     try {
       const order_id = `order_${new Date().getTime()}`;
       const response = await axios.post('https://beta.collegenotes.tech/api/create-order', {
         customer_mobile: user.phoneNumber,
-        user_token: 12a6aa5daf26fda8cc431c01361de5a2,
+        user_token: '12a6aa5daf26fda8cc431c01361de5a2',
         amount: 49.00,
         order_id: order_id,
         redirect_url: `${window.location.origin}/payment-success`,
@@ -107,7 +111,11 @@ const AccountPage = () => {
                     <div>
                       <p className="text-gray-700"><strong>FREE:</strong> Basic access with limited features.</p>
                       <p className="text-gray-700"><strong>PRO:</strong> Full access with premium features for <strong>49rs</strong>.</p>
-                      <button onClick={handleSubscribe} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Subscribe</button>
+                      {user.userRole === 'PRO' ? (
+                        <button className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg" disabled>You already subscribed</button>
+                      ) : (
+                        <button onClick={handleSubscribe} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Subscribe</button>
+                      )}
                     </div>
                   </div>
                 </div>
