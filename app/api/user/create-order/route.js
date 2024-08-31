@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-export function GET(req, res){
-    res.send('try post')
-}
 
 export async function POST(req) {
   const body = await req.text();
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
+    'Host': 'khilaadixpro.shop'
   };
 
   try {
     const response = await axios.post('https://khilaadixpro.shop/api/create-order', body, { headers });
 
-    return new NextResponse(response.data, {
+    return new NextResponse(JSON.stringify(response.data), {
       status: response.status,
       headers: {
         'Content-Type': 'application/json',

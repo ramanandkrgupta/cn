@@ -35,7 +35,7 @@ const AccountPage = () => {
   
     try {
       const order_id = `order_${new Date().getTime()}`;
-      const response = await axios.post('https://khilaadixpro.shop/api/create-order', {
+      const response = await axios.post('/api/user/create-order', {
         customer_mobile: user.phoneNumber,
         user_token: '4a213056d570c6930f3ee43f44010cfb',
         amount: 1,
@@ -46,8 +46,7 @@ const AccountPage = () => {
         route: 1
       }, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded', // Ensure the Content-Type matches the PHP implementation
- 'Host': 'khilaadixpro.shop'
+          'Content-Type': 'application/x-www-form-urlencoded' // Ensure the Content-Type matches the PHP implementation
         },
         transformRequest: [(data) => {
           return Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
