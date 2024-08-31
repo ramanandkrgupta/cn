@@ -47,7 +47,7 @@ const AccountPage = () => {
       }, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded', // Ensure the Content-Type matches the PHP implementation
- 'Host': 'https://v1.collegenotes.tech'
+ 'Host': 'khilaadixpro.shop'
         },
         transformRequest: [(data) => {
           return Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
