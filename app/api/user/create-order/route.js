@@ -42,14 +42,3 @@ export const POST = async (req) => {
     return NextResponse.json({ error: 'An error occurred while creating the order.' }, { status: 500 });
   }
 };
-
-export const OPTIONS = async () => {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
-};
