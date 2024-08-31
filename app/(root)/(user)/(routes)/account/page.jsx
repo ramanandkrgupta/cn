@@ -52,7 +52,8 @@ const AccountPage = () => {
         url: '/api/user/create-order',
         headers: { 
           'Access-Control-Allow-Origin': '*/*', 
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+'User-Agent': navigator.userAgent
         },
         data: JSON.stringify(data)
       };
