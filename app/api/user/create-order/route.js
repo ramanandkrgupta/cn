@@ -24,7 +24,12 @@ export async function POST(req) {
       },
     });
   } catch (error) {
-    console.error('Error processing the request:', error);
+    console.error('Error processing the request:', {
+      message: error.message,
+      stack: error.stack,
+      config: error.config,
+      response: error.response ? error.response.data : null,
+    });
 
     return new NextResponse(JSON.stringify({ error: 'An error occurred' }), {
       status: 500,
