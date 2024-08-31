@@ -32,6 +32,7 @@ const NavBar = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchedResults, setSearchedResults] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [isActive, setIsActive] = useState(""); // Define isActive state
   const data = useMemo(() => posts, [posts]);
 
   useEffect(() => {
