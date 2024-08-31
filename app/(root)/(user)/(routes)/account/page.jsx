@@ -38,7 +38,7 @@ const AccountPage = () => {
       const response = await axios.post('/api/user/create-order', {
         customer_mobile: user.phoneNumber,
         user_token: '4a213056d570c6930f3ee43f44010cfb',
-        amount: 49.00,
+        amount: 1,
         order_id: order_id,
         redirect_url: `${window.location.origin}/payment-success`,
         remark1: 'Subscription',
