@@ -3,13 +3,9 @@ import axios from 'axios';
 import qs from 'qs';
 
 // Middleware to parse the request body
-export const config = {
-  api: {
-    bodyParser: true,
-  },
-};
+export const runtime = 'nodejs';
 
-export async function POST(req) {
+export const POST = async (req) => {
   const { customer_mobile, user_token, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
   if (!customer_mobile || !user_token || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
@@ -47,9 +43,9 @@ export async function POST(req) {
     console.error(error.message, error.stack);
     return new NextResponse('An error occurred while creating the order', { status: 500 });
   }
-}
+};
 
-export async function OPTIONS() {
+export const OPTIONS = async () => {
   return new NextResponse(null, {
     status: 204,
     headers: {
@@ -58,4 +54,4 @@ export async function OPTIONS() {
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });
-}
+};
