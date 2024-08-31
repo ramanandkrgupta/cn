@@ -37,7 +37,7 @@ const AccountPage = () => {
 
   try {
     const order_id = `order_${new Date().getTime()}`;
-    const response = await axios.post('https://instantdum.com/api/create-order', {
+    const response = await axios.post('/api/user/create-order', {
       customer_mobile: user.phoneNumber,
       user_token: '271a4848bbd962e07b62466ec7fec8ae',
       amount: 1.00,
@@ -48,7 +48,8 @@ const AccountPage = () => {
       route: 1
     }, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        
       },
       transformRequest: [(data) => {
         return Object.entries(data)
