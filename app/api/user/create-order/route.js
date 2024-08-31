@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-export function GET(){
-    res.JSON("try post")
+export function GET(req, res){
+    res.send('try post')
 }
 
 export async function POST(req) {
