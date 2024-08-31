@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import ChangePassword from '@/components/admin/components/ChangePassword';
 import axios from 'axios';
+import qs from 'qs';
 
 const Tabs = ["Account Details", "Settings"];
 
@@ -29,56 +30,57 @@ const AccountPage = () => {
   const { user } = session;
 
   const handleSubscribe = async () => {
-  const { user } = session;
-  
-  if (user.userRole === 'PRO') {
-    return;
-  }
-
-  try {
-    const order_id = `order_${new Date().getTime()}`;
-    const response = await axios.post('/api/user/create-order', {
-      customer_mobile: user.phoneNumber,
-      user_token: '271a4848bbd962e07b62466ec7fec8ae',
-      amount: 1.00,
-      order_id: order_id,
-      redirect_url: 'https://v1.collegenotes.tech/payment-success',
-      remark1: 'Subscription',
-      remark2: 'PRO Plan',
-      route: 1
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        
-      },
-      transformRequest: [(data) => {
-        return Object.entries(data)
-          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-          .join('&');
-      }]
-    });
-
-    if (response.data.status) {
-      // Order created successfully, redirect to payment URL
-      window.location.href = response.data.result.payment_url;
-    } else {
-      // Handle API error
-      console.error('Payment URL creation failed:', response.data.message);
+    if (user.userRole === 'PRO') {
+      return;
     }
-  } catch (error) {
-    if (error.response) {
-      // Server responded with a status other than 200 range
-      console.error('Error response:', error.response.data.message);
-    } else if (error.request) {
-      // Request was made but no response received
-      console.error('Error request:', error.request);
-    } else {
-      // Other errors
-      console.error('Error message:', error.message);
-    }
-  }
-};
 
+    try {
+      const order_id = `order_${new Date().getTime()}`;
+      const data = qs.stringify({
+        customer_mobile: user.phoneNumber,
+        user_token: '271a4848bbd962e07b62466ec7fec8ae',
+        amount: '1',
+        order_id: order_id,
+        redirect_url: 'https://v1.collegenotes.tech/payment-success',
+        remark1: 'Subscription',
+        remark2: 'PRO Plan',
+        route: '1'
+      });
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://bgmi-taupe.vercel.app/create-order',
+        headers: { 
+          'Host': 'bgmi-taupe.vercel.app', 
+          'Access-Control-Allow-Origin': '*/*', 
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: data
+      };
+
+      const response = await axios.request(config);
+
+      if (response.data.status) {
+        // Order created successfully, redirect to payment URL
+        window.location.href = response.data.result.payment_url;
+      } else {
+        // Handle API error
+        console.error('Payment URL creation failed:', response.data.message);
+      }
+    } catch (error) {
+      if (error.response) {
+        // Server responded with a status other than 200 range
+        console.error('Error response:', error.response.data.message);
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error('Error request:', error.request);
+      } else {
+        // Other errors
+        console.error('Error message:', error.message);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen ">
