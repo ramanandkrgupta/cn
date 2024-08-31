@@ -31,7 +31,7 @@ export async function POST(req) {
       response: error.response ? error.response.data : null,
     });
 
-    return new NextResponse(JSON.stringify({ error: 'An error occurred' }), {
+    return new NextResponse(JSON.stringify({ error: 'An error occurred', details: error.message }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
