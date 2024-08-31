@@ -171,7 +171,7 @@ const NavBar = () => {
                   setIsActive(data.name);
                   setToggleDrawer(false);
                   data.btn ? setIsOpen(true) : router.push(data.link);
-                }
+                }}
               >
                 <Image
                   src={data.imgUrl}
