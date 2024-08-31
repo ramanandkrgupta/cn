@@ -9,46 +9,43 @@ import axios from 'axios';
 
 const Tabs = ["Account Details", "Settings"];
 
-const AccountPage = () => {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
-  if (status === 'loading') {
-    return <div>Loading...</div>;
+const handleSubscribe = async () => {
+  if (user.userRole === 'PRO') {
+    return;
   }
 
-  if (status === 'unauthenticated') {
-    router.push('/login'); // Redirect to login if not authenticated
-    return null;
-  }
+  try {
+    const order_id = `order_${new Date().getTime()}`;
+    const response = await axios.post('https://beta.collegenotes.tech/api/create-order', {
+      customer_mobile: user.phoneNumber,
+      user_token: '12a6aa5daf26fda8cc431c01361de5a2',
+      amount: 49.00,
+      order_id: order_id,
+      redirect_url: `${window.location.origin}/payment-success`,
+      remark1: 'Subscription',
+      remark2: 'PRO Plan',
+      route: 1
+    }, {
+      headers: {
+        'Content-Type': 'application/json' // Change to application/json to avoid issues with modern APIs
+      }
+    });
 
-  if (!session || !session.user) {
-    return <div>No user data found.</div>;
-  }
-
-  const { user } = session;
-
-  const handleSubscribe = async () => {
-    if (user.userRole === 'PRO') {
-      return;
+    if (response.data.status) {
+      window.location.href = response.data.result.payment_url;
+    } else {
+      console.error('Payment URL creation failed:', response.data.message);
     }
-
-    try {
-      const order_id = `order_${new Date().getTime()}`;
-      const response = await axios.post('https://beta.collegenotes.tech/api/create-order', {
-        customer_mobile: user.phoneNumber,
-        user_token: '12a6aa5daf26fda8cc431c01361de5a2',
-        amount: 49.00,
-        order_id: order_id,
-        redirect_url: `${window.location.origin}/payment-success`,
-        remark1: 'Subscription',
-        remark2: 'PRO Plan',
-        route: 1
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
+  } catch (error) {
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+    } else if (error.request) {
+      console.error('Error request:', error.request);
+    } else {
+      console.error('Error message:', error.message);
+    }
+  }
+};
 
       if (response.data.status) {
         window.location.href = response.data.result.payment_url;
