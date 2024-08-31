@@ -1,14 +1,10 @@
-/* eslint-disable @next/next/no-page-custom-font */
-"use client";
-
+// File: components/navigation/Navbar.jsx
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link"; // Import Link if you are using it
-import { useSession, signIn } from "next-auth/react"; // Import useSession and signOut from next-auth/react
-
+import Link from "next/link";
+import { useSession, signIn } from "next-auth/react";
 import { handleSignOutButton } from "@/libs/utils";
-
 import Search from "../Search";
 import { navlinks } from "@/constants";
 import { usePost } from "@/libs/hooks/usePost";
@@ -21,24 +17,18 @@ import PostViewDialogBox from "../models/PostViewDialogBox";
 const NavBar = () => {
   const { data: fetchedData, error } = usePost();
   const setData = usePostStore((state) => state.setPosts);
-
-  const { data: session } = useSession(); // Fetch session data
+  const { data: session } = useSession();
   const router = useRouter();
   const sidebarRef = useRef(null);
   const menuButtonRef = useRef(null);
 
   const [post, setPost] = useState("");
   const [isPostOpen, setIsPostOpen] = useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
   const [toggleDrawer, setToggleDrawer] = useState(false);
-
-  // for search function
   const [searchText, setSearchText] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchedResults, setSearchedResults] = useState([]);
-
-  // for controlling fetched data
   const [posts, setPosts] = useState([]);
   const data = useMemo(() => posts, [posts]);
 
@@ -66,7 +56,6 @@ const NavBar = () => {
   const handleSearchChange = (e) => {
     clearTimeout(searchTimeout);
     setSearchText(e.target.value);
-
     setSearchTimeout(
       setTimeout(() => {
         const searchResult = filterPosts(e.target.value, data);
@@ -75,7 +64,6 @@ const NavBar = () => {
     );
   };
 
-  // for navigation
   const handleToggleDrawer = () => {
     setToggleDrawer((prev) => !prev);
   };
@@ -106,7 +94,6 @@ const NavBar = () => {
     };
   }, []);
 
-  // Determine the active link based on the current URL
   const currentPath = router.pathname;
   const activeLink = navlinks.find((link) => link.link === currentPath);
 
@@ -123,7 +110,6 @@ const NavBar = () => {
         setIsPostOpen={setIsPostOpen}
         setPost={setPost}
       />
-      {/* Small screen navigation */}
       <div className="sm:hidden flex justify-between items-center relative">
         <div
           className="w-[40px] h-[40px] rounded-[10px] bg-[#2c2f32] flex justify-center items-center cursor-pointer"
@@ -135,11 +121,9 @@ const NavBar = () => {
             className="w-[60%] h-[60%] object-contain"
           />
         </div>
-
         <p className="text-[#4acd8d] align-middle text-center subpixel-antialiased text-3xl font-bold">
           College Notes<span className="badge">.tech</span>
         </p>
-
         <div
           className={`w-[34px] h-[34px] object-contain cursor-pointer transition-transform transform ${
             toggleDrawer ? "rotate-45" : "rotate-0"
@@ -153,7 +137,6 @@ const NavBar = () => {
             className="w-full h-full"
           />
         </div>
-
         <div
           className={`${
             toggleDrawer ? "translate-x-0" : "-translate-x-full"
@@ -196,10 +179,10 @@ const NavBar = () => {
             {session && session.user ? (
               <li
                 className="flex p-4 hover:bg-[#2c2f32] rounded-full cursor-pointer"
-                onClick={() => handleSignOutButton()}
+                onClick={handleSignOutButton}
               >
                 <Image
-                  src={logout} // Replace this with the actual path to your logout icon
+                  src={logout}
                   alt="Logout"
                   className="w-[24px] h-[24px] object-contain grayscale"
                 />
@@ -213,7 +196,7 @@ const NavBar = () => {
                 onClick={() => signIn()}
               >
                 <Image
-                  src={logout} // Replace this with the actual path to your login icon
+                  src={logout}
                   alt="Login"
                   className="w-[24px] h-[24px] object-contain grayscale"
                 />
