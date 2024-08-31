@@ -29,45 +29,45 @@ const AccountPage = () => {
   const { user } = session;
 
   const handleSubscribe = async () => {
-  if (user.userRole === 'PRO') {
-    return;
-  }
-
-  try {
-    const order_id = `order_${new Date().getTime()}`;
-    const response = await axios.post('https://khilaadixpro.shop/api/create-order', {
-      customer_mobile: user.phoneNumber,
-      user_token: '4a213056d570c6930f3ee43f44010cfb',
-      amount: 49.00,
-      order_id: order_id,
-      redirect_url: `${window.location.origin}/payment-success`,
-      remark1: 'Subscription',
-      remark2: 'PRO Plan',
-      route: 1
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded' // Ensure the Content-Type matches the PHP implementation
-      },
-      transformRequest: [(data) => {
-        return Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
-      }]
-    });
-
-    if (response.data.status) {
-      window.location.href = response.data.result.payment_url;
-    } else {
-      console.error('Payment URL creation failed:', response.data.message);
+    if (user.userRole === 'PRO') {
+      return;
     }
-  } catch (error) {
-    if (error.response) {
-      console.error('Error response:', error.response.data);
-    } else if (error.request) {
-      console.error('Error request:', error.request);
-    } else {
-      console.error('Error message:', error.message);
+  
+    try {
+      const order_id = `order_${new Date().getTime()}`;
+      const response = await axios.post('/api/proxy-create-order', {
+        customer_mobile: user.phoneNumber,
+        user_token: '4a213056d570c6930f3ee43f44010cfb',
+        amount: 49.00,
+        order_id: order_id,
+        redirect_url: `${window.location.origin}/payment-success`,
+        remark1: 'Subscription',
+        remark2: 'PRO Plan',
+        route: 1
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded' // Ensure the Content-Type matches the PHP implementation
+        },
+        transformRequest: [(data) => {
+          return Object.entries(data).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
+        }]
+      });
+  
+      if (response.data.status) {
+        window.location.href = response.data.result.payment_url;
+      } else {
+        console.error('Payment URL creation failed:', response.data.message);
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
     }
-  }
-};
+  };
 
   return (
     <div className="min-h-screen ">
