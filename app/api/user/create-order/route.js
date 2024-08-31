@@ -5,7 +5,6 @@ export async function POST(req) {
   const body = await req.text();
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
-    'Host': 'khilaadixpro.shop'
   };
 
   try {
