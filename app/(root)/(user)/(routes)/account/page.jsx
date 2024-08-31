@@ -34,7 +34,7 @@ const AccountPage = () => {
     }
 
     try {
-      const order_id = `order_${new Date().getTime()}`;
+      const order_id = `order${new Date().getTime()}`;
       const data = {
         customer_mobile: user.phoneNumber,
         user_token: '271a4848bbd962e07b62466ec7fec8ae',
