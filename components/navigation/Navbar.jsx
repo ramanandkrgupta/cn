@@ -165,12 +165,13 @@ const NavBar = () => {
               <li
                 key={data.name}
                 className={`flex p-4 ${
-                  activeLink && activeLink.name === data.name && "bg-[#3a3a43]"
-                } hover:bg-[#2c2f32] rounded-full ${data.name === 'Share' && 'hidden'}`}
+                  isActive === data.name && "bg-[#3a3a43]"
+                } hover:bg-[#2c2f32] rounded-full`}
                 onClick={() => {
+                  setIsActive(data.name);
                   setToggleDrawer(false);
                   data.btn ? setIsOpen(true) : router.push(data.link);
-                }}
+                }
               >
                 <Image
                   src={data.imgUrl}
