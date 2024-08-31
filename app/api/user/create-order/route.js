@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import https from 'https';
+
+const httpsAgent = new https.Agent({  
+  rejectUnauthorized: false,
+  minVersion: 'TLSv1.2'
+});
 
 export async function POST(req) {
   const body = await req.text();
@@ -8,7 +14,7 @@ export async function POST(req) {
   };
 
   try {
-    const response = await axios.post('https://khilaadixpro.shop/api/create-order', body, { headers });
+    const response = await axios.post('https://khilaadixpro.shop/api/create-order', body, { headers, httpsAgent });
 
     return new NextResponse(JSON.stringify(response.data), {
       status: response.status,
