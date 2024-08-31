@@ -46,7 +46,7 @@ const AccountPage = () => {
         route: 1
       }, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded' // Ensure the Content-Type matches the PHP implementation
+          'Content-Type': 'application/x-www-form-urlencoded', // Ensure the Content-Type matches the PHP implementation
  'Host': 'v1.collegenotes.tech'
         },
         transformRequest: [(data) => {
