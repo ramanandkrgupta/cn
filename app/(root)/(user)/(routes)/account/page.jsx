@@ -1,32 +1,68 @@
 "use client";
 
-import { Tab } from "@headlessui/react";
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { CheckBadgeIcon } from '@heroicons/react/24/outline';
-import ChangePassword from '@/components/admin/components/ChangePassword';
-import axios from 'axios';
+import Image from "next/image";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "sonner";
 
-const Tabs = ["Account Details", "Settings"];
+import { logo } from "@/public/assets";
+import FormButtons from "@/components/ui/FormButtons";
+import FormField from "@/components/ui/FormField";
+import { UserValidation } from "@/libs/validations/user";
 
-const AccountPage = () => {
+const RegisterPage = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-  if (status === 'unauthenticated') {
-    router.push('/login'); // Redirect to login if not authenticated
-    return null;
-  }
+    // Validate user input using the schema
+    const userInput = { name, email, phoneNumber, password, confirmPassword };
 
-  if (!session || !session.user) {
-    return <div>No user data found.</div>;
-  }
+    try {
+      // Validate the user input
+      const validation = UserValidation.registration.safeParse(userInput);
 
-  const { user } = session;
+      // If validation fails, return error message
+      if (!validation.success) {
+        validation.error.issues.forEach((err) => {
+          toast.error(err.message);
+        });
+        console.error("Validation errors:", validation.error.issues);
+      } else if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+      } else {
+        // If validation is successful, make the API request
+        const response = await axios.post("/api/user/register", userInput, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.status === 201) {
+          toast.success("Successfully registered! Redirecting to login...");
+          router.push("/login");
+        } else if (response.statusText === "FAILED") {
+          toast.error("User with this email already exists");
+        } else {
+          toast.error("Registration failed");
+        }
+      }
+    } catch (error) {
+      console.error("Registration Error: " + error);
+      toast.error("Something went wrong during registration");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubscribe = async () => {
     if (user.userRole === 'PRO') {
@@ -61,7 +97,34 @@ const AccountPage = () => {
 
       if (response.data.status) {
         // Order created successfully, redirect to payment URL
+        toast.success("Order created successfully! Redirecting to payment...");
         window.location.href = response.data.result.payment_url;
+
+        // After payment success, check the order status and update user role
+        setTimeout(async () => {
+          const checkStatusConfig = {
+            method: 'post',
+            url: '/api/user/check-order-status',
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+              user_token: '9856ce42fc26349fe5fab9c6b630e9c6',
+              order_id: order_id
+            })
+          };
+
+          try {
+            const statusResponse = await axios.request(checkStatusConfig);
+            if (statusResponse.data.message === 'User role updated to PRO.') {
+              // User role updated, you might want to refresh session or user data
+              toast.success("Payment received! Your subscription is now active.");
+              router.reload();
+            }
+          } catch (statusError) {
+            console.error('Error checking order status:', statusError.message);
+          }
+        }, 10000); // Delay to ensure payment processing is complete
       } else {
         // Handle API error
         console.error('Payment URL creation failed:', response.data.message);
@@ -81,76 +144,104 @@ const AccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen ">
-      <div className="container mx-auto p-1 flex gap-6">
-        <div className="flex-1 p-1 rounded-lg shadow-md">
-          <Tab.Group>
-            <Tab.List className="flex space-x-1 border-b-2">
-              {Tabs.map((tab, index) => (
-                <Tab
-                  key={index}
-                  className={({ selected }) =>
-                    `py-2 px-4 text-lg font-semibold ${
-                      selected ? "border-b-4 border-green-500" : "text-gray-500"
-                    }`
-                  }
-                >
-                  {tab}
-                </Tab>
-              ))}
-            </Tab.List>
-            <Tab.Panels className="mt-6">
-              <Tab.Panel>
-                <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                  <h2 className="text-2xl font-bold mb-4">Account Details</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-gray-700 flex"><strong>Name:</strong> {user.name} <CheckBadgeIcon className="h-5 w-25 text-green-500" /></p>
-                      <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
-                      <p className="text-gray-700"><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
-                      <p className="text-gray-700"><strong>Plan:</strong> {user.userRole || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
+    <section className="flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
+        <div>
+          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-white">
+            <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
+            College Notes
+          </a>
+        </div>
+        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-[#1c1c24] border-gray-700">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
+              Create your account
+            </h1>
 
-                {user.userRole === 'MANAGER' || user.userRole === 'ADMIN' ? (
-                  <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <h2 className="text-2xl font-bold mb-4">Admin Actions</h2>
-                    <p className="text-gray-700">Here you can add admin-specific actions and details.</p>
-                  </div>
-                ) : (
-                  <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <h2 className="text-2xl font-bold mb-4">User Actions</h2>
-                    <p className="text-gray-700">Here you can add user-specific actions and details.</p>
-                  </div>
-                )}
+            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+              <FormField
+                label="Your Name"
+                type="text"
+                name="name"
+                value={name}
+                placeholder="John Doe"
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                classLabel="label_loinForm"
+                classInput="input_loinForm"
+              />
+              <FormField
+                label="Your email"
+                type="email"
+                name="email"
+                value={email}
+                placeholder="name@example.com"
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                classLabel="label_loinForm"
+                classInput="input_loinForm"
+              />
+              <FormField
+                label="Your Mobile"
+                type="tel"
+                name="phoneNumber"
+                value={phoneNumber}
+                placeholder="1234567890"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                autoComplete="tel"
+                classLabel="label_loinForm"
+                classInput="input_loinForm"
+              />
+              <FormField
+                label="Your Password"
+                type="password"
+                name="password"
+                value={password}
+                placeholder="••••••••"
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                classLabel="label_loinForm"
+                classInput="input_loinForm"
+              />
+              <FormField
+                label="Confirm Password"
+                type="password"
+                name="confirmPassword"
+                value={confirmPassword}
+                placeholder="••••••••"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                classLabel="label_loinForm"
+                classInput="input_loinForm"
+              />
+              <div className="flex gap-1 mr-5 md:mr-0">
+                <FormButtons
+                  primaryLabel={isLoading ? "Please wait..." : "Register"}
+                  secondaryLabel="Back"
+                  onPrimaryClick={handleSubmit}
+                  onSecondaryClick={() => router.back()}
+                  primaryClassName="btn_loginFormPrimary"
+                  secondaryClassName="btn_loginFormSecondary"
+                />
+              </div>
+            </form>
 
-                <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-                  <h2 className="text-2xl font-bold mb-4">Plan Subscription</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-gray-700"><strong>FREE:</strong> Basic access with limited features.</p>
-                      <p className="text-gray-700"><strong>PRO:</strong> Full access with premium features for <strong>49rs</strong>.</p>
-                      {user.userRole === 'PRO' ? (
-                        <button className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg" disabled>You already subscribed</button>
-                      ) : (
-                        <button onClick={handleSubscribe} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Subscribe</button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Tab.Panel>
-              <Tab.Panel>
-                <div className="bg-gray-50 p-6 rounded-lg shadow-sm space-y-6">
-                  <ChangePassword sessionData={user.email} />
-                </div>
-              </Tab.Panel>
-            </Tab.Panels>
-          </Tab.Group>
+            {/* Login Button */}
+            <div className="flex justify-center mt-4">
+              <button
+                type="button"
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => router.push('/login')}
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Login"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
-export default AccountPage;
+export default RegisterPage;
