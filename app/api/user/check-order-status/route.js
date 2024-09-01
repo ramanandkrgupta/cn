@@ -15,7 +15,8 @@ export const POST = async (req) => {
 
     const data = qs.stringify({
       user_token,
-      order_id
+      order_id,
+phoneNumber
     });
 
     const config = {
