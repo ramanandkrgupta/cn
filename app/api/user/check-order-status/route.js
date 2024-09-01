@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import qs from 'qs';
-import db from '@/lib/db'; // Assuming you have a database module to interact with your user database
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const POST = async (req) => {
   try {
-    const { user_token, order_id } = await req.json();
+    const { user_token, order_id, phoneNumber } = await req.json();
 
-    if (!user_token || !order_id) {
+    if (!user_token || !order_id || !phoneNumber) {
       return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400 });
     }
 
@@ -28,9 +30,9 @@ export const POST = async (req) => {
     const response = await axios.request(config);
 
     if (response.data.status && response.data.result.txnStatus === 'SUCCESS') {
-      // Update user role to PRO in the database
-      await db.user.update({
-        where: { orderId: order_id },
+      // Update user role to PRO in the database using Prisma and phoneNumber
+      await prisma.user.update({
+        where: { phoneNumber: phoneNumber },
         data: { userRole: 'PRO' }
       });
 
