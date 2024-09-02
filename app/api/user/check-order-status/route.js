@@ -3,6 +3,12 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const responseHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 export const POST = async (req) => {
   try {
     const { status, order_id, customer_mobile, amount, remark1, remark2 } = await req.json();
@@ -10,7 +16,7 @@ export const POST = async (req) => {
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
 
     if (!status || !order_id || !customer_mobile) {
-      return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400, headers: { 'Access-Control-Allow-Origin': '*' } });
+      return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400, headers: responseHeaders });
     }
 
     if (status === 'SUCCESS') {
@@ -23,9 +29,9 @@ export const POST = async (req) => {
 
       console.log('Update result:', updateResult);
 
-      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: { 'Access-Control-Allow-Origin': '*' } });
+      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
     } else {
-      return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: { 'Access-Control-Allow-Origin': '*' } });
+      return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: responseHeaders });
     }
 
   } catch (error) {
@@ -41,8 +47,15 @@ export const POST = async (req) => {
       console.error('Error message:', error.message);
     }
 
-    return NextResponse.json({ error: 'An error occurred while processing the webhook.' }, { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
+    return NextResponse.json({ error: 'An error occurred while processing the webhook.' }, { status: 500, headers: responseHeaders });
   } finally {
     await prisma.$disconnect();
   }
+};
+
+export const OPTIONS = async () => {
+  return NextResponse.json({}, {
+    status: 204,
+    headers: responseHeaders
+  });
 };
