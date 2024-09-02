@@ -4,7 +4,12 @@ import { useState } from 'react';
 
    const OrderStatusForm = () => {
      const [orderId, setOrderId] = useState('');
-     const [status, setStatus] = useState(null);
+     const [customer_mobile, setcustomer_mobile] = useState('');
+     const [amount, setamount,] = useState('1');
+     const [remark1, setRemark1] = useState('TEST1234');
+const [remark2, setRemark2] = useState('TEST1234');
+
+     const [status, setStatus] = useState('SUCCESS');
 
      const handleSubmit = async (e) => {
        e.preventDefault();
