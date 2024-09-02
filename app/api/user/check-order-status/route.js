@@ -3,12 +3,19 @@ import prisma from "@/libs/prisma";
 
 export const POST = async (req) => {
   try {
+    // Set CORS headers
+    const responseHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
     const { status, order_id, customer_mobile, amount, remark1, remark2 } = await req.json();
 
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
 
     if (!status || !order_id || !customer_mobile) {
-      return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400, headers: responseHeaders });
     }
 
     if (status === 'SUCCESS') {
@@ -24,9 +31,9 @@ export const POST = async (req) => {
       // Log the result of the update operation
       console.log('Update result:', updateResult);
 
-      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200 });
+      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
     } else {
-      return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400 });
+      return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: responseHeaders });
     }
 
   } catch (error) {
@@ -43,6 +50,6 @@ export const POST = async (req) => {
       console.error('Error message:', error.message);
     }
 
-    return NextResponse.json({ error: 'An error occurred while processing the webhook.' }, { status: 500 });
+    return NextResponse.json({ error: 'An error occurred while processing the webhook.' }, { status: 500, headers: responseHeaders });
   }
 };
