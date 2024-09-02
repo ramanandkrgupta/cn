@@ -10,8 +10,6 @@ import axios from 'axios';
 import qs from 'qs';
 import { PrismaClient } from '@prisma/client';
 
-
-
 const Tabs = ["Account Details", "Settings"];
 
 const AccountPage = () => {
@@ -32,7 +30,6 @@ const AccountPage = () => {
   }
 
   const { user } = session;
-
   
   const handleSubscribe = async () => {
     if (user.userRole === 'PRO') {
@@ -69,32 +66,6 @@ const AccountPage = () => {
         // Order created successfully, redirect to payment URL
         toast.success("Order created successfully! Redirecting to payment...");
         window.location.href = response.data.result.payment_url;
-
-        // After payment success, check the order status and update user role
-        setTimeout(async () => {
-          const checkStatusConfig = {
-            method: 'post',
-            url: '/api/user/check-order-status',
-            headers: { 
-              'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-              user_token: '9856ce42fc26349fe5fab9c6b630e9c6',
-              order_id: order_id
-            })
-          };
-
-          try {
-            const statusResponse = await axios.request(checkStatusConfig);
-            if (statusResponse.data.message === 'User role updated to PRO.') {
-              // User role updated, you might want to refresh session or user data
-              toast.success("Payment received! Your subscription is now active.");
-              router.reload();
-            }
-          } catch (statusError) {
-            console.error('Error checking order status:', statusError.message);
-          }
-        }, 10000); // Delay to ensure payment processing is complete
       } else {
         // Handle API error
         console.error('Payment URL creation failed:', response.data.message);
