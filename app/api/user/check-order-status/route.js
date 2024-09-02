@@ -16,21 +16,27 @@ export const POST = async (req) => {
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
 
     if (!status || !order_id || !customer_mobile) {
+      console.log('Missing required parameters.');
       return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400, headers: responseHeaders });
     }
 
     if (status === 'SUCCESS') {
       console.log('Updating user with phoneNumber:', customer_mobile);
 
-      const updateResult = await prisma.user.update({
-        where: { phoneNumber: customer_mobile },
-        data: { userRole: 'PRO' }
-      });
-
-      console.log('Update result:', updateResult);
+      try {
+        const updateResult = await prisma.user.update({
+          where: { phoneNumber: customer_mobile },
+          data: { userRole: 'PRO' }
+        });
+        console.log('Update result:', updateResult);
+      } catch (updateError) {
+        console.error('Error updating user:', updateError);
+        return NextResponse.json({ error: 'Error updating user role.' }, { status: 500, headers: responseHeaders });
+      }
 
       return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
     } else {
+      console.log('Transaction not successful.');
       return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: responseHeaders });
     }
 
