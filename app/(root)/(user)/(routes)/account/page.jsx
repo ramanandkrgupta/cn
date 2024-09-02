@@ -10,6 +10,9 @@ import axios from 'axios';
 import qs from 'qs';
 import { PrismaClient } from '@prisma/client';
 
+
+import OrderStatusForm from './OrderStatusForm';
+
 const Tabs = ["Account Details", "Settings"];
 
 const AccountPage = () => {
@@ -103,6 +106,7 @@ const AccountPage = () => {
                 </Tab>
               ))}
             </Tab.List>
+<OrderStatusForm />
             <Tab.Panels className="mt-6">
               <Tab.Panel>
                 <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
