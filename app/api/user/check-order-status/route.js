@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import prisma from "@/libs/prisma";
 
 export const POST = async (req) => {
-  try {
-    // Set CORS headers
-    const responseHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    };
+  // Set CORS headers
+  const responseHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
 
+  try {
     const { status, order_id, customer_mobile, amount, remark1, remark2 } = await req.json();
 
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
