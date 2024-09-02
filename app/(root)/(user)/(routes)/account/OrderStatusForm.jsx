@@ -4,7 +4,7 @@ import { useState } from 'react';
 
    const OrderStatusForm = () => {
      const [orderId, setOrderId] = useState('');
-     const [customer_mobile, setcustomer_mobile] = useState('');
+     const [customer_mobile, setcustomer_mobile] = useState('1234567890');
      const [amount, setamount,] = useState('1');
      const [remark1, setRemark1] = useState('TEST1234');
 const [remark2, setRemark2] = useState('TEST1234');
@@ -14,7 +14,7 @@ const [remark2, setRemark2] = useState('TEST1234');
      const handleSubmit = async (e) => {
        e.preventDefault();
        try {
-         const response = await axios.post('/api/user/check-order-status', { order_id: orderId });
+         const response = await axios.post('/api/user/check-order-status', { order_id: orderId , amount: amount, customer_mobile: customer_mobile,status: status, remark1: remark1, reamr2:remark2,status: status});
          setStatus(response.data);
          toast.success("Order status retrieved successfully!");
        } catch (error) {
