@@ -29,12 +29,13 @@ export const POST = async (req) => {
           data: { userRole: 'PRO' }
         });
         console.log('Update result:', updateResult);
+
+        return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
       } catch (updateError) {
         console.error('Error updating user:', updateError);
+        console.error('Parameters:', { phoneNumber: customer_mobile, userRole: 'PRO' });
         return NextResponse.json({ error: 'Error updating user role.' }, { status: 500, headers: responseHeaders });
       }
-
-      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
     } else {
       console.log('Transaction not successful.');
       return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: responseHeaders });
