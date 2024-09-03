@@ -6,19 +6,19 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import ChangePassword from '@/components/admin/components/ChangePassword';
-import axios from 'axios';
-import qs from 'qs';
-import { PrismaClient } from '@prisma/client';
-
-
 import ProfileCard from './ProfileCard';
-import OrderStatusForm from './OrderStatusForm';
+import axios from 'axios';
+import { useState } from 'react';
+import Radio, { RadioGroup } from '@/components/Radio';
+import Plan from '@/components/Plan';
+import { BadgePercent, Sparkle, Gem, Crown, ArrowRight } from 'lucide-react';
 
 const Tabs = ["Account Details", "Settings"];
 
 const AccountPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [plan, setPlan] = useState("");
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -34,7 +34,7 @@ const AccountPage = () => {
   }
 
   const { user } = session;
-  
+
   const handleSubscribe = async () => {
     if (user.userRole === 'PRO') {
       return;
@@ -67,29 +67,24 @@ const AccountPage = () => {
       const response = await axios.request(config);
 
       if (response.data.status) {
-        // Order created successfully, redirect to payment URL
         toast.success("Order created successfully! Redirecting to payment...");
         window.location.href = response.data.result.payment_url;
       } else {
-        // Handle API error
         console.error('Payment URL creation failed:', response.data.message);
       }
     } catch (error) {
       if (error.response) {
-        // Server responded with a status other than 200 range
         console.error('Error response:', error.response.data.message);
       } else if (error.request) {
-        // Request was made but no response received
         console.error('Error request:', error.request);
       } else {
-        // Other errors
         console.error('Error message:', error.message);
       }
     }
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <div className="container mx-auto p-1 flex gap-6">
         <div className="flex-1 p-1 rounded-lg shadow-md">
           <Tab.Group>
@@ -107,14 +102,17 @@ const AccountPage = () => {
                 </Tab>
               ))}
             </Tab.List>
-<ProfileCard />
+            <ProfileCard />
             <Tab.Panels className="mt-6">
               <Tab.Panel>
                 <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
                   <h2 className="text-2xl font-bold mb-4">Account Details</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-gray-700 flex"><strong>Name:</strong> {user.name} <CheckBadgeIcon className="h-5 w-25 text-green-500" /></p>
+                      <p className="text-gray-700 flex">
+                        <strong>Name:</strong> {user.name} 
+                        <CheckBadgeIcon className="h-5 w-5 text-green-500 ml-2" />
+                      </p>
                       <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
                       <p className="text-gray-700"><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
                       <p className="text-gray-700"><strong>Plan:</strong> {user.userRole || 'N/A'}</p>
@@ -135,18 +133,50 @@ const AccountPage = () => {
                 )}
 
                 <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-                  <h2 className="text-2xl font-bold mb-4">Plan Subscription</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-gray-700"><strong>FREE:</strong> Basic access with limited features.</p>
-                      <p className="text-gray-700"><strong>PRO:</strong> Full access with premium features for <strong>49rs</strong>.</p>
-                      {user.userRole === 'PRO' ? (
-                        <button className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg" disabled>You already subscribed</button>
-                      ) : (
-                        <button onClick={handleSubscribe} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Subscribe</button>
-                      )}
+                  <h2 className="text-2xl font-bold mb-4">Choose Your Plan</h2>
+                  <RadioGroup value={plan} onChange={(e) => setPlan(e.target.value)}>
+                    <div className="flex gap-4 flex-col">
+                      <Radio value="free">
+                        <Plan
+                          icon={<BadgePercent />}
+                          title="Free"
+                          features={["SD (480p)", "Mobile", "Ads"]}
+                          price={0}
+                        />
+                      </Radio>
+                      <Radio value="basic">
+                        <Plan
+                          icon={<Sparkle />}
+                          title="Basic"
+                          features={["HD (720p)", "1 Device"]}
+                          price={4.99}
+                        />
+                      </Radio>
+                      <Radio value="standard">
+                        <Plan
+                          icon={<Gem />}
+                          title="Standard"
+                          features={["Full HD (1080p)", "2 Devices"]}
+                          price={9.99}
+                        />
+                      </Radio>
+                      <Radio value="premium">
+                        <Plan
+                          icon={<Crown />}
+                          title="Premium"
+                          features={["Ultra HD (4K) + HDR", "4 Devices"]}
+                          price={14.99}
+                        />
+                      </Radio>
                     </div>
-                  </div>
+                  </RadioGroup>
+                  <button
+                    className="mt-4 flex gap-4 items-center px-6 py-3 rounded-lg bg-violet-800 hover:bg-violet-700 font-semibold text-lg text-white"
+                    onClick={handleSubscribe}
+                  >
+                    Proceed with {plan} plan
+                    <ArrowRight />
+                  </button>
                 </div>
               </Tab.Panel>
               <Tab.Panel>
