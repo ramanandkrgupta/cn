@@ -12,7 +12,7 @@ model User {
   email       String    @unique
   name        String?
   password    String
-  phoneNumber String
+  phoneNumber String @unique
   subjects    subject[]
   posts       post[]
   userRole    Role      @default(USER)
