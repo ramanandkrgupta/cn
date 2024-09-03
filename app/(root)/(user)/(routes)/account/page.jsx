@@ -10,7 +10,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Radio, { RadioGroup } from '@/components/Radio.jsx';
 import Plan from '@/components/Plan.jsx';
-import { BadgePercent, Sparkle, Gem, Crown, ArrowRight } from 'lucide-react';
+import { BadgePercent, Crown, ArrowRight } from 'lucide-react';
 
 const AccountPage = () => {
   const router = useRouter();
@@ -48,7 +48,6 @@ const AccountPage = () => {
       const order_id = `order${new Date().getTime()}`;
       const data = {
         customer_mobile: user.phoneNumber,
-        
         amount: plan === 'premium' ? '49' : '0',
         order_id: order_id,
         redirect_url: 'https://v1.collegenotes.tech/account',
@@ -106,7 +105,7 @@ const AccountPage = () => {
                   />
                 </Radio>
 
-                <Radio value="premium" defaultChecked>
+                <Radio value="premium">
                   <Plan
                     icon={<Crown />}
                     title="Premium"
