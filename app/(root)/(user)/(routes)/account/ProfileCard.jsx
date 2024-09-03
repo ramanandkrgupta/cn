@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProfileCard = () => {
   return (
-    <div className="bg-gray-900 p-6 md:p-8 rounded-lg shadow-lg">
+    <div className="bg-[#2c2f32] p-6 md:p-8 rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="flex items-center mb-4 md:mb-0">
           <img
@@ -11,21 +11,26 @@ const ProfileCard = () => {
             className="w-16 h-16 rounded-full mr-4"
           />
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">Neelesh Chaudhary</h2>
-            <p className="text-gray-400">UI / UX Designer</p>
+
+<div class="flex items-center">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Neelesh Chaudhary</h2><CheckBadgeIcon className="h-5 w-5 text-green-500 ml-2"
+/>
+
+</div>
+            <p className="text-gray-400">Premium Member</p>
           </div>
         </div>
         <div className="flex space-x-6 md:space-x-4">
           <div className="text-center">
-            <p className="text-white font-medium">Post</p>
+            <p className="text-white font-medium">Total Download</p>
             <p className="text-lg font-bold text-white">23</p>
           </div>
           <div className="text-center">
-            <p className="text-white font-medium">Followers</p>
+            <p className="text-white font-medium">Post Share</p>
             <p className="text-lg font-bold text-white">326</p>
           </div>
           <div className="text-center">
-            <p className="text-white font-medium">Following</p>
+            <p className="text-white font-medium">Refer</p>
             <p className="text-lg font-bold text-white">120</p>
           </div>
         </div>
