@@ -106,7 +106,7 @@ const AccountPage = () => {
                   />
                 </Radio>
 
-                <Radio value="premium">
+                <Radio value="premium" defaultchecked>
                   <Plan
                     icon={<Crown />}
                     title="Premium"
