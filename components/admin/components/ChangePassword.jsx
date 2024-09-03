@@ -12,9 +12,9 @@ const ChangePassword = ({ sessionData }) => {
   const [newPassword, setNewPassword] = useState("");
 
   const styleChangePwd = {
-    classlabel: "block mb-2 text-sm font-medium text-gray-100",
+    classlabel: "block mb-2 text-sm sm:text-base font-medium text-gray-100",
     classInput:
-      "bg-gray-50 border border-gray-300 text-gray-300 text-sm rounded-lg block w-full p-2.5",
+      "bg-gray-50 border border-gray-300 text-gray-300 text-sm sm:text-base rounded-lg block w-full p-2.5 sm:p-3",
   };
 
   const handleSubmit = async (e) => {
@@ -26,17 +26,14 @@ const ChangePassword = ({ sessionData }) => {
       password: newPassword,
     };
     try {
-      // Validate the user input
       const validation = UserValidation.changepwd.safeParse(userInput);
 
-      //if validation is failure, return error message
       if (validation.success === false) {
         const { issues } = validation.error;
         issues.forEach((err) => {
           toast.error(err.message);
         });
       } else {
-        // If validation is successful, make the API request
         const response = await axios.patch("/api/user/changepwd", {
           oldPassword,
           newPassword,
@@ -63,46 +60,42 @@ const ChangePassword = ({ sessionData }) => {
     setOldPassword("");
     setNewPassword("");
   };
+
   return (
-    <div className="relative w-full max-w-sm h-full md:h-auto">
-      <div className="relative p-4 bg-[#2c2f32]  rounded-lg sm:p-5">
-        <div className="items-center pb-4 mb-4 rounded-t border-b sm:mb-5">
-        
+    <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-full md:h-auto">
+      <div className="relative p-4 sm:p-5 bg-[#2c2f32] rounded-lg">
+        <div className="mb-4 sm:mb-5">
+          <FormField
+            label="Current Password"
+            type="password"
+            name="oldPassword"
+            value={oldPassword}
+            placeholder="Enter old password"
+            onChange={(e) => setOldPassword(e.target.value)}
+            classLabel={styleChangePwd.classlabel}
+            classInput={`${styleChangePwd.classInput} uppercase`}
+          />
         </div>
-        <div>
-          <div className="mb-4">
-            <FormField
-              label="Current Password"
-              type="password"
-              name="oldPassword"
-              value={oldPassword}
-              placeholder="Enter old password"
-              onChange={(e) => setOldPassword(e.target.value)}
-              classLabel={styleChangePwd.classlabel}
-              classInput={`${styleChangePwd.classInput} uppercase`}
-            />
-          </div>
-          <div className="mb-4">
-            <FormField
-              label="New Password"
-              type="password"
-              name="newPassword"
-              value={newPassword}
-              placeholder="Enter new password"
-              onChange={(e) => setNewPassword(e.target.value)}
-              classLabel={styleChangePwd.classlabel}
-              classInput={`${styleChangePwd.classInput} uppercase`}
-            />
-          </div>
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="text-white inline-flex items-center bg-green-400 hover:bg-green-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            {isLoading ? <SmallLoading /> : "Change password"}
-          </button>
+        <div className="mb-4 sm:mb-5">
+          <FormField
+            label="New Password"
+            type="password"
+            name="newPassword"
+            value={newPassword}
+            placeholder="Enter new password"
+            onChange={(e) => setNewPassword(e.target.value)}
+            classLabel={styleChangePwd.classlabel}
+            classInput={`${styleChangePwd.classInput} uppercase`}
+          />
         </div>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="text-white inline-flex items-center bg-green-400 hover:bg-green-600 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 sm:px-6 sm:py-3 text-center"
+        >
+          {isLoading ? <SmallLoading /> : "Change password"}
+        </button>
       </div>
     </div>
   );
