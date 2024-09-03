@@ -10,14 +10,14 @@ import axios from 'axios';
 import qs from 'qs';
 import { PrismaClient } from '@prisma/client';
 
-
-import OrderStatusForm from './OrderStatusForm';
+import { useState } from 'react';
 
 const Tabs = ["Account Details", "Settings"];
 
 const AccountPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [userDetails, setUserDetails] = useState(session?.user || {});
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -87,6 +87,22 @@ const AccountPage = () => {
     }
   };
 
+  // Function to update user details
+  const handleEditProfile = async (updatedDetails) => {
+    try {
+      const response = await axios.post('/api/user/update-profile', updatedDetails);
+      if (response.data.success) {
+        toast.success("Profile updated successfully!");
+        setUserDetails(response.data.user);
+      } else {
+        toast.error("Failed to update profile.");
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      toast.error("An error occurred while updating profile.");
+    }
+  };
+
   return (
     <div className="min-h-screen ">
       <div className="container mx-auto p-1 flex gap-6">
@@ -106,22 +122,27 @@ const AccountPage = () => {
                 </Tab>
               ))}
             </Tab.List>
-<OrderStatusForm />
+
             <Tab.Panels className="mt-6">
               <Tab.Panel>
                 <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
                   <h2 className="text-2xl font-bold mb-4">Account Details</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-gray-700 flex"><strong>Name:</strong> {user.name} <CheckBadgeIcon className="h-5 w-25 text-green-500" /></p>
-                      <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
-                      <p className="text-gray-700"><strong>Phone Number:</strong> {user.phoneNumber || 'N/A'}</p>
-                      <p className="text-gray-700"><strong>Plan:</strong> {user.userRole || 'N/A'}</p>
+                      <img src={user.avatar || '/img/profile.png'} alt="User Avatar" className="w-24 h-24 rounded-full mb-4"/>
+                      <p className="text-gray-700 flex"><strong>Name:</strong> {userDetails.name} <CheckBadgeIcon className="h-5 w-25 text-green-500" /></p>
+                      <p className="text-gray-700"><strong>Email:</strong> {userDetails.email}</p>
+                      <p className="text-gray-700"><strong>Phone Number:</strong> {userDetails.phoneNumber || 'N/A'}</p>
+                      <p className="text-gray-700"><strong>Plan:</strong> {userDetails.userRole || 'N/A'}</p>
+                      <p className="text-gray-700"><strong>Total Downloads:</strong> {userDetails.totalDownloads || 0}</p>
+                      <p className="text-gray-700"><strong>Branch:</strong> {userDetails.branch || 'N/A'}</p>
+                      <p className="text-gray-700"><strong>University:</strong> {userDetails.university || 'N/A'}</p>
+                      <p className="text-gray-700"><strong>Roll No:</strong> {userDetails.rollNo || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
 
-                {user.userRole === 'MANAGER' || user.userRole === 'ADMIN' ? (
+                {userDetails.userRole === 'MANAGER' || userDetails.userRole === 'ADMIN' ? (
                   <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
                     <h2 className="text-2xl font-bold mb-4">Admin Actions</h2>
                     <p className="text-gray-700">Here you can add admin-specific actions and details.</p>
@@ -139,7 +160,7 @@ const AccountPage = () => {
                     <div>
                       <p className="text-gray-700"><strong>FREE:</strong> Basic access with limited features.</p>
                       <p className="text-gray-700"><strong>PRO:</strong> Full access with premium features for <strong>49rs</strong>.</p>
-                      {user.userRole === 'PRO' ? (
+                      {userDetails.userRole === 'PRO' ? (
                         <button className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg" disabled>You already subscribed</button>
                       ) : (
                         <button onClick={handleSubscribe} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Subscribe</button>
@@ -150,7 +171,16 @@ const AccountPage = () => {
               </Tab.Panel>
               <Tab.Panel>
                 <div className="bg-gray-50 p-6 rounded-lg shadow-sm space-y-6">
-                  <ChangePassword sessionData={user.email} />
+                  <ChangePassword sessionData={userDetails.email} />
+                  <div>
+                    <h3 className="text-lg font-semibold">Edit Profile</h3>
+                    <form onSubmit={(e) => { e.preventDefault(); handleEditProfile(userDetails); }}>
+                      <input type="text" placeholder="Branch" value={userDetails.branch} onChange={(e) => setUserDetails({ ...userDetails, branch: e.target.value })} />
+                      <input type="text" placeholder="University" value={userDetails.university} onChange={(e) => setUserDetails({ ...userDetails, university: e.target.value })} />
+                      <input type="text" placeholder="Roll No" value={userDetails.rollNo} onChange={(e) => setUserDetails({ ...userDetails, rollNo: e.target.value })} />
+                      <button type="submit" className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg">Save</button>
+                    </form>
+                  </div>
                 </div>
               </Tab.Panel>
             </Tab.Panels>
