@@ -12,9 +12,9 @@ const ChangePassword = ({ sessionData }) => {
   const [newPassword, setNewPassword] = useState("");
 
   const styleChangePwd = {
-    classlabel: "block mb-2 text-sm font-medium text-gray-900",
+    classlabel: "block mb-2 text-sm font-medium text-gray-100",
     classInput:
-      "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5",
+      "bg-gray-50 border border-gray-300 text-gray-300 text-sm rounded-lg block w-full p-2.5",
   };
 
   const handleSubmit = async (e) => {
@@ -65,11 +65,9 @@ const ChangePassword = ({ sessionData }) => {
   };
   return (
     <div className="relative w-full max-w-sm h-full md:h-auto">
-      <div className="relative p-4 bg-white rounded-lg sm:p-5">
+      <div className="relative p-4 bg-[#2c2f32]  rounded-lg sm:p-5">
         <div className="items-center pb-4 mb-4 rounded-t border-b sm:mb-5">
-          <h3 className="text-lg font-semibold text-gray-900">
-            <a href="#changepwd">Change Password</a>
-          </h3>
+        
         </div>
         <div>
           <div className="mb-4">
