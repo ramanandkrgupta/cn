@@ -48,7 +48,7 @@ const AccountPage = () => {
       const order_id = `order${new Date().getTime()}`;
       const data = {
         customer_mobile: user.phoneNumber,
-        user_token: '271a4848bbd962e07b62466ec7fec8ae',
+        user_token: '06918444e702633fe5dff373aecdd10b',
         amount: plan === 'premium' ? '49' : '0',
         order_id: order_id,
         redirect_url: 'https://v1.collegenotes.tech/account',
