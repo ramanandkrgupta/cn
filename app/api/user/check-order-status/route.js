@@ -46,16 +46,18 @@ export const POST = async (req) => {
 
   } catch (error) {
     console.error('Error processing webhook:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
 
-    // Instead of instanceof, directly use error.name or error.message
-    if (error.name === 'PrismaClientKnownRequestError') {
-      console.error('Prisma error code:', error.code);
-      console.error('Error meta:', error.meta);
-      return NextResponse.json({ error: 'Database error occurred.' }, { status: 500, headers: responseHeaders });
-    } else {
-      console.error('Error message:', error.message);
-      return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500, headers: responseHeaders });
-    }
+    return NextResponse.json({ 
+      error: 'An unexpected error occurred.', 
+      details: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } 
+    }, { status: 500, headers: responseHeaders });
   } finally {
     await prisma.$disconnect();
   }
