@@ -4,9 +4,10 @@ import qs from 'qs';
 
 export const POST = async (req) => {
   try {
-    const { customer_mobile, user_token, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
+const user_token = '06918444e702633fe5dff373aecdd10b'
+    const { customer_mobile, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
-    if (!customer_mobile || !user_token || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
+    if (!customer_mobile || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
       return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400 });
     }
 
@@ -24,10 +25,10 @@ export const POST = async (req) => {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://instantdum.com/api/create-order',
+      url: 'https://beta.collegenotes.tech/api/create-order',
       headers: { 
-        'Host': 'instantdum.com', 
-        'Origin': 'https://instantdum.com', 
+        'Host': 'beta.collegenotes.tech', 
+        'Origin': 'https://beta.collegenotes.tech', 
         'Access-Control-Allow-Origin': '*', 
         'Content-Type': 'application/x-www-form-urlencoded'
       },
