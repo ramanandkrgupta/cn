@@ -9,8 +9,8 @@ import ChangePassword from '@/components/admin/components/ChangePassword';
 import ProfileCard from './ProfileCard';
 import axios from 'axios';
 import { useState } from 'react';
-import Radio, { RadioGroup } from '@/components/Radio';
-import Plan from '@/components/Plan';
+import Radio, { RadioGroup } from '@/components/Radio.jsx';
+import Plan from '@/components/Plan.jsx';
 import { BadgePercent, Sparkle, Gem, Crown, ArrowRight } from 'lucide-react';
 
 const Tabs = ["Account Details", "Settings"];
