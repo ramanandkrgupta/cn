@@ -85,42 +85,11 @@ const AccountPage = () => {
       <div className="container mx-auto p-1 flex gap-6">
         <div className="flex-1 p-1 rounded-lg shadow-md">
           <ProfileCard />
-          <div className="mt-6 bg-gray-50 p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-4">Account Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <div className="text-gray-700 flex mb-2">
-                  <strong>Name:</strong>
-                  <span className="ml-2">{user.name}</span>
-                  <CheckBadgeIcon className="h-5 w-5 text-green-500 ml-2" />
-                </div>
-                <div className="text-gray-700 flex mb-2">
-                  <strong>Email:</strong>
-                  <span className="ml-2">{user.email}</span>
-                </div>
-                <div className="text-gray-700 flex mb-2">
-                  <strong>Phone Number:</strong>
-                  <span className="ml-2">{user.phoneNumber || 'N/A'}</span>
-                </div>
-                <div className="text-gray-700 flex mb-2">
-                  <strong>Plan:</strong>
-                  <span className="ml-2">{user.userRole || 'N/A'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+         
 
-          {user.userRole === 'MANAGER' || user.userRole === 'ADMIN' ? (
-            <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">Admin Actions</h2>
-              <p className="text-gray-700">Here you can add admin-specific actions and details.</p>
-            </div>
-          ) : (
-            <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">User Actions</h2>
-              <p className="text-gray-700">Here you can add user-specific actions and details.</p>
-            </div>
-          )}
+
+
+        
 
           <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-bold mb-4">Choose Your Plan</h2>
@@ -134,28 +103,13 @@ const AccountPage = () => {
                     price={0}
                   />
                 </Radio>
-                <Radio value="basic">
-                  <Plan
-                    icon={<Sparkle />}
-                    title="Basic"
-                    features={["HD (720p)", "1 Device"]}
-                    price={4.99}
-                  />
-                </Radio>
-                <Radio value="standard">
-                  <Plan
-                    icon={<Gem />}
-                    title="Standard"
-                    features={["Full HD (1080p)", "2 Devices"]}
-                    price={9.99}
-                  />
-                </Radio>
+               
                 <Radio value="premium">
                   <Plan
                     icon={<Crown />}
                     title="Premium"
-                    features={["Ultra HD (4K) + HDR", "4 Devices"]}
-                    price={14.99}
+                    features={["Access All Content", "Premium Support", "Early Access"]}
+                    price={49}
                   />
                 </Radio>
               </div>
@@ -169,7 +123,7 @@ const AccountPage = () => {
             </button>
           </div>
 
-          <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-sm">
+          <div className="mt-8 bg-[#2c2f32]  p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-bold mb-4">Change Password</h2>
             <ChangePassword sessionData={user.email} />
           </div>
