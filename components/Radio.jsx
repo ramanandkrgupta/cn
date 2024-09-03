@@ -1,4 +1,4 @@
-import { useContext, createContext } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 
 const RadioContext = createContext();
 
@@ -28,9 +28,24 @@ export default function Radio({ children, ...props }) {
   );
 }
 
-export function RadioGroup({ value, onChange, children }) {
+export function RadioGroup({ value: defaultValue, onChange, children }) {
+  const [value, setValue] = useState(defaultValue || "premium");
+
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(defaultValue);
+    }
+  }, [defaultValue]);
+
+  const handleChange = (e) => {
+    setValue(e.target.value);
+    if (onChange) {
+      onChange(e);
+    }
+  };
+
   return (
-    <RadioContext.Provider value={{ value, onChange }}>
+    <RadioContext.Provider value={{ value, onChange: handleChange }}>
       {children}
     </RadioContext.Provider>
   );
