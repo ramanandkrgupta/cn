@@ -23,7 +23,7 @@ export const POST = async (req) => {
     if (status === 'SUCCESS') {
       console.log('Updating user with phoneNumber:', customer_mobile);
 
-      const user = await prisma.user.findUnique({
+      const user = await prisma.user.findFirst({
         where: { phoneNumber: customer_mobile },
       });
 
@@ -33,7 +33,7 @@ export const POST = async (req) => {
       }
 
       const updateResult = await prisma.user.update({
-        where: { phoneNumber: customer_mobile },
+        where: { id: user.id }, // Use the unique id for the update operation
         data: { userRole: 'PRO' }
       });
       console.log('Update result:', updateResult);
