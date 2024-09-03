@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 
 const ProfileCard = () => {
   return (
