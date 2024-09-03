@@ -23,16 +23,16 @@ const ProfileCard = () => {
         </div>
         <div className="flex space-x-6 md:space-x-4">
           <div className="text-center">
-            <p className="text-white font-medium">Total Download</p>
+            <p className="text-white font-medium">Download</p>
             <p className="text-lg font-bold text-white">23</p>
           </div>
           <div className="text-center">
-            <p className="text-white font-medium">Post Share</p>
+            <p className="text-white font-medium">Like</p>
             <p className="text-lg font-bold text-white">326</p>
           </div>
           <div className="text-center">
             <p className="text-white font-medium">Refer</p>
-            <p className="text-lg font-bold text-white">120</p>
+            <p className="text-lg font-bold text-white">10</p>
           </div>
         </div>
       </div>
