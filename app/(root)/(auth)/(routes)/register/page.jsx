@@ -47,7 +47,7 @@ const RegisterPage = () => {
 
   const handleSendOtp = async () => {
      try {
-       const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+       const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
          'size': 'invisible',
          'callback': (response) => {
            // reCAPTCHA solved - will proceed with signInWithPhoneNumber
@@ -55,7 +55,7 @@ const RegisterPage = () => {
          'expired-callback': () => {
            // Reset reCAPTCHA?
          }
-       }, auth);
+       });
 
        recaptchaVerifier.render().then((widgetId) => {
          window.recaptchaWidgetId = widgetId;
