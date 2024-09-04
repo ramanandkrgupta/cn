@@ -2,10 +2,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
-import doc from "public/icons/doc.png";
-import fire from "public/icons/fire.png"; // Add your fire image or animation here
-import newt from "public/icons/new.png";
-import premiumIcon from "public/icons/premium.png";
+import doc from "public/icons/doc";
+import fire from "public/icons/fire"; // Add your fire image or animation here
+import newt from "public/icons/new";
+import premiumIcon from "public/icons/premium";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 
 const PostCard = ({ data }) => {
