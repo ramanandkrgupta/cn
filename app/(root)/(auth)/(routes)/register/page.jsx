@@ -46,30 +46,31 @@ const RegisterPage = () => {
   };
 
   const handleSendOtp = async () => {
-     try {
-       const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-         'size': 'invisible',
-         'callback': (response) => {
-           // reCAPTCHA solved - will proceed with signInWithPhoneNumber
-         },
-         'expired-callback': () => {
-           // Reset reCAPTCHA?
-         }
-       });
+  const formattedPhoneNumber = `+${phoneNumber}`;
+  try {
+    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        // reCAPTCHA solved - will proceed with signInWithPhoneNumber
+      },
+      'expired-callback': () => {
+        // Reset reCAPTCHA?
+      }
+    });
 
-       recaptchaVerifier.render().then((widgetId) => {
-         window.recaptchaWidgetId = widgetId;
-       });
+    recaptchaVerifier.render().then((widgetId) => {
+      window.recaptchaWidgetId = widgetId;
+    });
 
-       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-       window.confirmationResult = confirmationResult;
-       setOtpSent(true);
-       toast.success("OTP sent to your mobile number");
-     } catch (error) {
-       console.error("Error sending OTP:", error);
-       toast.error("Something went wrong while sending OTP: " + error.message);
-     }
-   };
+    const confirmationResult = await signInWithPhoneNumber(auth, formattedPhoneNumber, recaptchaVerifier);
+    window.confirmationResult = confirmationResult;
+    setOtpSent(true);
+    toast.success("OTP sent to your mobile number");
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    toast.error("Something went wrong while sending OTP: " + error.message);
+  }
+};
 
   const handleVerifyOtp = async () => {
     try {
