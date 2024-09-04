@@ -25,9 +25,15 @@ import mcomfinance from "./mcomfinance.PNG";
 import msw from "./msw.PNG";
 import coop from "./coop.PNG";
 import subject from "./subject.PNG";
+import fire from "public/icons/fire"; // Add your fire image or animation here
+import newt from "public/icons/newt";
+import premiumIcon from "public/icons/premium";
 
 export { 
-    play, 
+    play,
+    fire,
+    newt,
+    premiumIcon, 
     doc, 
     syllabus, 
     study, 
