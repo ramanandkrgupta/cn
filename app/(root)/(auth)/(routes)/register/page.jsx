@@ -24,16 +24,22 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-
-const [passwordMatch, setPasswordMatch] = useState(true);
-
+  const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordChange = (e) => {
     const { value } = e.target;
     setPassword(value);
     const evaluation = zxcvbn(value);
     setPasswordStrength(evaluation.score * 25); // Score is between 0 and 4
+    setPasswordMatch(value === confirmPassword);
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const { value } = e.target;
+    setConfirmPassword(value);
+    setPasswordMatch(password === value);
   };
 
   const handleSendOtp = async () => {
@@ -163,7 +169,7 @@ const [passwordMatch, setPasswordMatch] = useState(true);
                   onClick={handleSendOtp}
                   disabled={otpSent || isLoading}
                 >
-                  {otpSent ? "OTP Send ed" : "Send OTP"}
+                  {otpSent ? "OTP Sent" : "Send OTP"}
                 </button>
               </div>
               {otpSent && (
@@ -181,7 +187,7 @@ const [passwordMatch, setPasswordMatch] = useState(true);
               )}
               <FormField
                 label="Your Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={password}
                 placeholder="••••••••"
@@ -198,28 +204,28 @@ const [passwordMatch, setPasswordMatch] = useState(true);
               </div>
               <FormField
                 label="Confirm Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={confirmPassword}
                 placeholder="••••••••"
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={handleConfirmPasswordChange}
                 autoComplete="new-password"
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
               />
-<div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="showPassword"
-                  checked={showPassword}
-                  onChange={() => setShowPassword(!showPassword)}
-                  className="mr-2"
-                />
-                <label htmlFor="showPassword" className="text-white">Show Password</label>
-              </div>
-              {!passwordMatch && (
-                <p className="text-red-500">Passwords do not match</p>
-              )}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showPassword"
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                  className="mr-2"
+                />
+                <label htmlFor="showPassword" className="text-white">Show Password</label>
+              </div>
+              {!passwordMatch && (
+                <p className="text-red-500">Passwords do not match</p>
+              )}
               <div className="flex gap-1 mr-5 md:mr-0">
                 <FormButtons
                   primaryLabel={isLoading ? "Please wait..." : "Register"}
