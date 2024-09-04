@@ -17,7 +17,7 @@ import { auth } from "@/libs/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const RegisterPage = () => {
-  const auth = getAuth(app);
+  
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
