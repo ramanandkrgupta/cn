@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-     import { getAuth } from "firebase/auth";
+     import { getAuth ,RecaptchaVerifier, signInWithPhoneNumber} from "firebase/auth";
 
      const firebaseConfig = {
       apiKey: "AIzaSyDftv3fMblRlPUg8R6DTYx9EBye3eaLFf8",
@@ -11,7 +11,9 @@ import { initializeApp } from "firebase/app";
       measurementId: "G-W6GB5VBFFL"
      };
 
-     const app = initializeApp(firebaseConfig);
-     const auth = getAuth(app);
+     
 
-     export { auth };
+const app = initializeApp(firebaseConfig);
+   const auth = getAuth(app);
+
+   export { app, auth, RecaptchaVerifier, signInWithPhoneNumber };
