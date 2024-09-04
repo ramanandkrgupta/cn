@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
      import { getAuth ,RecaptchaVerifier, signInWithPhoneNumber} from "firebase/auth";
 
      const firebaseConfig = {
-      apiKey: "AIzaSyDftv3fMblRlPUg8R6DTYx9EBye3eaLFf8",
-      authDomain: "collegenotes-firebase-otp.firebaseapp.com",
-      projectId: "collegenotes-firebase-otp",
-      storageBucket: "collegenotes-firebase-otp.appspot.com",
-      messagingSenderId: "87289423653",
-      appId: "1:87289423653:web:a2903cb1d5a51abe4edccc",
-      measurementId: "G-W6GB5VBFFL"
+      apiKey: "AIzaSyDG3OncPE7czapu_HW4Dk6wYZJZqrig3zk",
+  authDomain: "battle-d3b31.firebaseapp.com",
+  databaseURL: "https://battle-d3b31-default-rtdb.firebaseio.com",
+  projectId: "battle-d3b31",
+  storageBucket: "battle-d3b31.appspot.com",
+  messagingSenderId: "504058292094",
+  appId: "1:504058292094:web:4f5e7a96af7354d97fb52f",
+  measurementId: "G-EXWEWC1JCP"
      };
 
      
