@@ -10,7 +10,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Radio, { RadioGroup } from '@/components/Radio.jsx';
 import Plan from '@/components/Plan.jsx';
-import { BadgePercent, Crown, ArrowRight } from 'lucide-react';
+import { BadgePercent, Sparkle, Gem, Crown, ArrowRight } from 'lucide-react';
 
 const AccountPage = () => {
   const router = useRouter();
