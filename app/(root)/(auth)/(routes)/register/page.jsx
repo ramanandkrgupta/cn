@@ -146,12 +146,12 @@ const RegisterPage = () => {
                 classInput="input_loinForm"
                 required
               />
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-row items-center ">
                 <PhoneInput
                   country={"us"}
                   value={phoneNumber}
                   onChange={setPhoneNumber}
-                  inputStyle={{ width: "100%" }}
+                  inputStyle={{ width: "80%" }}
                   containerStyle={{ width: "100%" }}
                 />
                 <button
@@ -160,7 +160,7 @@ const RegisterPage = () => {
                   onClick={handleSendOtp}
                   disabled={otpSent || isLoading}
                 >
-                  {otpSent ? "OTP Sent" : "Send OTP"}
+                  {otpSent ? "OTP Send ed" : "Send OTP"}
                 </button>
               </div>
               {otpSent && (
@@ -204,6 +204,19 @@ const RegisterPage = () => {
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
               />
+<div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showPassword"
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                  className="mr-2"
+                />
+                <label htmlFor="showPassword" className="text-white">Show Password</label>
+              </div>
+              {!passwordMatch && (
+                <p className="text-red-500">Passwords do not match</p>
+              )}
               <div className="flex gap-1 mr-5 md:mr-0">
                 <FormButtons
                   primaryLabel={isLoading ? "Please wait..." : "Register"}
