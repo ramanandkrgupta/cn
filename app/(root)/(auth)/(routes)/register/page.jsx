@@ -24,6 +24,9 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+
+const [passwordMatch, setPasswordMatch] = useState(true);
+
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   const handlePasswordChange = (e) => {
