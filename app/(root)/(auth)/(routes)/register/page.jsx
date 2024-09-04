@@ -13,10 +13,11 @@ import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
-import { auth } from "@/libs/firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { app } from "@/libs/firebase";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const RegisterPage = () => {
+  const auth = getAuth(app);
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
