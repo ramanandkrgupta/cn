@@ -13,6 +13,8 @@ import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
+import { auth } from "@/libs/firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -44,13 +46,11 @@ const RegisterPage = () => {
 
   const handleSendOtp = async () => {
     try {
-      const response = await axios.post("/api/user/send-otp", { phoneNumber });
-      if (response.status === 200) {
-        toast.success("OTP sent to your mobile number");
-        setOtpSent(true);
-      } else {
-        toast.error("Failed to send OTP");
-      }
+      const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+      window.confirmationResult = confirmationResult;
+      setOtpSent(true);
+      toast.success("OTP sent to your mobile number");
     } catch (error) {
       console.error("Error sending OTP: " + error);
       toast.error("Something went wrong while sending OTP");
@@ -59,15 +59,12 @@ const RegisterPage = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await axios.post("/api/user/verify-otp", { phoneNumber, otp });
-      if (response.status === 200) {
-        toast.success("OTP verified successfully");
-      } else {
-        toast.error("Invalid OTP");
-      }
+      const confirmationResult = window.confirmationResult;
+      await confirmationResult.confirm(otp);
+      toast.success("OTP verified successfully");
     } catch (error) {
       console.error("Error verifying OTP: " + error);
-      toast.error("Something went wrong while verifying OTP");
+      toast.error("Invalid OTP");
     }
   };
 
@@ -173,6 +170,7 @@ const RegisterPage = () => {
                   {otpSent ? "OTP Sent" : "Send OTP"}
                 </button>
               </div>
+              <div id="recaptcha-container"></div>
               {otpSent && (
                 <FormField
                   label="Enter OTP"
