@@ -47,7 +47,20 @@ const RegisterPage = () => {
 
   const handleSendOtp = async () => {
      try {
-       const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
+       const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+         'size': 'invisible',
+         'callback': (response) => {
+           // reCAPTCHA solved - will proceed with signInWithPhoneNumber
+         },
+         'expired-callback': () => {
+           // Reset reCAPTCHA?
+         }
+       }, auth);
+
+       recaptchaVerifier.render().then((widgetId) => {
+         window.recaptchaWidgetId = widgetId;
+       });
+
        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
        window.confirmationResult = confirmationResult;
        setOtpSent(true);
