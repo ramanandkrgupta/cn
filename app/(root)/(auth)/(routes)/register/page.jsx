@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
+import zxcvbn from "zxcvbn";
+import PhoneInput from "react-phone-input-2";
+import 'react-phone-input-2/lib/style.css';
 
 import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";
@@ -19,6 +22,45 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+
+  const handlePasswordChange = (e) => {
+    const { value } = e.target;
+    setPassword(value);
+    const evaluation = zxcvbn(value);
+    setPasswordStrength(evaluation.score * 25); // Score is between 0 and 4
+  };
+
+  const handleSendOtp = async () => {
+    try {
+      const response = await axios.post("/api/user/send-otp", { phoneNumber });
+      if (response.status === 200) {
+        toast.success("OTP sent to your mobile number");
+        setOtpSent(true);
+      } else {
+        toast.error("Failed to send OTP");
+      }
+    } catch (error) {
+      console.error("Error sending OTP: " + error);
+      toast.error("Something went wrong while sending OTP");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      const response = await axios.post("/api/user/verify-otp", { phoneNumber, otp });
+      if (response.status === 200) {
+        toast.success("OTP verified successfully");
+      } else {
+        toast.error("Invalid OTP");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP: " + error);
+      toast.error("Something went wrong while verifying OTP");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,6 +132,7 @@ const RegisterPage = () => {
                 autoComplete="name"
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
+                required
               />
               <FormField
                 label="Your email"
@@ -101,29 +144,55 @@ const RegisterPage = () => {
                 autoComplete="email"
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
+                required
               />
-              <FormField
-                label="Your Mobile"
-                type="tel"
-                name="phoneNumber"
-                value={phoneNumber}
-                placeholder="1234567890"
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                autoComplete="tel"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
+              <div className="flex items-center space-x-4">
+                <PhoneInput
+                  country={"us"}
+                  value={phoneNumber}
+                  onChange={setPhoneNumber}
+                  inputStyle={{ width: "100%" }}
+                  containerStyle={{ width: "100%" }}
+                />
+                <button
+                  type="button"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleSendOtp}
+                  disabled={otpSent || isLoading}
+                >
+                  {otpSent ? "OTP Sent" : "Send OTP"}
+                </button>
+              </div>
+              {otpSent && (
+                <FormField
+                  label="Enter OTP"
+                  type="text"
+                  name="otp"
+                  value={otp}
+                  placeholder="123456"
+                  onChange={(e) => setOtp(e.target.value)}
+                  autoComplete="one-time-code"
+                  classLabel="label_loinForm"
+                  classInput="input_loinForm"
+                />
+              )}
               <FormField
                 label="Your Password"
                 type="password"
                 name="password"
                 value={password}
                 placeholder="••••••••"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 autoComplete="new-password"
                 classLabel="label_loinForm"
                 classInput="input_loinForm"
               />
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full"
+                  style={{ width: `${passwordStrength}%` }}
+                ></div>
+              </div>
               <FormField
                 label="Confirm Password"
                 type="password"
