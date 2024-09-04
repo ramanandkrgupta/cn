@@ -157,15 +157,15 @@ const RegisterPage = () => {
               />
               <div className="flex flex-row items-center ">
                 <PhoneInput
-                  country={"us"}
+                  country={"india"}
                   value={phoneNumber}
                   onChange={setPhoneNumber}
-                  inputStyle={{ width: "80%" }}
-                  containerStyle={{ width: "100%" }}
+                  inputStyle={{ width: "100%" }}
+                  containerStyle={{ width: "80%" }}
                 />
                 <button
                   type="button"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold mx-2 rounded"
                   onClick={handleSendOtp}
                   disabled={otpSent || isLoading}
                 >
