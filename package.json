@@ -23,6 +23,7 @@
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.9",
     "file-saver": "^2.0.5",
+    "firebase": "^10.13.1",
     "https": "^1.0.0",
     "ionicons": "^7.4.0",
     "lucide-react": "^0.438.0",
@@ -34,6 +35,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-icons": "^4.10.1",
+    "react-phone-input-2": "^2.15.1",
     "sharp": "^0.32.6",
     "sonner": "^1.0.3",
     "supports-color": "^8.1.1",
@@ -41,7 +43,8 @@
     "swr": "^2.2.4",
     "tailwindcss": "3.3.2",
     "zod": "^3.22.4",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "daisyui": "^3.5.1",
