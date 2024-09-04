@@ -46,17 +46,17 @@ const RegisterPage = () => {
   };
 
   const handleSendOtp = async () => {
-    try {
-      const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
-      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-      window.confirmationResult = confirmationResult;
-      setOtpSent(true);
-      toast.success("OTP sent to your mobile number");
-    } catch (error) {
-      console.error("Error sending OTP: " + error);
-      toast.error("Something went wrong while sending OTP");
-    }
-  };
+     try {
+       const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
+       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+       window.confirmationResult = confirmationResult;
+       setOtpSent(true);
+       toast.success("OTP sent to your mobile number");
+     } catch (error) {
+       console.error("Error sending OTP:", error);
+       toast.error("Something went wrong while sending OTP: " + error.message);
+     }
+   };
 
   const handleVerifyOtp = async () => {
     try {
