@@ -157,11 +157,12 @@ const RegisterPage = () => {
               />
               <div className="flex flex-row items-center ">
                 <PhoneInput
-                  country={"india"}
+                  country={"in"} // Restricting to India only
                   value={phoneNumber}
                   onChange={setPhoneNumber}
                   inputStyle={{ width: "100%" }}
                   containerStyle={{ width: "80%" }}
+                  onlyCountries={['in']} // Restricting to India only
                 />
                 <button
                   type="button"
