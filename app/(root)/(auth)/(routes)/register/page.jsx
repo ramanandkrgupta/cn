@@ -5,16 +5,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
-import zxcvbn from "zxcvbn";
-import PhoneInput from "react-phone-input-2";
-import 'react-phone-input-2/lib/style.css';
+
 
 import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
-import { auth } from "@/libs/firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+
 
 const RegisterPage = () => {
   
@@ -25,8 +22,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
+  
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -45,43 +41,9 @@ const RegisterPage = () => {
     setPasswordMatch(password === value);
   };
 
-  const handleSendOtp = async () => {
-  const formattedPhoneNumber = `+${phoneNumber}`;
-  try {
-    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible',
-      'callback': (response) => {
-        // reCAPTCHA solved - will proceed with signInWithPhoneNumber
-      },
-      'expired-callback': () => {
-        // Reset reCAPTCHA?
-      }
-    });
+  
 
-    recaptchaVerifier.render().then((widgetId) => {
-      window.recaptchaWidgetId = widgetId;
-    });
-
-    const confirmationResult = await signInWithPhoneNumber(auth, formattedPhoneNumber, recaptchaVerifier);
-    window.confirmationResult = confirmationResult;
-    setOtpSent(true);
-    toast.success("OTP sent to your mobile number");
-  } catch (error) {
-    console.error("Error sending OTP:", error);
-    toast.error("Something went wrong while sending OTP: " + error.message);
-  }
-};
-
-  const handleVerifyOtp = async () => {
-    try {
-      const confirmationResult = window.confirmationResult;
-      await confirmationResult.confirm(otp);
-      toast.success("OTP verified successfully");
-    } catch (error) {
-      console.error("Error verifying OTP: " + error);
-      toast.error("Invalid OTP");
-    }
-  };
+    
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -167,25 +129,7 @@ const RegisterPage = () => {
                 classInput="input_loinForm"
                 required
               />
-              <div className="flex flex-row items-center ">
-                <PhoneInput
-                  country={"in"} // Restricting to India only
-                  value={phoneNumber}
-                  onChange={setPhoneNumber}
-                  inputStyle={{ width: "100%" }}
-                  containerStyle={{ width: "80%" }}
-                  onlyCountries={['in']} // Restricting to India only
-                />
-                <button
-                  type="button"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold mx-2 rounded"
-                  onClick={handleSendOtp}
-                  disabled={otpSent || isLoading}
-                >
-                  {otpSent ? "OTP Sent" : "Send OTP"}
-                </button>
-              </div>
-              <div id="recaptcha-container"></div>
+             
               {otpSent && (
                 <FormField
                   label="Enter OTP"
