@@ -130,19 +130,17 @@ const RegisterPage = () => {
                 required
               />
              
-              {otpSent && (
-                <FormField
-                  label="Enter OTP"
-                  type="text"
-                  name="otp"
-                  value={otp}
-                  placeholder="123456"
-                  onChange={(e) => setOtp(e.target.value)}
-                  autoComplete="one-time-code"
-                  classLabel="label_loinForm"
-                  classInput="input_loinForm"
-                />
-              )}
+             <FormField
+            label="Your Mobile"
+            type="tel"
+            name="phoneNumber"
+            value=`+91{phoneNumber}`
+            placeholder="1234567890"
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            autoComplete="tel"
+            classLabel="label_loinForm"
+            classInput="input_loinForm"
+          />
               <FormField
                 label="Your Password"
                 type={showPassword ? "text" : "password"}
