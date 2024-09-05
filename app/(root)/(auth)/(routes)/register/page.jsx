@@ -130,17 +130,20 @@ const RegisterPage = () => {
                 required
               />
              
-             <FormField
-            label="Your Mobile"
-            type="tel"
-            name="phoneNumber"
-            value=`+91{phoneNumber}`
-            placeholder="1234567890"
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            autoComplete="tel"
-            classLabel="label_loinForm"
-            classInput="input_loinForm"
-          />
+             <div className="flex items-center">
+  <span className="bg-gray-200 px-3 py-2 rounded-l text-black">+91</span>
+  <FormField
+    label="Your Mobile"
+    type="tel"
+    name="phoneNumber"
+    value={phoneNumber}
+    placeholder="1234567890"
+    onChange={(e) => setPhoneNumber(e.target.value)}
+    autoComplete="tel"
+    classLabel="label_loinForm"
+    classInput="input_loinForm rounded-l-none"
+  />
+</div>
               <FormField
                 label="Your Password"
                 type={showPassword ? "text" : "password"}
