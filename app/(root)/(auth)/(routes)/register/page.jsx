@@ -14,11 +14,12 @@ import { UserValidation } from "@/libs/validations/user";
 
 
 const RegisterPage = () => {
-  const RawPhoneNumber;
+  
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -139,7 +140,7 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
     name="phoneNumber"
     value={RawPhoneNumber}
     placeholder="1234567890"
-    onChange={(e) => setPhoneNumber(e.target.value)}
+    onChange={(e) => setRawPhoneNumber(e.target.value)}
     autoComplete="tel"
     classLabel="label_loinForm"
     classInput="input_loinForm rounded-l-none"
