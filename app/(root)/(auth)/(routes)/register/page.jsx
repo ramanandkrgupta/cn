@@ -48,6 +48,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+const phoneNumber = +91${ RawPhoneNumber}`;
 
     // Validate user input using the schema
     const userInput = { name, email, phoneNumber, password, confirmPassword };
@@ -131,12 +132,12 @@ const RegisterPage = () => {
               />
              
              <div className="flex items-center">
-  <span className="bg-gray-200 px-3 py-2 rounded-l text-black">+91</span>
+  <span className="input_loinForm  px-3 py-2 rounded-l text-black">+91</span>
   <FormField
     label="Your Mobile"
     type="tel"
     name="phoneNumber"
-    value={phoneNumber}
+    value={RawPhoneNumber}
     placeholder="1234567890"
     onChange={(e) => setPhoneNumber(e.target.value)}
     autoComplete="tel"
