@@ -48,7 +48,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-const phoneNumber = +91${ RawPhoneNumber}`;
+const phoneNumber = `+91${ RawPhoneNumber}`;
 
     // Validate user input using the schema
     const userInput = { name, email, phoneNumber, password, confirmPassword };
