@@ -14,7 +14,7 @@ import { UserValidation } from "@/libs/validations/user";
 
 
 const RegisterPage = () => {
-  
+  const RawPhoneNumber;
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
