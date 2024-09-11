@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { getSession } from 'next-auth/react';
-import { getServerSession } from 'next-auth/next';
-import { NextAuthOptions } from 'next-auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/options'; // Adjust the path based on your setup
+import { updateSessionToken } from '@/lib/session'; // Custom helper to update session token
 
 const prisma = new PrismaClient();
 
@@ -14,12 +14,6 @@ const responseHeaders = {
 
 export const POST = async (req) => {
   try {
-    const session = await getServerSession(req, NextAuthOptions);
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: responseHeaders });
-    }
-
     const { status, order_id, customer_mobile, amount, remark1, remark2 } = await req.json();
 
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
@@ -41,16 +35,22 @@ export const POST = async (req) => {
         return NextResponse.json({ error: 'User not found.' }, { status: 404, headers: responseHeaders });
       }
 
+      // Update user role to PRO
       const updateResult = await prisma.user.update({
         where: { id: user.id }, // Use the unique id for the update operation
         data: { userRole: 'PRO' }
       });
       console.log('Update result:', updateResult);
 
-      // Update session role if needed
-      session.user.userRole = 'PRO';
+      // Get the session for the current user
+      const session = await getServerSession(authOptions);
+      if (session) {
+        // Update the session to reflect the new role
+        await updateSessionToken(session.user.email, 'PRO');
+        console.log('Session updated to PRO.');
+      }
 
-      return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
+      return NextResponse.json({ message: 'User role updated to PRO and session updated.' }, { status: 200, headers: responseHeaders });
     } else {
       console.log('Transaction not successful.');
       return NextResponse.json({ error: 'Transaction not successful.' }, { status: 400, headers: responseHeaders });
