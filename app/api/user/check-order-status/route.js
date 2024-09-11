@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { NextAuthOptions } from 'next-auth';
 
 const prisma = new PrismaClient();
 
@@ -11,6 +14,12 @@ const responseHeaders = {
 
 export const POST = async (req) => {
   try {
+    const session = await getServerSession(req, NextAuthOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: responseHeaders });
+    }
+
     const { status, order_id, customer_mobile, amount, remark1, remark2 } = await req.json();
 
     console.log('Request data:', { status, order_id, customer_mobile, amount, remark1, remark2 });
@@ -37,6 +46,9 @@ export const POST = async (req) => {
         data: { userRole: 'PRO' }
       });
       console.log('Update result:', updateResult);
+
+      // Update session role if needed
+      session.user.userRole = 'PRO';
 
       return NextResponse.json({ message: 'User role updated to PRO.' }, { status: 200, headers: responseHeaders });
     } else {
