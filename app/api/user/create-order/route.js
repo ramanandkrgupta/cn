@@ -4,7 +4,7 @@ import qs from 'qs';
 
 export const POST = async (req) => {
   try {
-const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
+const user_token = '06918444e702633fe5dff373aecdd10b'
     const { customer_mobile, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
     if (!customer_mobile || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
@@ -29,7 +29,7 @@ const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
       headers: { 
         'Host': 'beta.collegenotes.tech', 
         'Origin': 'https://beta.collegenotes.tech', 
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': '*', 
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       data: data
