@@ -51,7 +51,7 @@ const user_token = '12a6aa5daf26fda8cc431c01361de5a2';
         customer_mobile: user.phoneNumber,
         amount: plan === 'premium' ? '1' : '0',
         order_id: order_id,
-user_token: user_token;
+user_token: user_token,
         redirect_url: 'https://v1.collegenotes.tech/account',
         remark1: 'Subscription',
         remark2: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
