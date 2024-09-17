@@ -25,7 +25,7 @@ const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://betacollegenotes.tech/api/create-order',
+      url: 'https://beta.collegenotes.tech/api/create-order',
       headers: { 
         
         'Content-Type': 'application/x-www-form-urlencoded'
