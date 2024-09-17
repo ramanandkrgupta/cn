@@ -4,7 +4,7 @@ import qs from 'qs';
 
 export const POST = async (req) => {
   try {
-const user_token = '12a6aa5daf26fda8cc431c01361de5a2';
+const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
     const { customer_mobile, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
     if (!customer_mobile || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
@@ -25,7 +25,7 @@ const user_token = '12a6aa5daf26fda8cc431c01361de5a2';
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://pay.collegenotes.tech/api/create-order',
+      url: 'https://betacollegenotes.tech/api/create-order',
       headers: { 
         
         'Content-Type': 'application/x-www-form-urlencoded'
