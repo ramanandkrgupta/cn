@@ -4,7 +4,7 @@ import qs from 'qs';
 
 export const POST = async (req) => {
   try {
-const user_token = '12a6aa5daf26fda8cc431c01361de5a2'
+const user_token = '12a6aa5daf26fda8cc431c01361de5a2';
     const { customer_mobile, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
     if (!customer_mobile || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
