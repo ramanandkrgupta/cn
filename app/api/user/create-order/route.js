@@ -27,7 +27,7 @@ const user_token = '12a6aa5daf26fda8cc431c01361de5a2'
       maxBodyLength: Infinity,
       url: 'https://pay.collegenotes.tech/api/create-order',
       headers: { 
-        'Host': 'beta.collegenotes.tech', 
+        'Host': 'pay.collegenotes.tech', 
         'Origin': 'https://pay.collegenotes.tech', 
         'Access-Control-Allow-Origin': '*', 
         'Content-Type': 'application/x-www-form-urlencoded'
