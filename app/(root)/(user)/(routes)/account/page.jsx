@@ -55,16 +55,20 @@ const AccountPage = () => {
         remark2: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
         route: '1'
       };
+// Convert the data to application/x-www-form-urlencoded format
+const formBody = Object.keys(data).map(key => {
+  return encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
+}).join('&');
 
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: '/api/user/create-order',
+        url: 'https://pay.collegenotes.tech/api/create-order',
         headers: { 
           'Access-Control-Allow-Origin': '*/*', 
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: JSON.stringify(data)
+        data: formBody
       };
 
       const response = await axios.request(config);
