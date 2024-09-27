@@ -46,7 +46,7 @@ const AccountPage = () => {
 
     try {
       const order_id = `order${new Date().getTime()}`;
-const user_token = '12a6aa5daf26fda8cc431c01361de5a2';
+const user_token = '271efbf1b89e030bfbc30fb05ebd6af9';
       const data = {
         customer_mobile: user.phoneNumber,
         amount: plan === 'premium' ? '1' : '0',
