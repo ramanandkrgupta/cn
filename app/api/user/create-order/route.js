@@ -4,7 +4,7 @@ import qs from 'qs';
 
 export const POST = async (req) => {
   try {
-const user_token = '271efbf1b89e030bfbc30fb05ebd6af9'
+    const user_token = '271efbf1b89e030bfbc30fb05ebd6af9';
     const { customer_mobile, amount, order_id, redirect_url, remark1, remark2, route } = await req.json();
 
     if (!customer_mobile || !amount || !order_id || !redirect_url || !remark1 || !remark2 || !route) {
@@ -39,8 +39,7 @@ const user_token = '271efbf1b89e030bfbc30fb05ebd6af9'
     return NextResponse.json(response.data, { status: 200 });
 
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 402 });
-
-    return NextResponse.json({ error: 'An error occurred while creating the order.' }, { status: 500 });
+    console.error('Error creating order:', error);
+    return NextResponse.json({ error: error.message, details: error.response ? error.response.data : 'No additional details' }, { status: error.response ? error.response.status : 500 });
   }
 };
