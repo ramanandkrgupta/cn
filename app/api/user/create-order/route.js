@@ -27,7 +27,7 @@ const user_token = '271efbf1b89e030bfbc30fb05ebd6af9'
       maxBodyLength: Infinity,
       url: 'https://pay.collegenotes.tech/api/create-order',
       headers: { 
-        'Host': 'beta.collegenotes.tech', 
+        'Host': 'pay.collegenotes.tech', 
         'Origin': 'https://pay.collegenotes.tech', 
         'Access-Control-Allow-Origin': '*', 
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -39,7 +39,8 @@ const user_token = '271efbf1b89e030bfbc30fb05ebd6af9'
     return NextResponse.json(response.data, { status: 200 });
 
   } catch (error) {
-    console.error('Error:', error.message, error.response?.data || error.stack);
+    return NextResponse.json({ error: error.message }, { status: 402 });
+
     return NextResponse.json({ error: 'An error occurred while creating the order.' }, { status: 500 });
   }
 };
