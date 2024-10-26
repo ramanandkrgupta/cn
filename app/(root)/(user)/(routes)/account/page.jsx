@@ -46,7 +46,7 @@ const AccountPage = () => {
 
     try {
       const order_id = `order${new Date().getTime()}`;
-const user_token = '271efbf1b89e030bfbc30fb05ebd6af9';
+const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
       const data = {
         customer_mobile: user.phoneNumber,
         amount: plan === 'premium' ? '1' : '0',
@@ -65,7 +65,7 @@ const formBody = Object.keys(data).map(key => {
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://pay.collegenotes.tech/api/create-order',
+        url: 'https://beta.collegenotes.tech/api/create-order',
         headers: { 
           'Access-Control-Allow-Origin': '*/*', 
           'Content-Type': 'application/x-www-form-urlencoded'
