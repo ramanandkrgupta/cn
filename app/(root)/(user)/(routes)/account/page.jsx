@@ -24,7 +24,7 @@ const AccountPage = () => {
   }, [session]);
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   if (status === 'unauthenticated') {
@@ -46,49 +46,27 @@ const AccountPage = () => {
 
     try {
       const order_id = `order${new Date().getTime()}`;
-const user_token = 'bd53cb790ccc318001ab4dd05f68e767';
       const data = {
         customer_mobile: user.phoneNumber,
         amount: plan === 'premium' ? '1' : '0',
-        order_id: order_id,
-user_token: user_token,
+        order_id,
         redirect_url: 'https://v1.collegenotes.tech/account',
         remark1: 'Subscription',
         remark2: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
         route: '1'
       };
-// Convert the data to application/x-www-form-urlencoded format
-const formBody = Object.keys(data).map(key => {
-  return encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
-}).join('&');
 
-      const config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://beta.collegenotes.tech/api/create-order',
-        headers: { 
-          'Access-Control-Allow-Origin': '*/*', 
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: formBody
-      };
-
-      const response = await axios.request(config);
+      const response = await axios.post('/api/user/create-order', data);
 
       if (response.data.status) {
         toast.success("Order created successfully! Redirecting to payment...");
         window.location.href = response.data.result.payment_url;
       } else {
-        console.error('Payment URL creation failed:', response.data.message);
+        toast.error("Failed to create payment URL: " + response.data.message);
       }
     } catch (error) {
-      if (error.response) {
-        console.error('Error response:', error.response.data.message);
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-      } else {
-        console.error('Error message:', error.message);
-      }
+      toast.error("An error occurred during subscription.");
+      console.error('Error:', error.response ? error.response.data.message : error.message);
     }
   };
 
