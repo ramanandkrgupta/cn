@@ -101,7 +101,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       }
                     >
                       {data.premium && session && session.user
-                        ? session.user.role === "PRO"
+                        ? session.user.userRole === "PRO"
                           ? "Premium File - Download"
                           : "Premium File - Upgrade to Download"
                         : "Download"}
