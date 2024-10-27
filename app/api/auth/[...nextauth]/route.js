@@ -101,13 +101,16 @@ const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user = {
-        ...token,
-        phoneNumber: token.phoneNumber,
-        userRole: token.role,
-      };
-      return session;
-    },
+     const user = await prisma.user.findUnique({
+       where: { id: token.id },
+     });
+     session.user = {
+       ...token,
+       phoneNumber: user.phoneNumber,
+       userRole: user.userRole,
+     };
+     return session;
+   },
   },
 };
 
