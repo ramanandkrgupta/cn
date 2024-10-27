@@ -19,7 +19,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const handleDownload = (url, filename) => {
     if (data.premium) {
       if (session && session.user) {
-        if (session.user.role === "PRO") {
+        if (session.user.userRole === "PRO") {
           saveAs(url, `cn-${filename}`);
           toast("Successfully downloaded");
         } else {
@@ -114,7 +114,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       <ShareIcon className="h-6 w-6" />
                     </button>
                   </div>
-                  {data.premium && session && session.user && session.user.role !== "PRO" && (
+                  {data.premium && session && session.user && session.user.userRole !== "PRO" && (
                     <p className="text-sm mt-2">
                       <a href="/plans" className="text-blue-500 underline">
                         Upgrade to PRO
