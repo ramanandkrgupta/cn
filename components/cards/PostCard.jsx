@@ -63,7 +63,7 @@ const PostCard = ({ data }) => {
       <div className="mt-2">
         {data.premium ? (
           session && session.user ? (
-            session.user.role === "PRO" ? (
+            session.user.userRole === "PRO" ? (
               <button
                 onClick={handleDownload}
                 className="bg-green-500 text-white px-4 py-2 rounded"
