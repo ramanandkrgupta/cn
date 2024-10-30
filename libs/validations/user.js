@@ -32,7 +32,7 @@ const User = z.object({
       required_error: "Phone number is required.",
       invalid_type_error: "Phone number must be a string.",
     })
-    .refine((phoneNumber) => /^(\91)[0-9]{10}$/.test(phoneNumber), {
+    .refine((phoneNumber) => /^(\+91)[0-9]{10}$/.test(phoneNumber), {
       message: "Phone number must start with +91 and be 10 digits long.",
     }),
 });
