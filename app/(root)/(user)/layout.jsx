@@ -1,4 +1,5 @@
 import { Navbar, Sidebar } from "@/components/navigation";
+import Script from "next/script";
 
 export default function AccountLayout({ children }) {
   return (
@@ -10,10 +11,12 @@ export default function AccountLayout({ children }) {
         <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-5">
           <Navbar />
           {children}
+          <Script src="https://checkout.razorpay.com/v1/checkout.js"></Script>
+          
         </div>
 
       </div>
-      <script src="https://checkout.razorpay.com/v1/checkout.js" />
+      
     </section>
 
   );

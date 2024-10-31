@@ -197,11 +197,12 @@ const ProfilePage = () => {
             <h2 className="text-2xl font-bold">Profile Information</h2>
             <div className="bg-base-100 rounded-lg shadow-md p-6 space-y-4">
               <div className="flex items-center space-x-4">
-                <img
-                  className="h-20 w-20 rounded-full"
+                
+                <Image
+                className="h-20 w-20 rounded-full"
                   src={user.image || "/img/profile.jpg"}
                   alt={user.name}
-                />
+                  />
                 <div>
                   <h3 className="text-xl font-semibold">{user.name}</h3>
                   <p className="text-gray-500">{user.email}</p>
@@ -326,11 +327,11 @@ const ProfilePage = () => {
                             {favorite.description}
                           </p>
                         </div>
-                        <img
-                          className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+                        <Image className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
                           src={favorite.image}
-                          alt=""
-                        />
+                          alt=""/>
+                          
+                        
                       </div>
                       <div>
                         <div className="-mt-px flex divide-x divide-gray-200">
@@ -387,7 +388,7 @@ const ProfilePage = () => {
           </div>
           <div className="hidden lg:flex items-center">
             <span className="text-gray-700 mr-4">{user.name}</span>
-            <img
+           <Image
               className="h-8 w-8 rounded-full"
               src={user.image || "/img/profile.jpg"}
               alt={user.name}
