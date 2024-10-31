@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Ensure this path is correct
+import { authOptions } from '@/app/api/auth/[...nextauth]'; // Ensure this path is correct
 import { updateSessionToken } from '@/libs/session'; // Custom helper to update session token
 
 const prisma = new PrismaClient();
