@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IconBrandGithub } from "@tabler/icons-react";
 const Contribution = () => {
   const contributeText = {
-    title: "Paschub is an open source project built with 💖",
+    title: "College Notes is an open source project built with 💖",
     desc: "Open-source, passion-fueled project. Revolutionizing education with an intuitive platform for seamless student-teacher interaction.",
     subDesc:
       "We highly appreciate any feedback or contribution that could help us improve.",
@@ -29,7 +29,7 @@ const Contribution = () => {
           <p>{contributeText.desc}</p>
           <p className="mt-2">{contributeText.subDesc}</p>
           <Link
-            href="https://github.com/SHABIN-K/Studydrive"
+            href="https://github.com/ramanandkrgupta"
             target="_blank"
             className="flex hover:text-white items-center justify-center mt-3 text-2xl gap-1 text-gray-400"
           >
