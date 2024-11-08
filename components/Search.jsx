@@ -73,7 +73,7 @@ const SearchDropDown = ({
       </div>
       {result?.map((post, index) => {
         let title = post.title.slice(0, 22);
-        let shouldShowDots = post.title.length > 22;
+        let shouldShowDots = post.title.length > 50;
         return (
           <div
             key={index}

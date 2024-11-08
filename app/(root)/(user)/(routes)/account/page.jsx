@@ -202,6 +202,8 @@ const ProfilePage = () => {
                 className="h-20 w-20 rounded-full"
                   src={user.image || "/img/profile.jpg"}
                   alt={user.name}
+                  width={200} 
+                  height={200}
                   />
                 <div>
                   <h3 className="text-xl font-semibold">{user.name}</h3>
@@ -392,6 +394,8 @@ const ProfilePage = () => {
               className="h-8 w-8 rounded-full"
               src={user.image || "/img/profile.jpg"}
               alt={user.name}
+              width={200}
+              height={200}
             />
           </div>
         </div>

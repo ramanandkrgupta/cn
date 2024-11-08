@@ -1,6 +1,8 @@
 // File: components/navigation/Navbar.jsx
 
 "use client";
+import { UserButton } from '@clerk/nextjs';
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -146,7 +148,7 @@ const NavBar = () => {
           College <span className="text-secondary">Notes</span>
           <span className="badge">.tech</span>
         </p>
-
+        <UserButton />
         <label className="swap swap-rotate">
           {/* this hidden checkbox controls the state */}
           <input
@@ -181,6 +183,8 @@ const NavBar = () => {
   onClick={handleToggleDrawer}
   ref={menuButtonRef}
 >
+
+  
   {toggleDrawer ? (
     <label>
       <svg 
@@ -239,7 +243,7 @@ const NavBar = () => {
                 <p
                   className={`ml-[20px] font-epilogue font-semibold text-[14px] ${
                     activeLink && activeLink.name === data.name
-                      ? "text-[#1dc071]"
+                      ? "text-primary"
                       : "text-[#808191]"
                   }`}
                 >
