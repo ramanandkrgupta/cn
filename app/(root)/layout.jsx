@@ -1,5 +1,9 @@
 "use client";
 import { Toaster } from "sonner";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3da53c2304039f974d887e3c8aff239f485c902d
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -56,7 +60,11 @@ export default function RootLayout({ children }) {
               </main>
             </EdgeStoreProvider>
           </AuthProvider>
+<<<<<<< HEAD
         
+=======
+       
+>>>>>>> 3da53c2304039f974d887e3c8aff239f485c902d
       </body>
     </html>
   );
