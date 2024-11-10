@@ -1,14 +1,30 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+export default withAuth(
+  function middleware(req) {
+    const { token } = req.nextauth;
 
-export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-    // Custom routes that require authentication
-    "/dashboard/:path*",
-  ],
-};
+    if (!token) {
+      console.log("No token found, redirecting to login");
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    console.log("Token found:", token);
+
+    if (token.role === "ADMIN" || token.role === "MANAGER") {
+      console.log("Authorized role:", token.role);
+      return NextResponse.next();
+    } else {
+      console.log("Unauthorized role:", token.role);
+      return NextResponse.redirect(new URL("/account", req.url));
+    }
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+);
+
+export const config = { matcher: ["/dashboard/:path*", "/api/"] };
