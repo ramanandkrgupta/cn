@@ -11,6 +11,14 @@ module.exports = {
       fontFamily: {
         epilogue: ["Epilogue", "sans-serif"],
       },
+      
+      boxShadow: {
+        myShadow1: "4.1px -5px 0 0 rgb(17,24,39)",
+        myShadow2: "-4.1px -5px 0 0 rgb(17,24,39)",
+      },
+
+
+
       colors: {},
       screens: {
         xs: "400px",
@@ -29,6 +37,7 @@ module.exports = {
         mydark: {
 
           "primary": "#f97316",
+          "primar-500": "#f5802f",
 
           "secondary": "#f5f5f4",
 
@@ -52,6 +61,7 @@ module.exports = {
         mylight: {
           
 "primary": "#f97316",
+"primary-500": '#f5802f',
           
 "secondary": "#1c1917",
           

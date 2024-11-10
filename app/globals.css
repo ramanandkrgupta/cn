@@ -139,7 +139,7 @@ body {
 }
 
 .label_form {
-  @apply text-gray-900 text-sm font-medium;
+  @apply text-primary text-sm font-medium;
 }
 /* admin table button and input*/
 

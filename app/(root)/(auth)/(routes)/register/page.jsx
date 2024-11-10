@@ -1,11 +1,11 @@
 "use client";
-import { Navbar } from "@/components/navigation";
+var zxcvbn = require('zxcvbn');
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
-
+// import { zxcvbn } from 'zxcvbn';
 
 import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";
@@ -27,6 +27,26 @@ const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [theme, setTheme] = useState("mydark");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "mydark";
+    setTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    // Listener to update theme when `localStorage` is modified
+    const handleStorageChange = (event) => {
+      if (event.key === "theme") {
+        const newTheme = event.newValue || "mydark";
+        setTheme(newTheme);
+        document.documentElement.setAttribute("data-theme", newTheme);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const handlePasswordChange = (e) => {
     const { value } = e.target;
@@ -91,13 +111,15 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
     }
   };
 
+  
+
   return (
     
     <section className="flex items-center justify-center">
-      <Navbar />
+      
       <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
         <div>
-          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-white">
+          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-secondary">
             <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
             College Notes
           </a>
@@ -105,12 +127,12 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
         <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0  border-secondary">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-secondary">
-              Create your account
+              Create  account
             </h1>
 
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <FormField
-                label="Your Name"
+                label="Name"
                 type="text"
                 name="name"
                 value={name}
@@ -122,8 +144,8 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
                 required
               />
               <FormField
-                label="Your email"
-                type="email"
+                label=" email"
+                type="Email"
                 name="email"
                 value={email}
                 placeholder="name@example.com"
@@ -134,10 +156,10 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
                 required
               />
              
-             <div className="flex items-center">
-  <span className="input_loinForm  px-3 py-2 rounded-l text-black">+91</span>
+         
+  
   <FormField
-    label="Your Mobile"
+    label="Mobile"
     type="tel"
     name="phoneNumber"
     value={RawPhoneNumber}
@@ -147,9 +169,9 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
     classLabel="label_loinForm"
     classInput="input_loinForm rounded-l-none"
   />
-</div>
+
               <FormField
-                label="Your Password"
+                label="Password"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={password}

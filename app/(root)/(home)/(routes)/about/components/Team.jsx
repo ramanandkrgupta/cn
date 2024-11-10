@@ -71,6 +71,15 @@ const Team = () => {
       linkedinUsername: "ramanand-kumar-saw",
     },
 
+    {
+      name: "Prankur Patel",
+      role: "Graphic Designer ",
+      img: "/team/member-05.jpg",
+
+      xUsername: "prankur_patel17",
+      linkedinUsername: "prankur-patel-b3076a30a",
+    },
+
    
   ];
 

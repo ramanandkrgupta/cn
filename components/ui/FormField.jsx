@@ -11,7 +11,8 @@ const FormField = ({
 }) => {
   return (
     <>
-      <label className={classLabel}>{label}</label>
+      <label className={`${classLabel} text-primaryh1`}>{label}</label>
+
       <input
         type={type}
         name={name}

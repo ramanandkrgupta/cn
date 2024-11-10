@@ -1,12 +1,5 @@
 "use client";
 import { Toaster } from "sonner";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
-} from '@clerk/nextjs';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import "../globals.css";
 import { EdgeStoreProvider } from "@/libs/edgestore";
 import AuthProvider from "@/components/layouts/ProviderLayouts";
+import { Navigation } from "@/components/navigation";
 
 export default function RootLayout({ children }) {
   const router = useRouter();
@@ -52,16 +46,17 @@ export default function RootLayout({ children }) {
         <meta name="twitter:image" content="/favicon/icon-128x128.png" />
       </head>
       <body className="bg-base-100 min-h-screen">
-        <ClerkProvider>
+        
           <AuthProvider>
             <EdgeStoreProvider>
               <Toaster richColors closeButton position="top-center" />
               <main className="pb-16">
                 {children}
+                <Navigation />
               </main>
             </EdgeStoreProvider>
           </AuthProvider>
-        </ClerkProvider>
+        
       </body>
     </html>
   );

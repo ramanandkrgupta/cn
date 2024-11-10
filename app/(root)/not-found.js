@@ -49,7 +49,7 @@ export default function NotFound() {
               onClick={() => {
                 router.push("/");
               }}
-              className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-[#32CD32] rounded-lg shrink-0 sm:w-auto hover:bg-green-500"
+              className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-primary rounded-lg shrink-0 sm:w-auto hover:bg-primar-500"
             >
               Take me home
             </button>

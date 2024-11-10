@@ -1,7 +1,7 @@
 // File: components/navigation/Navbar.jsx
 
 "use client";
-import { UserButton } from '@clerk/nextjs';
+
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -148,7 +148,7 @@ const NavBar = () => {
           College <span className="text-secondary">Notes</span>
           <span className="badge">.tech</span>
         </p>
-        <UserButton />
+        
         <label className="swap swap-rotate">
           {/* this hidden checkbox controls the state */}
           <input
