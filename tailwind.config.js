@@ -37,7 +37,7 @@ module.exports = {
         mydark: {
 
           "primary": "#f97316",
-          "primar-500": "#f5802f",
+          "base-300": "#1c1c24",
 
           "secondary": "#f5f5f4",
 
@@ -60,24 +60,16 @@ module.exports = {
       {
         mylight: {
           
-"primary": "#f97316",
-"primary-500": '#f5802f',
-          
-"secondary": "#1c1917",
-          
-"accent": "#4ade80",
-          
-"neutral": "#1f2937",
-          
-"base-100": "#f5f5f4",
-          
-"info": "#0087f2",
-          
-"success": "#56e900",
-          
-"warning": "#fecaca",
-          
-"error": "#b91c1c",
+        "primary": "#f97316",
+        "base-300": "#eaeaea",
+          "secondary": "#1c1917",
+          "accent": "#4ade80",
+          "neutral": "#1f2937",
+          "base-100": "#f5f5f4",
+          "info": "#0087f2",
+          "success": "#56e900",
+          "warning": "#fecaca",
+          "error": "#b91c1c",
           },
         },
     ],
