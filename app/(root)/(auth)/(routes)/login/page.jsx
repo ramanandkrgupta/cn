@@ -1,18 +1,16 @@
 "use client";
-
-import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { motion } from "framer-motion";
+import { Mail, Lock, Loader } from "lucide-react";
+import Link from "next/link";  // Using Next.js Link
+import Input from "../../../../../components/ui/Input";
+import { useAuthStore } from "../../../../../libs/authStore";
+import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 
-import { logo } from "@/public/assets";
-import FormButtons from "@/components/ui/FormButtons";
-import FormField from "@/components/ui/FormField";
-import { UserValidation } from "@/libs/validations/user";
-
 const LoginPage = () => {
-  const router = useRouter();
+	
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -63,72 +61,66 @@ const LoginPage = () => {
   }
 };
 
-  return (
-    <section className="flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
-        <div>
-          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-white">
-            <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
-            College Notes
-          </a>
-        </div>
-        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-[#1c1c24] border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
-              Sign in to your account
-            </h1>
+	return (
+		<div className="container items-center justify-center">
+			<div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
+			className='max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden'
+		>
+			<div className='p-8'>
+				<h2 className='text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text'>
+					Welcome Back
+				</h2>
 
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <FormField
-                label="Your email"
-                type="email"
-                name="email"
-                value={email}
-                placeholder="name@example.com"
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <FormField
-                label="Your Password"
-                type="password"
-                name="password"
-                value={password}
-                placeholder="••••••••"
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <div className="flex gap-1 mr-5 md:mr-0">
-                <FormButtons
-                  primaryLabel={isLoading ? "Please wait..." : "Login"}
-                  secondaryLabel="Back"
-                  onPrimaryClick={handleSubmit}
-                  onSecondaryClick={() => router.back()}
-                  primaryClassName="btn_loginFormPrimary"
-                  secondaryClassName="btn_loginFormSecondary"
-                />
-              </div>
-            </form>
+				<form onSubmit={handleSubmit}>
+					<Input
+						icon={Mail}
+						type='email'
+						placeholder='Email Address'
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+					/>
 
-            {/* Register Button */}
-            <div className="flex justify-center mt-4">
-              <button
-                type="button"
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/register')}
-                disabled={isLoading}
-              >
-                {isLoading ? "Loading..." : "Register"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+					<Input
+						icon={Lock}
+						type='password'
+						placeholder='Password'
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+					/>
+
+					<div className='flex items-center mb-6'>
+						<Link href='/forgot-password' className='text-sm text-green-400 hover:underline'>
+							Forgot password?
+						</Link>
+					</div>
+					<p className='text-red-500 font-semibold mb-2'></p>
+
+					<motion.button
+						whileHover={{ scale: 1.02 }}
+						whileTap={{ scale: 0.98 }}
+						className='w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200'
+						type='submit'
+						disabled={isLoading}
+					>
+						{isLoading ? <Loader className='w-6 h-6 animate-spin  mx-auto' /> : "Login"}
+					</motion.button>
+				</form>
+			</div>
+			<div className='px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center'>
+				<p className='text-sm text-gray-400'>
+					Don't have an account?{" "}
+					<Link href='/register' className='text-green-400 hover:underline'>
+						Sign up
+					</Link>
+				</p>
+			</div>
+		</motion.div>
+		</div></div>
+	); 
 };
 
 export default LoginPage;

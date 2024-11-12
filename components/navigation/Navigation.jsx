@@ -15,7 +15,7 @@ const Navigation = () => {
 
   
   const currentPath = usePathname();
-  console.log(currentPath);
+  
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-base-100 shadow-lg py-3 px-6 rounded-t-xl flex justify-between items-center">

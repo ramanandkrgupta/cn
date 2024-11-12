@@ -1,78 +1,35 @@
 "use client";
-var zxcvbn = require('zxcvbn');
-import Image from "next/image";
-import { useState, useEffect } from "react";
+
+import { motion } from "framer-motion";
+import { Loader, Lock, Mail, Phone, User } from "lucide-react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
-import { toast } from "sonner";
-// import { zxcvbn } from 'zxcvbn';
-
-import { logo } from "@/public/assets";
-import FormButtons from "@/components/ui/FormButtons";
-import FormField from "@/components/ui/FormField";
+import Input from "@/components/ui/Input";
+import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
-
+import { toast } from "sonner";
 
 const RegisterPage = () => {
-  
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  // const [phoneNumber, setPhoneNumber] = useState("");
 const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [passwordMatch, setPasswordMatch] = useState(true);
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [theme, setTheme] = useState("mydark");
+  const router = useRouter();
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "mydark";
-    setTheme(savedTheme);
-    document.documentElement.setAttribute("data-theme", savedTheme);
-
-    // Listener to update theme when `localStorage` is modified
-    const handleStorageChange = (event) => {
-      if (event.key === "theme") {
-        const newTheme = event.newValue || "mydark";
-        setTheme(newTheme);
-        document.documentElement.setAttribute("data-theme", newTheme);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  const handlePasswordChange = (e) => {
-    const { value } = e.target;
-    setPassword(value);
-    const evaluation = zxcvbn(value);
-    setPasswordStrength(evaluation.score * 25); // Score is between 0 and 4
-    setPasswordMatch(value === confirmPassword);
-  };
-
-  const handleConfirmPasswordChange = (e) => {
-    const { value } = e.target;
-    setConfirmPassword(value);
-    setPasswordMatch(password === value);
-  };
-
-  
-
-    
-
-  const handleSubmit = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-const phoneNumber = `+91${ RawPhoneNumber}`;
-
+    console.log(RawPhoneNumber)
+    const phoneNumber = `+91${RawPhoneNumber}`;
+console.log("phone",phoneNumber)
     // Validate user input using the schema
-    const userInput = { name, email, phoneNumber, password, confirmPassword };
+    const userInput = { name, email, phoneNumber, password };
 
     try {
       // Validate the user input
@@ -84,8 +41,7 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
           toast.error(err.message);
         });
         console.error("Validation errors:", validation.error.issues);
-      } else if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
+      
       } else {
         // If validation is successful, make the API request
         const response = await axios.post("/api/user/register", userInput, {
@@ -111,133 +67,77 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
     }
   };
 
-  
-
   return (
-    
-    <section className="flex items-center justify-center">
-      
-      <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
-        <div>
-          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-secondary">
-            <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
-            College Notes
-          </a>
-        </div>
-        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0  border-secondary">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-secondary">
-              Create  account
-            </h1>
+    <div className="container items-center justify-center">
+			<div className="container items-center justify-center  md:h-screen lg:py-0">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+    >
+      <div className="p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+          Create Account
+        </h2>
 
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <FormField
-                label="Name"
-                type="text"
-                name="name"
-                value={name}
-                placeholder="John Doe"
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-                required
-              />
-              <FormField
-                label=" email"
-                type="Email"
-                name="email"
-                value={email}
-                placeholder="name@example.com"
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-                required
-              />
-             
-         
-  
-  <FormField
-    label="Mobile"
-    type="tel"
-    name="phoneNumber"
-    value={RawPhoneNumber}
-    placeholder="1234567890"
-    onChange={(e) => setRawPhoneNumber(e.target.value)}
-    autoComplete="tel"
-    classLabel="label_loinForm"
-    classInput="input_loinForm rounded-l-none"
-  />
+        <form onSubmit={handleSignUp}>
+          <Input
+            icon={User}
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            icon={Mail}
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            icon={Phone}
+            type="tel"
+            placeholder="WhatsApp Number"
+            value={RawPhoneNumber}
+            onChange={(e) => setRawPhoneNumber(e.target.value)}
+          />
+          <Input
+            icon={Lock}
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
+          <PasswordStrengthMeter password={password} />
 
-              <FormField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={password}
-                placeholder="••••••••"
-                onChange={handlePasswordChange}
-                autoComplete="new-password"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  style={{ width: `${passwordStrength}%` }}
-                ></div>
-              </div>
-              <FormField
-                label="Confirm Password"
-                type={showPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={confirmPassword}
-                placeholder="••••••••"
-                onChange={handleConfirmPasswordChange}
-                autoComplete="new-password"
-                classLabel="label_loinForm"
-                classInput="input_loinForm"
-              />
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="showPassword"
-                  checked={showPassword}
-                  onChange={() => setShowPassword(!showPassword)}
-                  className="mr-2"
-                />
-                <label htmlFor="showPassword" className="text-white">Show Password</label>
-              </div>
-              {!passwordMatch && (
-                <p className="text-red-500">Passwords do not match</p>
-              )}
-              <div className="flex gap-1 mr-5 md:mr-0">
-                <FormButtons
-                  primaryLabel={isLoading ? "Please wait..." : "Register"}
-                  secondaryLabel="Back"
-                  onPrimaryClick={handleSubmit}
-                  onSecondaryClick={() => router.back()}
-                  primaryClassName="btn_loginFormPrimary"
-                  secondaryClassName="btn_loginFormSecondary"
-                />
-              </div>
-            </form>
-
-            {/* Login Button */}
-            <div className="flex justify-center mt-4">
-              <button
-                type="button"
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/login')}
-                disabled={isLoading}
-              >
-                {isLoading ? "Loading..." : "Login"}
-              </button>
-            </div>
-          </div>
-        </div>
+          <motion.button
+            className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+              font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 
+              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+              focus:ring-offset-gray-900 transition duration-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader className="animate-spin mx-auto" size={24} /> : "Sign Up"}
+          </motion.button>
+        </form>
       </div>
-    </section>
+      <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+        <p className="text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link href='/login' className='text-green-400 hover:underline'>
+						Sign up
+					</Link>
+        </p>
+      </div>
+    </motion.div>
+    </div>
+    </div>
   );
 };
 
