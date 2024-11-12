@@ -4,8 +4,7 @@ import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader } from "lucide-react";
 import Link from "next/link";  // Using Next.js Link
-import Input from "../../../../../components/ui/Input";
-import { useAuthStore } from "../../../../../libs/authStore";
+import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 
