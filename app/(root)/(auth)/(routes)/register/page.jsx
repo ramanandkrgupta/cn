@@ -1,4 +1,5 @@
 "use client";
+import Head from "next/head";
 
 import { motion } from "framer-motion";
 import { Loader, Lock, Mail, Phone, User } from "lucide-react";
@@ -68,6 +69,12 @@ console.log("phone",phoneNumber)
   };
 
   return (
+    <>
+    <Head>
+            <title>Register | College Notes</title>
+            <meta name="description" content="Create an account to access premium study materials and exclusive content on College Notes." />
+          </Head>
+
     <div className="container items-center justify-center">
 			<div className="container items-center justify-center  md:h-screen lg:py-0">
     <motion.div
@@ -137,7 +144,7 @@ console.log("phone",phoneNumber)
       </div>
     </motion.div>
     </div>
-    </div>
+    </div></>
   );
 };
 
