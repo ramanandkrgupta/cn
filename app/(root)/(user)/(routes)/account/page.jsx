@@ -1,5 +1,9 @@
-import React from 'react';
+"use client";
+// import React from 'react';
 import Image from 'next/image';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   User,
   CreditCard,
@@ -11,21 +15,36 @@ import {
 } from "lucide-react";
 
 export default function Profile() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
+      // Fetch user data, downloads, and favorites
+      // fetchUserData();
+      
+    }
+  }, [status, router]);
+
+  
+  const { user } = session;
   return (
     <div className="bg-base-100">
       <div className="mx-auto px-4 min-h-min">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg">
             <Image
-              src="/img/profile.jpg"
+              src="/team/member-1.jpeg"
               alt="profile"
               width={100}
               height={100}
               className="object-cover"
             />
           </div>
-          <div className="text-2xl font-semibold text-secondary mt-1">Ramanand</div>
-          <div className="text-sm text-gray-500">ID 12012010</div>
+          <div className="text-2xl font-semibold text-secondary mt-1">{user.name}</div>
+          <div className="text-sm text-gray-500">{user.email}</div>
         </div>
 
         <div className="mt-2 space-y-4">

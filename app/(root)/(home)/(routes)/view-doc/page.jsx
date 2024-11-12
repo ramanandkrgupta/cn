@@ -2,24 +2,25 @@
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-
 import PostCard from "@/components/cards/PostCard";
 import { useFilterPost } from "@/libs/hooks/usePost";
 import NoDataFound from "@/components/ui/NoDataFound";
 import SkeletonLoading from "@/components/ui/SkeletonLoading";
 
-const MyDoc = () => {
+const ViewDoc = () => {
   const searchParams = useSearchParams();
-  const subId = searchParams.get("subId");
   const course = searchParams.get("name");
   const semester = searchParams.get("sem");
   const category = searchParams.get("category");
+  const subId = searchParams.get("subId");
 
   const {
     data: fetchedData,
     error,
     isLoading: loading,
   } = useFilterPost({ course, semester, category, subId });
+
+  const [userSelectedData, setUserSelectedData] = useState([]);
 
   useEffect(() => {
     if (fetchedData) {
@@ -31,27 +32,26 @@ const MyDoc = () => {
     }
   }, [fetchedData, error]);
 
-  const [userSelectedData, setUserSelectedData] = useState([]);
   const data = useMemo(() => userSelectedData, [userSelectedData]);
 
   return (
     <div>
       <h1 className="select_header">{category}</h1>
       <small className="text-gray-400">
-  Path: 
-  <a href={`/category?name=${course}`} className="text-blue-500 hover:underline">
-    {course}
-  </a>
-  /
-  <a href={`/semester?name=${course}&category=${category}`} className="text-blue-500 hover:underline">
-    {category}
-  </a>
-  /
-  <a href={`/view-subjects?name=${course}&category=${category}&sem=${semester}`} className="text-blue-500 hover:underline">
-    {semester}
-  </a>
-  /{category}
-</small>
+        Path: 
+        <a href={`/category?name=${course}`} className="text-blue-500 hover:underline">
+          {course}
+        </a>
+        /
+        <a href={`/semester?name=${course}&category=${category}`} className="text-blue-500 hover:underline">
+          {category}
+        </a>
+        /
+        <a href={`/view-subjects?name=${course}&category=${category}&sem=${semester}`} className="text-blue-500 hover:underline">
+          {semester}
+        </a>
+        /{category}
+      </small>
 
       <div className="items-center">
         {loading ? (
@@ -74,4 +74,4 @@ const MyDoc = () => {
   );
 };
 
-export default MyDoc;
+export default ViewDoc;

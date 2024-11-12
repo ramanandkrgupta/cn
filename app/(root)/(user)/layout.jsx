@@ -1,8 +1,12 @@
+"use client";
 import { Navbar, Sidebar } from "@/components/navigation";
+import { ProtectedLayout } from "@/components/layouts/protectLayouts";
 import Script from "next/script";
 
 export default function AccountLayout({ children }) {
   return (
+  
+    <ProtectedLayout>
     <section>
       <div className="relative sm:p-8 p-4  flex flex-row">
         <div className="sm:flex hidden mr-10 relative">
@@ -18,6 +22,6 @@ export default function AccountLayout({ children }) {
       </div>
       
     </section>
-
+    </ProtectedLayout>
   );
 }

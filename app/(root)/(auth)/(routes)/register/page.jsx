@@ -2,7 +2,7 @@
 import Head from "next/head";
 
 import { motion } from "framer-motion";
-import { Loader, Lock, Mail, Phone, User } from "lucide-react";
+import { Loader, Lock, Mail, Phone, User , Eye, EyeOff} from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -20,6 +20,8 @@ const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
@@ -94,6 +96,7 @@ console.log("phone",phoneNumber)
             type="text"
             placeholder="Full Name"
             value={name}
+            
             onChange={(e) => setName(e.target.value)}
           />
           <Input
@@ -101,6 +104,7 @@ console.log("phone",phoneNumber)
             type="email"
             placeholder="Email Address"
             value={email}
+            // autocomplete="new-email"
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
@@ -110,13 +114,27 @@ console.log("phone",phoneNumber)
             value={RawPhoneNumber}
             onChange={(e) => setRawPhoneNumber(e.target.value)}
           />
-          <Input
-            icon={Lock}
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative">
+                <Input
+                  icon={Lock}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                {/* Eye icon for show/hide password */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
           {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           <PasswordStrengthMeter password={password} />
 
@@ -138,7 +156,7 @@ console.log("phone",phoneNumber)
         <p className="text-sm text-gray-400">
           Already have an account?{" "}
           <Link href='/login' className='text-green-400 hover:underline'>
-						Sign up
+						Login Here
 					</Link>
         </p>
       </div>
