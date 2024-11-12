@@ -9,7 +9,7 @@ const User = z.object({
     .email({ message: "Invalid email address." })
     .min(5, { message: "Email must be at least 5 characters long." })
     .max(100, { message: "Email can be at most 100 characters long." }),
-  password: z
+    password: z
     .string({
       required_error: "Password is required.",
       invalid_type_error: "Password must be a string.",
@@ -17,8 +17,8 @@ const User = z.object({
     .min(5, { message: "Password must be at least 5 characters long." })
     .max(200, { message: "Password can be at most 200 characters long." })
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,200}$/,
-      "Password must contain at least one uppercase letter, one lowercase letter, and one number. Only alphanumeric characters are allowed."
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,200}$/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
     ),
   name: z
     .string({
@@ -32,7 +32,7 @@ const User = z.object({
       required_error: "Phone number is required.",
       invalid_type_error: "Phone number must be a string.",
     })
-    .refine((phoneNumber) => /^(\91)[0-9]{10}$/.test(phoneNumber), {
+    .refine((phoneNumber) => /^(\+91)[0-9]{10}$/.test(phoneNumber), {
       message: "Phone number must start with +91 and be 10 digits long.",
     }),
 });
