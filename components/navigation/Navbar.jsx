@@ -2,7 +2,6 @@
 
 "use client";
 
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -18,8 +17,9 @@ import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 import { newlogo } from "@/public/icons";
+import SearchFn from "./SearchFn";
 
-const NavBar = () => {
+const NavBar = ({ showSearch = true }) => {
   const { data: fetchedData, error } = usePost();
   const setData = usePostStore((state) => state.setPosts);
   const { data: session } = useSession();
@@ -27,13 +27,11 @@ const NavBar = () => {
   const sidebarRef = useRef(null);
   const menuButtonRef = useRef(null);
 
-  const [post, setPost] = useState("");
-  const [isPostOpen, setIsPostOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [toggleDrawer, setToggleDrawer] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [searchTimeout, setSearchTimeout] = useState(null);
-  const [searchedResults, setSearchedResults] = useState([]);
+  const [isPostOpen, setIsPostOpen] = useState(false);
+  const [post, setPost] = useState("");
+
   const [posts, setPosts] = useState([]);
   const [isActive, setIsActive] = useState(""); // Define isActive state
   const data = useMemo(() => posts, [posts]);
@@ -53,14 +51,6 @@ const NavBar = () => {
     }
   }, [fetchedData, error]);
 
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(this, args), delay);
-    };
-  };
-
   // Toggle theme between light and dark
   const toggleTheme = () => {
     const newTheme = theme === "mylight" ? "mydark" : "mylight";
@@ -75,27 +65,12 @@ const NavBar = () => {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
-  const handleSearchChange = (e) => {
-    clearTimeout(searchTimeout);
-    setSearchText(e.target.value);
-    setSearchTimeout(
-      setTimeout(() => {
-        const searchResult = filterPosts(e.target.value, data);
-        setSearchedResults(searchResult);
-      }, 500)
-    );
-  };
-
   const handleToggleDrawer = () => {
     setToggleDrawer((prev) => !prev);
   };
 
   const handleCloseSidebar = () => {
     setToggleDrawer(false);
-  };
-
-  const handleCloseSearch = () => {
-    setSearchText("");
   };
 
   useEffect(() => {
@@ -107,7 +82,6 @@ const NavBar = () => {
         !menuButtonRef.current.contains(event.target)
       ) {
         handleCloseSidebar();
-        handleCloseSearch();
       }
     };
     document.addEventListener("click", handleOutsideClick);
@@ -125,14 +99,13 @@ const NavBar = () => {
         College <span className="text-secondary">Notes</span>{" "}
         <span className="badge">.tech</span>
       </p>
-      <Search
-        results={searchedResults}
-        searchText={searchText}
-        setSearchText={setSearchText}
-        onChangeValue={handleSearchChange}
-        setIsPostOpen={setIsPostOpen}
-        setPost={setPost}
-      />
+      <div className={`${showSearch ? "block" : "hidden"} sm:block`}>
+        <SearchFn
+          posts={posts}
+          setIsPostOpen={setIsPostOpen}
+          setPost={setPost}
+        />
+      </div>
       <div className="sm:hidden flex justify-between items-center relative">
         <div
           className="w-[40px] h-[40px] rounded-[10px] bg-[#2c2f32] flex justify-center items-center cursor-pointer"
@@ -148,7 +121,7 @@ const NavBar = () => {
           College <span className="text-secondary">Notes</span>
           <span className="badge">.tech</span>
         </p>
-        
+
         <label className="swap swap-rotate">
           {/* this hidden checkbox controls the state */}
           <input
@@ -177,41 +150,42 @@ const NavBar = () => {
           </svg>
         </label>
         <div
-  className={`w-[34px] h-[34px] object-contain cursor-pointer transition-transform transform ${
-    toggleDrawer ? "rotate-90" : "rotate-0"
-  }`}
-  onClick={handleToggleDrawer}
-  ref={menuButtonRef}
->
-
-  
-  {toggleDrawer ? (
-    <label>
-      <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      className="inline-block h-8 w-8 stroke-current" 
-      viewBox="0 0 24 24" 
-      fill="none"  
-      ><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-    </label>
-  ) : (
-    <label>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        className="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M4 6h16M4 12h16M4 18h16"
-        ></path>
-      </svg>
-    </label>
-  )}
-</div>
+          className={`w-[34px] h-[34px] object-contain cursor-pointer transition-transform transform ${
+            toggleDrawer ? "rotate-90" : "rotate-0"
+          }`}
+          onClick={handleToggleDrawer}
+          ref={menuButtonRef}
+        >
+          {toggleDrawer ? (
+            <label>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="inline-block h-8 w-8 stroke-current"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </label>
+          ) : (
+            <label>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="inline-block h-8 w-8 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </label>
+          )}
+        </div>
         <div
           className={`${
             toggleDrawer ? "translate-x-0" : "-translate-x-full"
@@ -285,11 +259,13 @@ const NavBar = () => {
       </div>
       {isOpen && <ShareDialogBox isOpen={isOpen} setIsOpen={setIsOpen} />}
       {isPostOpen && (
-        <PostViewDialogBox
-          isOpen={isPostOpen}
-          setIsOpen={setIsPostOpen}
-          data={post}
-        />
+        <div className="relative z-50">
+          <PostViewDialogBox
+            isOpen={isPostOpen}
+            setIsOpen={setIsPostOpen}
+            data={post}
+          />
+        </div>
       )}
     </nav>
   );

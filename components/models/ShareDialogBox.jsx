@@ -7,7 +7,7 @@ import { Dialog, Transition } from "@headlessui/react";
 
 import { handlesharebtn } from "@/libs/utils";
 
-const ShareDialogBox = ({ isOpen, setIsOpen }) => {
+const ShareDialogBox = ({ isOpen, setIsOpen, postId }) => {
   function closeModal() {
     setIsOpen(false);
   }
@@ -17,6 +17,30 @@ const ShareDialogBox = ({ isOpen, setIsOpen }) => {
     content:
       "Discover a wealth of helpful study materials on our web app designed for students. Follow this link to join and enhance your learning experience.",
     url: process.env.NEXT_PUBLIC_APP_URL,
+  };
+
+  const updateShareMetric = async () => {
+    if (postId) {
+      try {
+        await fetch('/api/posts/metrics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId,
+            metricType: 'shares'
+          }),
+        });
+      } catch (error) {
+        console.error('Error updating shares:', error);
+      }
+    }
+  };
+
+  const handleShare = async () => {
+    await updateShareMetric();
+    handlesharebtn(post);
   };
 
   return (
@@ -76,7 +100,7 @@ const ShareDialogBox = ({ isOpen, setIsOpen }) => {
                   <button
                     type="button"
                     className="inline-flex justify-center rounded-md border border-transparent bg-gray-700 px-4 py-2 text-sm font-medium text-[#32CD32] hover:bg-gray-500"
-                    onClick={() => handlesharebtn(post)}
+                    onClick={handleShare}
                   >
                     Invite Friends
                   </button>

@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  email           String     @unique
+  isEmailVerified Boolean    @default(false)
+  name            String?
+  password        String
+  phoneNumber     String     @unique
+  isMobileVerified Boolean   @default(false)
+  subjects        subject[]  // Relation to subjects
+  posts           post[]     // Relation to posts
+  userRole        Role       @default(USER)
+  videos          video[]    // Relation to videos
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
+  avatar          String     // URL of avatar image
+  emailVerifications EmailVerification[]
+  mobileVerifications MobileVerification[]
+  coins           Coins      @relation(fields: [coinsId], references: [id])
+  coinsId         String     @db.ObjectId
+  purchases       CoursePurchase[]  // Relation to purchased courses
+}
+
+model EmailVerification {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  token        String
+  expireAt     DateTime
+  isVerified   Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model MobileVerification {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  token        String
+  expireAt     DateTime
+  isVerified   Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model subject {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?   @relation(fields: [userId], references: [id])
+  userId        String? @db.ObjectId
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  videos        video[] // Relation to video model
+}
+
+model post {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @db.ObjectId
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  title         String
+  description   String
+  category      String?
+  premium       Boolean  @default(false)
+  file_url      String?
+  file_name     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model video {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @db.ObjectId
+  title         String
+  url           String
+  sequence      Int
+  course_name   String
+  semester_code String
+  subject_code  String
+  subject_name  String
+  category      String?
+  subject       subject  @relation(fields: [subjectId], references: [id])
+  subjectId     String   @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  FREE
+  PRO
+}
+
+model Plans {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  purchasedBy   String   @relation(fields: [userId], references: [id])
+  userId        String?  @db.ObjectId
+  startedAt     DateTime @default(now())
+  expireAt      DateTime @updatedAt
+}
+
+model Coins {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  balance       Int      @default(0) // Total number of coins the user has
+  transactions  CoinsTransaction[]
+}
+
+model CoinsTransaction {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  coins         Int      // Amount of coins added or deducted
+  transactionType String  // Could be 'purchase' or 'earn'
+  description   String   // Reason for the transaction (e.g., course purchase)
+  createdAt     DateTime @default(now())
+}
+
+model CoursePurchase {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  courseId      String   // ID of the purchased course
+  priceInCoins  Int      // Number of coins required to purchase
+  purchasedAt   DateTime @default(now())
+  status        String   // 'pending', 'completed', 'failed', etc.
+  paymentMethod String   // Method used for payment
+}
+

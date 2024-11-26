@@ -8,31 +8,53 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  email       String    @unique
-  name        String?
-  password    String
-  phoneNumber String @unique
-  subjects    subject[]
-  posts       post[]
-  userRole    Role      @default(USER)
-  video       video[]
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  email               String               @unique
+  isEmailVerified     Boolean              @default(false)
+  name                String?
+  password            String
+  phoneNumber         String               @unique
+  isMobileVerified    Boolean              @default(false)
+  subjects            subject[] // Corrected to match model name
+  posts               post[] // Corrected to match model name
+  userRole            Role                 @default(USER)
+  videos              video[] // Corrected to match model name
+  createdAt           DateTime?            @default(now())
+  updatedAt           DateTime?            @default(now()) @updatedAt
+  avatar              String? // URL of avatar image
+  emailVerifications  EmailVerification[] // Corrected to match model name
+  mobileVerifications MobileVerification[] // Corrected to match model name
+  coins               Coins?               @relation(fields: [coinsId], references: [id])
+  coinsId             String?              @db.ObjectId
+  purchases           CoursePurchase[] // Corrected to match model name
+  mentorshipRequests  MentorshipRequest[]  @relation("UserRequests")
+  mentorshipsMentored MentorshipRequest[]  @relation("MentorRequests")
+  Badge               Badge[]
+  Resume              Resume[]
+  GroupMember         GroupMember[]
+  likes               UserLike[]
+  downloads           UserDownload[]
+  settings            UserSettings?
+  notifications       Notification[]
 }
 
-model subject {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  User          User?   @relation(fields: [userId], references: [id])
-  userId        String? @db.ObjectId
+model subject{
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?      @relation(fields: [userId], references: [id])
+  userId        String?    @db.ObjectId
   course_name   String
   semester_code String
   subject_code  String
   subject_name  String
-  videos        video[] // New relation to video model
+  videos        video[] // Corrected to match model name
+  // MockTest      MockTest?
 }
+
+
 
 model post {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  User          User?    @relation(fields: [userId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
   userId        String?  @db.ObjectId
   course_name   String
   semester_code String
@@ -41,16 +63,23 @@ model post {
   title         String
   description   String
   category      String?
-premium   Boolean  @default(false) // Add this line
+  premium       Boolean  @default(false)
   file_url      String?
   file_name     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  downloads     Int @default(0)
+  likes         Int @default(0)
+  shares        Int @default(0)
+  userLikes     UserLike[]
+  userDownloads UserDownload[]
 }
+
+
 
 model video {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  User          User?    @relation(fields: [userId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
   userId        String?  @db.ObjectId
   title         String
   url           String
@@ -64,6 +93,108 @@ model video {
   subjectId     String   @db.ObjectId
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  Course        Course?  @relation(fields: [courseId], references: [id])
+  courseId      String?  @db.ObjectId
+}
+
+model EmailVerification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  token      String
+  expireAt   DateTime
+  isVerified Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model MobileVerification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  token      String
+  expireAt   DateTime
+  isVerified Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Badge {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  icon        String // URL of badge icon
+  awardedAt   DateTime @default(now())
+  userId      String   @db.ObjectId
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+model Resume {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  url        String // Resume file URL
+  userId     String   @db.ObjectId
+  User       User     @relation(fields: [userId], references: [id])
+  uploadedAt DateTime @default(now())
+}
+
+model MentorshipRequest {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  mentorId    String   @db.ObjectId
+  subject     String
+  status      String   @default("pending") // 'pending', 'accepted', 'rejected'
+  requestedAt DateTime @default(now())
+  User        User     @relation(name: "UserRequests", fields: [userId], references: [id])
+  Mentor      User     @relation(name: "MentorRequests", fields: [mentorId], references: [id])
+}
+
+model Group {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  members     GroupMember[]
+  createdAt   DateTime      @default(now())
+}
+
+model GroupMember {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId  String   @db.ObjectId
+  userId   String   @db.ObjectId
+  joinedAt DateTime @default(now())
+  Group    Group    @relation(fields: [groupId], references: [id])
+  User     User     @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  description    String
+  priceInCoins   Int
+  duration       Int // Duration in hours
+  certificate    Boolean          @default(false)
+  videos         video[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+  CoursePurchase CoursePurchase[]
+}
+
+model CoursePurchase {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  courseId     String   @db.ObjectId
+  priceInCoins Int
+  purchasedAt  DateTime @default(now())
+  status       String   @default("completed") // 'pending', 'completed', 'failed'
+  User         User     @relation(fields: [userId], references: [id])
+  Course       Course   @relation(fields: [courseId], references: [id])
+}
+
+model MockTest {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  subjectId   String   @db.ObjectId
+  questions   String // JSON representation of questions
+  maxMarks    Int
+  duration    Int // Duration in minutes
+  createdAt   DateTime @default(now())
+//  Subject     subject  @relation(fields: [subjectId], references: [id])
 }
 
 enum Role {
@@ -71,5 +202,70 @@ enum Role {
   ADMIN
   FREE
   PRO
+}
 
+model Coins {
+  id           String             @id @default(auto()) @map("_id") @db.ObjectId
+  balance      Int                @default(0) // Total number of coins the user has
+  transactions CoinsTransaction[]
+  User         User[]
+}
+
+model CoinsTransaction {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  coins           Int // Amount of coins added or deducted
+  transactionType String // Could be 'purchase' or 'earn'
+  description     String // Reason for the transaction (e.g., course purchase)
+  createdAt       DateTime @default(now())
+  Coins           Coins?   @relation(fields: [coinsId], references: [id])
+  coinsId         String?  @db.ObjectId
+}
+
+model UserLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  postId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  post      post     @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model UserDownload {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  postId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  post      post     @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model UserSettings {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String   @db.ObjectId
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  darkMode           Boolean  @default(false)
+  language           String   @default("en")
+  user               User     @relation(fields: [userId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([userId])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  type      String   // 'like', 'download', 'share', 'admin'
+  message   String
+  image     String?  // Optional image URL
+  link      String?  // Optional link URL
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }

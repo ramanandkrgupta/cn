@@ -1,8 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-
-
+import { signIn } from "next-auth/react";
 
 import { doc, fire, newt, premiumIcon } from "@/public/icons";
 
@@ -36,7 +35,11 @@ const PostCard = ({ data }) => {
             <Image src={doc} alt={data.description} />
           </figure>
           <div className="absolute top-0 left-0 w-10 h-10">
-            <Image src={fire} alt="Fire Icon" className="animate-pulse w-25 h-25" />
+            <Image
+              src={fire}
+              alt="Fire Icon"
+              className="animate-pulse w-25 h-25"
+            />
             {/* You can add CSS classes like animate-pulse for a pulsing effect */}
           </div>
         </div>
@@ -71,10 +74,15 @@ const PostCard = ({ data }) => {
                 Download
               </button>
             ) : (
-              <p className="text-red-500">Upgrade to PRO to download this file.</p>
+              <p className="text-red-500">
+                Upgrade to PRO to download this file.
+              </p>
             )
           ) : (
-            <p className="text-blue-500 cursor-pointer" onClick={() => signIn()}>
+            <p
+              className="text-blue-500 cursor-pointer"
+              onClick={() => signIn()}
+            >
               Login to download
             </p>
           )
@@ -86,6 +94,11 @@ const PostCard = ({ data }) => {
             Download
           </button>
         )}
+      </div>
+      <div className="flex justify-between text-sm text-gray-500 mt-2">
+        <span>{data.downloads} downloads</span>
+        <span>{data.likes} likes</span>
+        <span>{data.shares} shares</span>
       </div>
     </div>
   );

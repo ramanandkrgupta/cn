@@ -3,7 +3,7 @@ const Hero = () => {
     tittle_one: "Dive into the Sea of ",
     tittle_two: "Study Resources 🌊",
     descrption:
-      "Join the community on a mission to make education more accessible and enjoyable. Start your journey with Paschub today!",
+      "Join the community on a mission to make education more accessible and enjoyable. Start your journey with College Notes today!",
   };
   return (
     <section className="text-white">

@@ -1,10 +1,20 @@
 import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
 import Notification from "@/components/Notification";
+import Greeting from "@/components/Greeting";
 
 export default function Home() {
+  const user = { name: "John" }; // Replace this with actual user logic
+
   return (
     <div className="flex flex-col items-center sm:mb-5">
+      {/* Greeting Section */}
+      {user?.name && (
+        <div className="w-full">
+          <Greeting name={user.name} />
+        </div>
+      )}
+
       {/* Banner Section */}
       <div className="w-full">
         <Banner />
@@ -16,7 +26,7 @@ export default function Home() {
       </div>
 
       {/* Feed Section */}
-      <div className="w-full md:px-8 ">
+      <div className="w-full md:px-8">
         <Feed
           label="Discover Courses"
           styleHead="mt-3"

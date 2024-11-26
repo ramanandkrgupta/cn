@@ -13,7 +13,7 @@ export default function AccountLayout({ children }) {
           <Sidebar />
         </div>
         <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-5">
-          <Navbar />
+          <Navbar showSearch={false} />
           {children}
           <Script src="https://checkout.razorpay.com/v1/checkout.js"></Script>
           

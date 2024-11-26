@@ -28,6 +28,7 @@ const Search = ({
             src={search}
             alt="search icon"
             className="w-[18px] h-[18px] object-contain"
+            width="auto"
           />
         </div>
       </div>
@@ -73,7 +74,8 @@ const SearchDropDown = ({
       </div>
       {result?.map((post, index) => {
         let title = post.title.slice(0, 22);
-        let shouldShowDots = post.title.length > 50;
+        let shouldShowDots = post.title.length > 100;
+        console.log(shouldShowDots);
         return (
           <div
             key={index}
@@ -81,12 +83,10 @@ const SearchDropDown = ({
             className="flex rounded-full py-2 px-3 w-full hover:bg-[#2c2f32] justify-between items-center"
             onClick={() => handleModel(post)}
           >
-            <p className="text-white font-medium sm:hidden">
+            {/* <p className="text-white font-medium sm:hidden">
               {shouldShowDots ? `${title}...` : title}
-            </p>
-            <p className="text-white font-medium hidden sm:block">
-              {post.title}
-            </p>
+            </p> */}
+            <p className="text-white font-medium">{post.title}</p>
             <p className="text-gray-400 text-sm">{post.category}</p>
           </div>
         );

@@ -10,8 +10,7 @@ const Feed = ({ label, styleHead, style }) => {
             <DataCard
               key={index}
               hrefData={{
-                pathname: `/category`,
-                query: { name: item.link },
+                pathname: `/rgpv/${item.link}`,
               }}
               data={item}
               altMsg={item.description}

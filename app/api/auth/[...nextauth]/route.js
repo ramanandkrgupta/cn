@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import prisma from "@/libs/prisma";
 
-const authOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     // GitHub Provider
@@ -95,22 +95,17 @@ const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.userRole || "user"; // Default role
-        token.phoneNumber = user.phoneNumber || ''; // Include phoneNumber
+        token.role = user.userRole;
       }
       return token;
     },
     async session({ session, token }) {
-     const user = await prisma.user.findUnique({
-       where: { id: token.id },
-     });
-     session.user = {
-       ...token,
-       phoneNumber: user.phoneNumber,
-       userRole: user.userRole,
-     };
-     return session;
-   },
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+      }
+      return session;
+    }
   },
 };
 

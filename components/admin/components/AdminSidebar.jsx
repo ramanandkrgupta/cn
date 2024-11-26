@@ -62,7 +62,7 @@ const AdminSidebar = () => {
         </div>
       </div>
       <div className="font-medium text-xs text-gray-400 mb-5 mr-5">
-        paschub@2023
+        collegenotes@2024
       </div>
     </aside>
   );

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons
-import Link from "next/link";  // Using Next.js Link
+import Link from "next/link"; // Using Next.js Link
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
@@ -76,6 +76,7 @@ const LoginPage = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autocomplete="on"
               />
 
               <div className="relative">
@@ -100,8 +101,6 @@ const LoginPage = () => {
                 </button>
               </div>
 
-              
-
               <div className="flex items-center mb-6">
                 <Link
                   href="/forgot-password"
@@ -120,7 +119,11 @@ const LoginPage = () => {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <Loader className="w-6 h-6 animate-spin mx-auto" /> : "Login"}
+                {isLoading ? (
+                  <Loader className="w-6 h-6 animate-spin mx-auto" />
+                ) : (
+                  "Login"
+                )}
               </motion.button>
             </form>
           </div>
