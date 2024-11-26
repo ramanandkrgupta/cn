@@ -1,4 +1,4 @@
-# StudyDrive 📚
+# College Notes 📚
 A full stack web application that makes studying easier for students and document management hassle-free for teachers. **Students can easily find study materials sorted by subjects and courses, while teachers can upload, organize, and manage resources effortlessly**. StudyHub encourages teamwork, makes study materials easy to access, and acts as a hub for all educational resources 🚀
 
 ## Features 🌟
@@ -52,10 +52,10 @@ From your command line:
 
 ```bash
 # Clone this repository
-  $git clone https://github.com/your_github_name/studydrive.git
+  $git clone https://github.com/ramanandkrgupta/cn.git
 
 # Go into the repository
-  $cd studydrive
+  $cd cn
 
 # Install dependencies
   $npm install
@@ -69,15 +69,14 @@ From your command line:
 ````
 ## Contributing 🤝
    We welcome contributions from the community. Please fork the repository and submit pull requests.
-   **Make sure to see [contributing.md](https://github.com/SHABIN-K/studydrive/blob/main/CONTRIBUTING.md) for instructions on contributing to the project!**
+   **Make sure to see [contributing.md](https://github.com/ramanandkrgupta/cn/blob/main/CONTRIBUTING.md) for instructions on contributing to the project!**
    
-## Support 💬
-Join Our [Telegram Group](https://www.telegram.dog/codexbotzsupport) For Support/Assistance And Our [Channel](https://www.telegram.dog/codexbotz) For Updates.   
+   
    
 Report Bugs, Give Feature Requests There..   
 
 ## Licence 📝
-[Studydrive](https://github.com/SHABIN-K/studydrive) is Free Software: You can use, study share and improve it at your
+[Studydrive](https://github.com/ramanandkrgupta/cn) is Free Software: You can use, study share and improve it at your
 will. Specifically you can redistribute and/or modify it under the terms of the
 [MIT License](https://opensource.org/license/mit/l) as
 published by the Free Software Foundation, either version 3 of the License, or
