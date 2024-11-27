@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
-import Image from "next/image";
-import { search } from "@/public/assets";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import Image from 'next/image'
+import { search } from '@/public/assets'
+import { XMarkIcon } from '@heroicons/react/20/solid'
 
 const Search = ({
   results,
@@ -42,10 +42,10 @@ const Search = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Search;
+export default Search
 
 const SearchDropDown = ({
   result,
@@ -55,42 +55,46 @@ const SearchDropDown = ({
   setPost,
 }) => {
   const handleClose = () => {
-    closeSearch("");
-  };
+    closeSearch('')
+  }
 
   const handleModel = (post) => {
-    setPost(post);
-    setIsPostOpen(true);
-  };
+    setPost(post)
+    setIsPostOpen(true)
+  }
 
   return (
-    <div className="relative top-4 md:top-6 z-50 grid max-h-[500px] w-full gap-1 rounded-3xl bg-[#1c1c24] p-4 overflow-auto shadow-2xl shadow-gray-800">
-      <XMarkIcon
-        className="text-[#32CD32] hover:text-gray-300 absolute top-4 right-4 text-lg  cursor-pointer w-6 h-6"
-        onClick={handleClose}
-      />
-      <div className="">
-        {result.length} <span> results for</span> "{searchText}"
+    <div className="relative top-4 md:top-6 z-50 max-h-[500px] w-full rounded-3xl bg-[#1c1c24] p-4 shadow-2xl shadow-gray-800">
+      <div className="sticky top-0 bg-[#1c1c24] z-10 pb-2">
+        <XMarkIcon
+          className="text-[#32CD32] hover:text-gray-300 absolute right-4 text-lg  cursor-pointer w-6 h-6"
+          onClick={handleClose}
+        />
+        <div className="">
+          {result.length} <span> results for</span> "{searchText}"
+        </div>
       </div>
-      {result?.map((post, index) => {
-        let title = post.title.slice(0, 22);
-        let shouldShowDots = post.title.length > 100;
-        console.log(shouldShowDots);
-        return (
-          <div
-            key={index}
-            title={`file Details : \n subject name : ${post.subject_name} \n semester : ${post.semester_code} \n course name : ${post.course_name}`}
-            className="flex rounded-full py-2 px-3 w-full hover:bg-[#2c2f32] justify-between items-center"
-            onClick={() => handleModel(post)}
-          >
-            {/* <p className="text-white font-medium sm:hidden">
+      <div className="overflow-y-auto max-h-[400px] space-y-2 pr-2 scrollbar-thin scrollbar-track-[#1c1c24] scrollbar-thumb-[#32CD32] scrollbar-thumb-rounded-full">
+        {result?.map((post, index) => {
+          let title = post.title.slice(0, 22)
+          let shouldShowDots = post.title.length > 100
+          console.log(shouldShowDots)
+          return (
+            <div
+              key={index}
+              title={`file Details : \n subject name : ${post.subject_name} \n semester : ${post.semester_code} \n course name : ${post.course_name}`}
+              className="flex rounded-full py-2 px-3 w-full hover:bg-[#2c2f32] justify-between items-center"
+              onClick={() => handleModel(post)}
+            >
+              {/* <p className="text-white font-medium sm:hidden">
               {shouldShowDots ? `${title}...` : title}
             </p> */}
-            <p className="text-white font-medium">{post.title}</p>
-            <p className="text-gray-400 text-sm">{post.category}</p>
-          </div>
-        );
-      })}
+              <p className="text-white font-medium">{post.title}</p>
+              <p className="text-gray-400 text-sm">{post.category}</p>
+            </div>
+          )
+        })}
+      </div>
     </div>
-  );
-};
+  )
+}
