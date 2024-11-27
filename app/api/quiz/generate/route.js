@@ -10,6 +10,14 @@ export async function GET(req) {
     const interest = searchParams.get("interest");
     const semester = searchParams.get("semester");
 
+    // Validate input
+    if (!interest || !semester) {
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters: interest or semester." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // Create the prompt
     const prompt = `
       Create a quiz with 5 multiple-choice questions for a student interested in ${interest}, currently in semester ${semester}.  
@@ -36,14 +44,18 @@ export async function GET(req) {
     // Call the generative model
     const result = await model.generateContent({ prompt });
 
-    // Validate and clean response
-    const rawResponse = result?.text || result?.response || ""; // Access response safely
+    // Validate the result
+    if (!result || !result.text) {
+      throw new Error("No valid response received from the model.");
+    }
+
+    // Clean and parse the response
+    const rawResponse = result.text;
     const cleanResponse = rawResponse
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    // Parse the response to JSON
     const questions = JSON.parse(cleanResponse);
 
     return new Response(JSON.stringify({ questions }), {
@@ -51,7 +63,7 @@ export async function GET(req) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error generating quiz:", error);
+    console.error("Error generating quiz:", error.message);
     return new Response(
       JSON.stringify({
         error: "Failed to generate quiz",
