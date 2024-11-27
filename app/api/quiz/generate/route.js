@@ -11,8 +11,25 @@ export async function GET(req) {
 
   // Create the prompt
   const prompt = `
-    Create a quiz with 5 multiple-choice questions for a student interested in ${interest}, currently in semester ${semester}.
-    Each question should be challenging yet relevant. Return the questions in JSON format with fields: question, options (an array), and correct_answer.
+    Create a quiz with 5 multiple-choice questions for a student interested in ${interest}, currently in semester ${semester}.  
+
+### Details:  
+1. **Difficulty**: Tailor the questions based on the semester level (easy for early semesters, moderate to challenging for later semesters).  
+2. **Relevance**: Ensure all questions align with the interest (${interest}) and semester curriculum.  
+3. **Diversity**: Include a mix of conceptual, practical, and application-based questions.  
+4. **Output Format**: Return questions in JSON format with fields:  
+   - `question`: The question text.  
+   - `options`: An array of four choices (strings).  
+   - `correct_answer`: The correct answer (string).  
+
+### Example Topics by Interest:  
+- **Web Development**: HTML, CSS, JavaScript, frameworks (React, Angular), APIs.  
+- **Data Analytics**: Python, R, statistics, visualization tools (Tableau, Power BI), databases (SQL).  
+- **AI and ML**: Algorithms, Python libraries (TensorFlow, scikit-learn), neural networks.  
+- **Cybersecurity**: Cryptography, network protocols, ethical hacking, firewalls.  
+- **Software Engineering**: SDLC, Agile, UML diagrams, programming concepts.  
+
+Generate unique questions each time with no repetitions.
   `;
 
   try {
