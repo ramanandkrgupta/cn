@@ -5,22 +5,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function GET(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const interest = searchParams.get("interest");
-    const semester = searchParams.get("semester");
+  const { searchParams } = new URL(req.url);
+  const interest = searchParams.get('interest');
+  const semester = searchParams.get('semester');
 
-    // Validate input
-    if (!interest || !semester) {
-      return new Response(
-        JSON.stringify({ error: "Missing required parameters: interest or semester." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Create the prompt
-    const prompt = `
-      Create a quiz with 5 multiple-choice questions for a student interested in ${interest}, currently in semester ${semester}.  
+  // Create the prompt
+  const prompt = `
+    Create a quiz with 5 multiple-choice questions for a student interested in ${interest}, currently in semester ${semester}.  
 
       ### Details:  
       1. **Difficulty**: Tailor the questions based on the semester level (easy for early semesters, moderate to challenging for later semesters).  
@@ -39,37 +30,24 @@ export async function GET(req) {
       - **Software Engineering**: SDLC, Agile, UML diagrams, programming concepts.  
 
       Generate unique questions each time with no repetitions.
-    `;
+  `;
 
-    // Call the generative model
-    const result = await model.generateContent({ prompt });
+  try {
+    const result = await model.generateContent(prompt);
 
-    // Validate the result
-    if (!result || !result.text) {
-      throw new Error("No valid response received from the model.");
-    }
+    // Strip any unwanted characters and markdown formatting from the response
+    const rawResponse = result.response.text();
+    const cleanResponse = rawResponse.replace(/```json/g, "").replace(/```/g, "").trim();
 
-    // Clean and parse the response
-    const rawResponse = result.text;
-    const cleanResponse = rawResponse
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
+    // Parse the cleaned response to JSON
     const questions = JSON.parse(cleanResponse);
 
-    return new Response(JSON.stringify({ questions }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ questions }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error("Error generating quiz:", error.message);
-    return new Response(
-      JSON.stringify({
-        error: "Failed to generate quiz",
-        details: error.message,
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    console.error("Error generating quiz:", error);
+    return new Response(JSON.stringify({ error: "Failed to generate quiz", details: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
+
+
+I want to use that prompt here . But i got error . May be for this ` . Missing semicolon 
