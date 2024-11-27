@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import bcrypt from "bcrypt";
 
 export async function GET(req) {
   try {
@@ -127,5 +128,36 @@ export async function DELETE(req) {
       error: "Error deleting user",
       details: error.message 
     }, { status: 500 });
+  }
+}
+
+export async function POST(req) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { name, email, password, role } = await req.json();
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        userRole: role,
+        phoneNumber: "", // Default or handle as needed
+        isEmailVerified: false,
+        isMobileVerified: false,
+      }
+    });
+
+    return NextResponse.json(newUser);
+  } catch (error) {
+    console.error("Error adding user:", error);
+    return NextResponse.json({ error: "Error adding user", details: error.message }, { status: 500 });
   }
 } 

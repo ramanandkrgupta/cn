@@ -308,9 +308,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                 </div>
                 <div className="mt-4 flex flex-col gap-2">
                   <div className="flex justify-between text-sm text-gray-500">
-                    <span>{metrics.downloads} downloads</span>
-                    <span>{metrics.likes} likes</span>
-                    <span>{metrics.shares} shares</span>
+                    <span>{metrics.downloads} 📥</span>
+                    <span>{metrics.likes} ❤️</span>
+                    <span>{metrics.shares} 📢</span>
                   </div>
                   <div className="flex w-full gap-2">
                     <button

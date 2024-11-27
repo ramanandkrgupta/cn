@@ -96,12 +96,14 @@ const PostCard = ({ data }) => {
         )}
       </div>
       <div className="flex justify-between text-sm text-gray-500 mt-2">
-        <span>{data.downloads} downloads</span>
-        <span>{data.likes} likes</span>
-        <span>{data.shares} shares</span>
+        <span>{data.downloads} 📥</span>
+        <span>{data.likes} ❤️</span>
+        <span>{data.shares} 📢</span>
+        
       </div>
     </div>
-  );
+        
+      );
 };
 
 export default PostCard;

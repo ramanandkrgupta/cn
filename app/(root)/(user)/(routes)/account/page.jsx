@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  LayoutDashboard
 } from "lucide-react";
 
 export default function Profile() {
@@ -50,7 +51,7 @@ export default function Profile() {
     }
   };
 
-  const menuItems = [
+  const baseMenuItems = [
     {
       icon: <User size={24} className="text-gray-500" />,
       title: "My Profile",
@@ -77,6 +78,17 @@ export default function Profile() {
       onClick: () => router.push('/account/settings'),
     },
   ];
+
+  const menuItems = session?.user?.role === "ADMIN" 
+    ? [
+        {
+          icon: <LayoutDashboard size={24} className="text-primary" />,
+          title: "Admin Panel",
+          onClick: () => router.push('/dashboard'),
+        },
+        ...baseMenuItems
+      ]
+    : baseMenuItems;
 
   if (!session || !userData) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
@@ -105,7 +117,9 @@ export default function Profile() {
           {/* User Role Badge */}
           <div className="mt-2">
             <span className={`px-3 py-1 rounded-full text-xs font-medium
-              ${userData.userRole === 'PRO' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+              ${userData.userRole === 'PRO' ? 'bg-green-100 text-green-800' : 
+                userData.userRole === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 
+                'bg-blue-100 text-blue-800'}`}>
               {userData.userRole || 'FREE'} User
             </span>
           </div>

@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  Users, 
-  Search, 
+import {
+  Users,
+  Search,
   UserPlus,
   Filter,
   MoreVertical,
@@ -13,7 +13,7 @@ import {
   Shield,
   Ban,
   FileText,
-  Download
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,7 +28,7 @@ export default function UsersPage() {
     total: 0,
     pages: 0,
     page: 1,
-    limit: 10
+    limit: 10,
   });
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function UsersPage() {
         search: searchTerm,
         role: filterRole,
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
       });
 
       const response = await fetch(`/api/admin/users?${params}`);
@@ -78,10 +78,10 @@ export default function UsersPage() {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const response = await fetch('/api/admin/users', {
-        method: 'PUT',
+      const response = await fetch("/api/admin/users", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ userId, role: newRole }),
       });
@@ -105,7 +105,7 @@ export default function UsersPage() {
 
     try {
       const response = await fetch(`/api/admin/users?userId=${userId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
@@ -158,7 +158,7 @@ export default function UsersPage() {
           />
         </div>
         <div className="flex gap-2">
-          <select 
+          <select
             className="select select-bordered"
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
@@ -175,11 +175,13 @@ export default function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-base-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="table w-full">
+      {/* <div className="bg-base-200 rounded-lg overflow-hidden"> */}
+      <div className="overflow-x-auto">
+      <table className="table">
             <thead>
+            
               <tr>
+                <th></th>
                 <th>User</th>
                 <th>Role</th>
                 <th>Activity</th>
@@ -188,29 +190,36 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody>
+            
               {users.map((user) => (
-                <tr key={user.id}>
+                <tr key={user.id} className="hover">
+                   <th>1</th>
                   <td>
+                 
                     <div className="flex items-center space-x-3">
                       <div className="avatar placeholder">
                         <div className="bg-neutral text-neutral-content rounded-full w-12">
-                          <span className="text-xl">{user.name?.[0] || user.email[0]}</span>
+                          <span className="text-xl">
+                            {user.name?.[0] || user.email[0]}
+                          </span>
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold">{user.name || 'N/A'}</div>
+                        <div className="font-bold">{user.name || "N/A"}</div>
                         <div className="text-sm opacity-50">{user.email}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <div className={`badge ${
-                      user.userRole === 'PRO' 
-                        ? 'badge-primary' 
-                        : user.userRole === 'ADMIN'
-                        ? 'badge-secondary'
-                        : 'badge-ghost'
-                    }`}>
+                    <div
+                      className={`badge ${
+                        user.userRole === "PRO"
+                          ? "badge-primary"
+                          : user.userRole === "ADMIN"
+                          ? "badge-secondary"
+                          : "badge-ghost"
+                      }`}
+                    >
                       {user.userRole}
                     </div>
                   </td>
@@ -236,21 +245,38 @@ export default function UsersPage() {
                       <label tabIndex={0} className="btn btn-ghost btn-sm">
                         <MoreVertical className="w-4 h-4" />
                       </label>
-                      <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                      >
                         <li>
-                          <a onClick={() => router.push(`/dashboard/users/${user.id}`)}>
+                          <a
+                            onClick={() =>
+                              router.push(`/dashboard/users/${user.id}`)
+                            }
+                          >
                             <Edit className="w-4 h-4 mr-2" />
                             View Details
                           </a>
                         </li>
                         <li>
-                          <a onClick={() => handleRoleChange(user.id, user.userRole === 'PRO' ? 'USER' : 'PRO')}>
+                          <a
+                            onClick={() =>
+                              handleRoleChange(
+                                user.id,
+                                user.userRole === "PRO" ? "FREE" : "PRO"
+                              )
+                            }
+                          >
                             <Shield className="w-4 h-4 mr-2" />
                             Toggle PRO
                           </a>
                         </li>
                         <li>
-                          <a className="text-error" onClick={() => handleDeleteUser(user.id)}>
+                          <a
+                            className="text-error"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
                             <Trash className="w-4 h-4 mr-2" />
                             Delete User
                           </a>
@@ -262,34 +288,44 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        {/* </div> */}
 
         {/* Pagination */}
         <div className="flex justify-between items-center p-4">
           <div className="text-sm text-gray-500">
-            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+            {pagination.total} entries
           </div>
           <div className="join">
-            <button 
+            <button
               className="join-item btn btn-sm"
               disabled={pagination.page === 1}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
             >
               Previous
             </button>
             {[...Array(pagination.pages)].map((_, i) => (
               <button
                 key={i + 1}
-                className={`join-item btn btn-sm ${pagination.page === i + 1 ? 'btn-active' : ''}`}
-                onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+                className={`join-item btn btn-sm ${
+                  pagination.page === i + 1 ? "btn-active" : ""
+                }`}
+                onClick={() =>
+                  setPagination((prev) => ({ ...prev, page: i + 1 }))
+                }
               >
                 {i + 1}
               </button>
             ))}
-            <button 
+            <button
               className="join-item btn btn-sm"
               disabled={pagination.page === pagination.pages}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
             >
               Next
             </button>
@@ -298,4 +334,4 @@ export default function UsersPage() {
       </div>
     </div>
   );
-} 
+}
