@@ -1,15 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-
+import Link from "next/link";
 import { semester } from "@/constants";
 import DataCard from "@/components/cards/DataCard";
 import { usePostStore } from "@/libs/state/useStore";
 import NoDataFound from "@/components/ui/NoDataFound";
 import { filterSyllabus } from "@/libs/hooks/usefilter";
 import PostViewDialogBox from "@/components/models/PostViewDialogBox";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const UserSemester = ({ course }) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   // const course = searchParams.get("name");
   const category = searchParams.get("category");
@@ -47,7 +50,13 @@ const UserSemester = ({ course }) => {
 
   return (
     <div>
-      <h1 className="select_header">Select Semester</h1>
+      <div className="flex items-center gap-2">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
+      <h1 className="select_header">Select Category</h1>
+    </div>
       <small className="text-gray-400">
         Path:
         <a href={`/${course}`} className="text-blue-500 hover:underline">

@@ -1,13 +1,15 @@
 "use client";
 import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import PostCard from "@/components/cards/PostCard";
 import { useFilterPost } from "@/libs/hooks/usePost";
 import NoDataFound from "@/components/ui/NoDataFound";
 import SkeletonLoading from "@/components/ui/SkeletonLoading";
+import { ArrowLeft } from "lucide-react";
 
 const ViewDoc = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const course = searchParams.get("name");
   const semester = searchParams.get("sem");
@@ -36,7 +38,13 @@ const ViewDoc = () => {
 
   return (
     <div>
+      <div className="flex items-center gap-2">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
       <h1 className="select_header">{category}</h1>
+      </div>
       <small className="text-gray-400">
         Path: 
         <a href={`/category?name=${course}`} className="text-blue-500 hover:underline">

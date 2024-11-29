@@ -1,14 +1,16 @@
 "use client";
 import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import SubCard from "@/components/cards/SubCard";
 import NoDataFound from "@/components/ui/NoDataFound";
 import { useFilterSubject } from "@/libs/hooks/useSubject";
 import SkeletonLoading from "@/components/ui/SkeletonLoading";
+import { ArrowLeft } from "lucide-react";
 
 const ViewSubjects = ({ course, semester }) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   // const course = searchParams.get("name");
   // const semester = searchParams.get("sem");
@@ -35,7 +37,13 @@ const ViewSubjects = ({ course, semester }) => {
 
   return (
     <div>
-      <h1 className="select_header">Select Subjects</h1>
+      <div className="flex items-center gap-2">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
+        <h1 className="select_header">Select Subjects</h1>
+      </div>
       <small className="text-gray-400">
         Path:
         <a

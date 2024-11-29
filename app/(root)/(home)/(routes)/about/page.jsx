@@ -16,6 +16,7 @@ const About = () => {
         <Howitworks /> */}
         <Team />
         <Contribution />
+        <Contribution />
         <Footer />
       </div>
     </div>

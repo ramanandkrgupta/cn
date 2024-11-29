@@ -2,15 +2,22 @@
 
 import DataCard from "@/components/cards/DataCard";
 import { category } from "@/constants";
-// import { useRouter } from "next/router";
+import { ArrowLeft } from "lucide-react";
+ import { useRouter } from "next/navigation";
 
 const MyCategoryClient = ({ course, semester, subId }) => {
-  // const router = useRouter();
+  const router = useRouter();
   // Extract dynamic route parameter (course)
   console.log(course);
   return (
     <div>
-      <h1 className="select_header">Select Category</h1>
+     <div className="flex items-center gap-2">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
+        <h1 className="select_header">Select Category</h1>
+      </div>
       <small className="text-gray-400">Path: {course}</small>
       <div className="item-center">
         <div className="grid grid-cols-2 mt-[18px] gap-[18px]">

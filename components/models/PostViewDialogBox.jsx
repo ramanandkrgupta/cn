@@ -6,13 +6,13 @@ import { saveAs } from "file-saver";
 import { Dialog, Transition } from "@headlessui/react";
 import { ShareIcon, XMarkIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useSession, signIn } from "next-auth/react";
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 import { handlesharebtn } from "@/libs/utils";
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
-  
+
   useEffect(() => {
     console.log("Session in component:", session); // Debug log
   }, [session]);
@@ -20,7 +20,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [metrics, setMetrics] = useState({
     downloads: data.downloads || 0,
     likes: data.likes || 0,
-    shares: data.shares || 0
+    shares: data.shares || 0,
   });
   const [isLiked, setIsLiked] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
@@ -47,7 +47,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   }
 
   const addUserDetailsToPdf = async (existingPdfBytes, userName, userEmail) => {
-    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const pdfDoc = await PDFDocument.load(existingPdfBytes, { ignoreEncryption: true });
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
 
@@ -73,38 +73,38 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
   const updateMetric = async (metricType) => {
     try {
-      console.log('Updating metric:', {
+      console.log("Updating metric:", {
         metricType,
         postId: data.id,
-        session: session
+        session: session,
       });
 
-      const response = await fetch('/api/posts/metrics', {
-        method: 'POST',
+      const response = await fetch("/api/posts/metrics", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           postId: data.id,
-          metricType
+          metricType,
         }),
       });
 
       const responseData = await response.json();
-      console.log('Metric update response:', responseData);
+      console.log("Metric update response:", responseData);
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to update metric');
+        throw new Error(responseData.error || "Failed to update metric");
       }
 
-      setMetrics(prev => ({
+      setMetrics((prev) => ({
         ...prev,
-        ...responseData
+        ...responseData,
       }));
 
       return true;
     } catch (error) {
-      console.error('Error updating metric:', error);
+      console.error("Error updating metric:", error);
       toast.error(error.message);
       return false;
     }
@@ -118,22 +118,24 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
           return;
         }
         if (session.user.userRole !== "PRO") {
-          toast("This is a premium file. You need a premium membership to download it.");
+          toast(
+            "This is a premium file. You need a premium membership to download it."
+          );
           return;
         }
       }
 
       // First download the file
-      const response = await fetch('/api/posts/secure-file', {
-        method: 'POST',
+      const response = await fetch("/api/posts/secure-file", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ postId: data.id }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get file access');
+        throw new Error("Failed to get file access");
       }
 
       const { fileUrl } = await response.json();
@@ -141,39 +143,45 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       const existingPdfBytes = await fileResponse.arrayBuffer();
 
       // Process and save the file
-      const modifiedPdfBytes = session?.user 
-        ? await addUserDetailsToPdf(existingPdfBytes, session.user.name, session.user.email)
+      const modifiedPdfBytes = session?.user
+        ? await addUserDetailsToPdf(
+            existingPdfBytes,
+            session.user.name,
+            session.user.email
+          )
         : existingPdfBytes;
 
-      const modifiedBlob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      const modifiedBlob = new Blob([modifiedPdfBytes], {
+        type: "application/pdf",
+      });
       saveAs(modifiedBlob, `cn-${filename}`);
 
       // After successful download, update metrics if user is logged in
       if (session?.user) {
-        const metricsResponse = await fetch('/api/posts/metrics', {
-          method: 'POST',
+        const metricsResponse = await fetch("/api/posts/metrics", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             postId: data.id,
-            metricType: 'downloads'
+            metricType: "downloads",
           }),
         });
 
         if (metricsResponse.ok) {
           const updatedMetrics = await metricsResponse.json();
-          setMetrics(prev => ({
+          setMetrics((prev) => ({
             ...prev,
-            ...updatedMetrics
+            ...updatedMetrics,
           }));
         }
       }
 
-      toast.success("Successfully downloaded");
+      toast.success("Post downloaded successfully!");
     } catch (error) {
-      console.error('Download error:', error);
-      toast.error("Error downloading file");
+      console.error("Download error:", error);
+      toast.error("Error downloading post");
     }
   };
 
@@ -181,30 +189,30 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     try {
       // Share without login requirement
       await handlesharebtn(SharePost);
-      
+
       // Update share count without requiring login
-      const response = await fetch('/api/posts/metrics', {
-        method: 'POST',
+      const response = await fetch("/api/posts/metrics", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           postId: data.id,
-          metricType: 'shares'
+          metricType: "shares",
         }),
       });
 
       if (response.ok) {
         const updatedMetrics = await response.json();
-        setMetrics(prev => ({
+        setMetrics((prev) => ({
           ...prev,
-          ...updatedMetrics
+          ...updatedMetrics,
         }));
       }
-      
+
       toast.success("Post shared!");
     } catch (error) {
-      console.error('Share error:', error);
+      console.error("Share error:", error);
       toast.error("Error sharing post");
     }
   };
@@ -217,14 +225,14 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     }
 
     try {
-      const response = await fetch('/api/posts/metrics', {
-        method: 'POST',
+      const response = await fetch("/api/posts/metrics", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           postId: data.id,
-          metricType: 'likes'
+          metricType: "likes",
         }),
       });
 
@@ -233,9 +241,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       if (response.ok) {
         // Update local state
         setHasLiked(true);
-        setMetrics(prev => ({
+        setMetrics((prev) => ({
           ...prev,
-          likes: result.likes || prev.likes + 1
+          likes: result.likes || prev.likes + 1,
         }));
         toast.success("Post liked!");
       } else {
@@ -246,17 +254,22 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
         }
       }
     } catch (error) {
-      console.error('Like error:', error);
+      console.error("Like error:", error);
       toast.error(error.message || "Error liking post");
     }
   };
 
   const SharePost = {
     title: data.title || "",
-    content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${data.course_name}\n\n📕File Title 📕\n ${
-      data.title
-    } \n\n#${data.subject_name.replace(/\s/g, "")} #${data.course_name.replace(/\s/g, "")}\n\n 🚀 Download Link 🚀 \n`,
-    url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${data.id}/${data.title.replace(/\s+/g, "-")}`,
+    content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${
+      data.course_name
+    }\n\n📕File Title 📕\n ${data.title} \n\n#${data.subject_name.replace(
+      /\s/g,
+      ""
+    )} #${data.course_name.replace(/\s/g, "")}\n\n 🚀 Download Link 🚀 \n`,
+    url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
+      data.id
+    }/${data.title.replace(/\s+/g, "-")}`,
   };
 
   return (
@@ -324,17 +337,21 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                           : "Premium File - Upgrade to Download"
                         : "Download"}
                     </button>
-                    
+
                     <button
                       onClick={handleLike}
                       disabled={hasLiked}
                       className={`mt-4 p-2.5 rounded-full ${
-                        hasLiked ? 'bg-red-500' : 'bg-black hover:bg-gray-700'
+                        hasLiked ? "bg-red-500" : "bg-black hover:bg-gray-700"
                       }`}
                     >
-                      <HeartIcon className={`h-6 w-6 ${hasLiked ? 'text-white' : 'text-gray-300'}`} />
+                      <HeartIcon
+                        className={`h-6 w-6 ${
+                          hasLiked ? "text-white" : "text-gray-300"
+                        }`}
+                      />
                     </button>
-                    
+
                     <button
                       type="button"
                       className="rounded-full items-center mt-4 p-2.5 text-white bg-black hover:bg-gray-700"
@@ -343,14 +360,17 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       <ShareIcon className="h-6 w-6" />
                     </button>
                   </div>
-                  {data.premium && session && session.user && session.user.userRole !== "PRO" && (
-                    <p className="text-sm mt-2">
-                      <a href="/plans" className="text-blue-500 underline">
-                        Upgrade to PRO
-                      </a>{" "}
-                      to download premium files.
-                    </p>
-                  )}
+                  {data.premium &&
+                    session &&
+                    session.user &&
+                    session.user.userRole !== "PRO" && (
+                      <p className="text-sm mt-2">
+                        <a href="/plans" className="text-blue-500 underline">
+                          Upgrade to PRO
+                        </a>{" "}
+                        to download premium files.
+                      </p>
+                    )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

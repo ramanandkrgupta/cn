@@ -1,4 +1,4 @@
-import UserSemester from "./MyPage";
+import UserSemester from "./MySemester";
 
 const MySemsterPage = ({ params }) => {
   const { course } = params;

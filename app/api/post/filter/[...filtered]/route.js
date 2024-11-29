@@ -3,7 +3,7 @@ import prisma from "@/libs/prisma";
 export async function GET(req, { params }) {
   const [courseName, semester, category, subId] = params.filtered;
   try {
-    const filteredPost = await prisma.post.findMany({
+    const posts = await prisma.post.findMany({
       where: {
         course_name: courseName,
         semester_code: semester,
@@ -11,9 +11,12 @@ export async function GET(req, { params }) {
         subject_code: subId,
       },
     });
-    
-    return new Response(JSON.stringify(filteredPost), {
-      status: 200, // Created
+
+    // Exclude file_url from each post
+    const filteredPosts = posts.map(({ file_url, ...rest }) => rest);
+
+    return new Response(JSON.stringify(filteredPosts), {
+      status: 200,
       headers: {
         "Content-Type": "application/json",
       },
@@ -22,7 +25,7 @@ export async function GET(req, { params }) {
     console.error("Error processing the request:", error);
 
     return new Response("An error occurred", {
-      status: 500, // Internal Server Error
+      status: 500,
     });
   }
 }

@@ -25,7 +25,7 @@ const SearchFn = ({ posts, setIsPostOpen, setPost }) => {
   };
 
   return (
-    <div className="relative z-10 md:flex-1 max-w-[658px]">
+    <div className="relative z-10 md:flex-1 max-w-[1024px]">
       <Search
         results={searchedResults}
         searchText={searchText}

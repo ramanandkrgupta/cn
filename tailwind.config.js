@@ -8,6 +8,10 @@ module.exports = {
 
   theme: {
     extend: {
+
+      transitionTimingFunction: {
+        'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
       fontFamily: {
         epilogue: ['Epilogue', 'sans-serif'],
       },
@@ -29,7 +33,7 @@ module.exports = {
   },
   plugins: [
     require('daisyui'),
-    require('tailwind-scrollbar')({ nocompatible: true }),
+    require('tailwind-scrollbar'),
   ],
   daisyui: {
     darkTheme: 'mydark',
