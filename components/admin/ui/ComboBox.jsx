@@ -67,7 +67,7 @@ const ComboBox = ({
             >
               {filteredData.length === 0 && query !== "" && subTrue ? (
                 <Link href="/dashboard#addproduct">
-                  <div className="relative cursor-pointer select-none px-4 py-2 text-gray-700 hover:text-green-600">
+                  <div className="relative cursor-pointer select-none px-4 py-2 text-gray-700 hover:text-orange-600">
                     Add "{query}" to list
                   </div>
                 </Link>
@@ -81,7 +81,7 @@ const ComboBox = ({
                     key={data.id}
                     className={({ active }) =>
                       `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                        active ? "bg-green-400 text-white" : "text-gray-900"
+                        active ? "bg-orange-400 text-white" : "text-gray-900"
                       }`
                     }
                     value={data}
@@ -98,7 +98,7 @@ const ComboBox = ({
                         {selected ? (
                           <span
                             className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                              active ? "text-white" : "text-green-400"
+                              active ? "text-white" : "text-orange-400"
                             }`}
                           >
                             <CheckIcon className="h-5 w-5" aria-hidden="true" />

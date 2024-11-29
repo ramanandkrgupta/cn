@@ -204,10 +204,10 @@ const Upload = () => {
     <div className="flex flex-col items-center justify-center">
       {/* Title and description */}
       <div className="flex-col items-center mt-5">
-        <h3 className="text-white text-3xl font-extrabold text-center">
+        <h3 className="text-secondary text-3xl font-extrabold text-center">
           Upload document
         </h3>
-        <p className="text-gray-200 mt-2 text-sm font-medium text-center align-bottom mb-2">
+        <p className="text-secondary mt-2 text-sm font-medium text-center align-bottom mb-2">
           Upload your summaries and other study documents to College Notes
         </p>
       </div>
@@ -217,7 +217,7 @@ const Upload = () => {
 
       {/* Section component based on the active step*/}
 
-      <div className="bg-[#1d232a] p-3 rounded-lg mt-5 border border-green-400 w-full max-h-[490px] mb-5 overflow-auto">
+      <div className="bg-[#1d232a] p-3 rounded-lg mt-5 border border-orange-400 w-full max-h-[490px] mb-5 overflow-auto">
         {getSectionComponent()}
       </div>
 
@@ -227,7 +227,7 @@ const Upload = () => {
         {activeStep !== 0 && (
           <button
             onClick={handlePreviousBtn}
-            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-green-400 border hover:border-green-400 right-0"
+            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-orange-400 border hover:border-orange-400 right-0"
           >
             Previous
           </button>
@@ -236,7 +236,7 @@ const Upload = () => {
         {activeStep !== steps.length - 1 && (
           <div
             onClick={activeStep === 0 ? handleNextBtn : handleSubmitBtn}
-            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-green-400 border hover:border-green-400 right-0"
+            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-orange-400 border hover:border-orange-400 right-0"
           >
             {activeStep === 0 ? "Upload" : "Submit"}
             {isLoading && "ing..."}

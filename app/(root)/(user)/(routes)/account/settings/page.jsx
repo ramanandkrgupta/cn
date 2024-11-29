@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 export default function Settings() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState({
     emailNotifications: true,
@@ -60,8 +63,13 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
-      
+      <div className="flex items-center gap-2 mb-6">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
+      <h1 className="text-2xl font-bold">Settings</h1>
+      </div>
       <div className="space-y-6">
         {/* Notifications */}
         <div className="bg-base-200 p-4 rounded-lg">

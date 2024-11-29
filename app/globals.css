@@ -106,7 +106,7 @@ body {
     @apply bg-primary ;
   }
   100% {
-    @apply bg-primary  ;
+    @apply bg-orange-600;
   }
 }
 /* search button*/

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 export default function EditProfile() {
   const router = useRouter();
@@ -112,9 +113,15 @@ export default function EditProfile() {
   return (
     <div className="bg-base-100 min-h-screen">
       <div className="mx-auto px-4 max-w-lg py-6">
-        <h1 className="text-2xl font-semibold text-secondary text-center mb-6">
+      <div className="flex items-center gap-2 mb-6">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
+        <h1 className="text-2xl font-semibold text-secondary text-center">
           Edit Profile
         </h1>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Section */}
           <div className="flex flex-col items-center">
@@ -129,7 +136,7 @@ export default function EditProfile() {
             </div>
             <label
               htmlFor="avatar"
-              className="mt-3 px-4 py-2 bg-primary text-white text-sm font-medium rounded cursor-pointer hover:bg-primary-focus"
+              className="mt-3 px-4 py-2 bg-primary text-secondary text-sm font-medium rounded cursor-pointer hover:bg-primary-focus"
             >
               Change Avatar
             </label>
@@ -144,7 +151,7 @@ export default function EditProfile() {
 
           {/* Name Field */}
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm text-gray-600 font-medium">
+            <label htmlFor="name" className="text-sm text-secondary font-medium">
               Name
             </label>
             <input
@@ -154,14 +161,14 @@ export default function EditProfile() {
               value={userData.name}
               onChange={handleInputChange}
               placeholder="Enter your name"
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary"
+              className="w-full p-3  rounded-lg shadow-sm "
               required
             />
           </div>
 
           {/* Email (Non-editable) */}
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm text-gray-600 font-medium">
+            <label htmlFor="email" className="text-sm text-secondary font-medium">
               Email
             </label>
             <input

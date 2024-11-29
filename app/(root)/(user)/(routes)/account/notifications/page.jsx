@@ -1,10 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Bell, Download, ThumbsUp, Share2, Check, CheckCheck } from "lucide-react";
+import { Bell, Download, ThumbsUp, Share2, Check, CheckCheck, ArrowLeft } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
+
 export default function Notifications() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -102,7 +105,13 @@ export default function Notifications() {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center gap-2 mb-6">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
         <h1 className="text-2xl font-bold">Notifications</h1>
+        </div>
         {notifications.some((n) => !n.read) && (
           <button
             onClick={markAllAsRead}

@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Upload, Trash2, Edit } from "lucide-react";
+import { Upload, Trash2, Edit, ArrowLeft } from "lucide-react";
 import PostCard from "@/components/cards/PostCard";
 
 export default function UserUploads() {
+  const router = useRouter();
   const [uploads, setUploads] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,7 +60,13 @@ export default function UserUploads() {
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center gap-2 mb-6">
+      {/* Back Button */}
+      <button onClick={() => router.back()} aria-label="Go Back">
+        <ArrowLeft className="w-6 h-6" />
+      </button>
         <h1 className="text-2xl font-bold">Your Uploads</h1>
+        </div>
         <button
           onClick={() => router.push('/upload')}
           className="btn btn-primary"

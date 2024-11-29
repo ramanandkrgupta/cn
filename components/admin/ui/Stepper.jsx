@@ -7,12 +7,12 @@ const Stepper = ({ steps, activeStep }) => {
           <li
             key={index}
             className={`flex items-center ${
-              isCompleted ? "text-green-400" : "text-gray-400"
+              isCompleted ? "text-orange-400" : "text-secondary"
             }`}
           >
             <span
               className={`flex items-center justify-center w-5 h-5 mr-2 text-xs border rounded-full shrink-0 ${
-                isCompleted ? "border-green-400 " : "border-gray-400"
+                isCompleted ? "border-orange-400 " : "border-secondary"
               }`}
             >
               {index + 1}
