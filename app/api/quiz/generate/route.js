@@ -50,4 +50,4 @@ export async function GET(req) {
 }
 
 
-I want to use that prompt here . But i got error . May be for this ` . Missing semicolon 
+ 
