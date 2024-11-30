@@ -14,15 +14,7 @@ export default function RootLayout({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Protect routes
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (!session) {
-    router.push("/login");
-    return null;
-  }
+  
 
   return (
     <EdgeStoreProvider>
