@@ -121,7 +121,7 @@ export const courses = [
   {
     id: 4,
     name: "Electronics & Communication (EC)",
-    imgUrl: bsw,
+    imgUrl: ec,
     link: "ec",
     description:
       "Electronics & Communication (EC) is an academic program that provides in-depth knowledge of electronics and communication.",
@@ -129,7 +129,7 @@ export const courses = [
   {
     id: 5,
     name: "Electrical & Electronics (EX)",
-    imgUrl: maths,
+    imgUrl: ex,
     link: "ex",
     description:
       "Electrical & Electronics (EX) is an academic program that provides in-depth knowledge of electrical and electronics.",

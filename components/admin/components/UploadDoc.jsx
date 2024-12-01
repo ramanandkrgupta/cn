@@ -1,3 +1,4 @@
+// full path /components/admin/components/UploadDoc.jsx
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
@@ -10,6 +11,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { Cloud } from "@/public/assets";
+import { createHash } from 'crypto';
 
 const UploadDoc = ({
   files,
@@ -56,50 +58,70 @@ const UploadDoc = ({
     return new File([pdfBytes], file.name, { type: file.type });
   };
 
+  const calculateFileHash = async (file) => {
+    const buffer = await file.arrayBuffer();
+    const hash = createHash('sha256');
+    hash.update(Buffer.from(buffer));
+    return hash.digest('hex');
+  };
+
+  const checkDuplicate = async (hash) => {
+    const response = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
+    const data = await response.json();
+    return data.isDuplicate;
+  };
+
+  const validateFile = async (file) => {
+    // Check file type
+    if (!["application/pdf"].includes(file.type)) {
+      toast.error("Only PDF files are supported");
+      return false;
+    }
+
+    // Check file size (e.g., 10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size should be less than 10MB");
+      return false;
+    }
+
+    // Calculate file hash
+    const fileHash = await calculateFileHash(file);
+    
+    // Check for duplicates
+    const isDuplicate = await checkDuplicate(fileHash);
+    if (isDuplicate) {
+      toast.error("This file has already been uploaded");
+      return false;
+    }
+
+    return { isValid: true, hash: fileHash };
+  };
+
   const onDrop = useCallback(
     async (acceptedFiles) => {
-      if (files.length + acceptedFiles.length > 3) {
-        toast.error("You can only upload up to three files.");
-        return [];
-      }
-      const validFiles = await Promise.all(
+      const processedFiles = await Promise.all(
         acceptedFiles.map(async (file) => {
-          if (files.some((existingFile) => existingFile.name === file.name)) {
-            toast.error(`File '${file.name}' is already uploaded.`);
+          const validation = await validateFile(file);
+          if (!validation.isValid) {
             return null;
           }
-          if (!validateFile(file)) {
-            return null;
-          }
-          if (file.type === "application/pdf") {
-            return await addWatermarkToPdf(file);
-          }
-          return file;
+
+          // Add watermark
+          const watermarkedFile = await addWatermarkToPdf(file);
+          
+          return {
+            file: watermarkedFile,
+            hash: validation.hash
+          };
         })
       );
 
-      const filteredFiles = validFiles.filter(Boolean); // Remove any nulls
-
-      setFiles((prevFiles) => [...prevFiles, ...filteredFiles]);
-      return filteredFiles;
+      const validFiles = processedFiles.filter(Boolean);
+      setFiles(prev => [...prev, ...validFiles]);
+      return validFiles;
     },
     [files, setFiles]
   );
-
-  const validateFile = (file) => {
-    if (
-      ![
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      ].includes(file.type)
-    ) {
-      toast.error("Invalid file type. Supported types are PDF, DOC, DOCX, and PPTX.");
-      return false;
-    }
-    return true;
-  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {

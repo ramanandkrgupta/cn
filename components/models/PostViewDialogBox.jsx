@@ -7,6 +7,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ShareIcon, XMarkIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useSession, signIn } from "next-auth/react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { Lock } from 'lucide-react';
+import Link from 'next/link';
 
 import { handlesharebtn } from "@/libs/utils";
 
@@ -47,7 +49,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   }
 
   const addUserDetailsToPdf = async (existingPdfBytes, userName, userEmail) => {
-    const pdfDoc = await PDFDocument.load(existingPdfBytes, { ignoreEncryption: true });
+    const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+      ignoreEncryption: true,
+    });
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
 
@@ -112,20 +116,18 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
   const handleDownload = async (postId, filename) => {
     try {
-      if (data.premium) {
-        if (!session?.user) {
-          toast("Please log in to download premium files.");
-          return;
-        }
-        if (session.user.userRole !== "PRO") {
-          toast(
-            "This is a premium file. You need a premium membership to download it."
-          );
-          return;
-        }
+      // Check if user is logged in
+      if (!session?.user) {
+        toast.error("Please login to download files");
+        return;
       }
 
-      // First download the file
+      // Additional check for premium content
+      if (data.premium && session.user.userRole !== "PRO") {
+        toast.error("This is a premium file. You need a premium membership to download it.");
+        return;
+      }
+
       const response = await fetch("/api/posts/secure-file", {
         method: "POST",
         headers: {
@@ -135,85 +137,32 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get file access");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to get file access");
       }
 
       const { fileUrl } = await response.json();
       const fileResponse = await fetch(fileUrl);
       const existingPdfBytes = await fileResponse.arrayBuffer();
 
-      // Process and save the file
-      const modifiedPdfBytes = session?.user
-        ? await addUserDetailsToPdf(
-            existingPdfBytes,
-            session.user.name,
-            session.user.email
-          )
-        : existingPdfBytes;
+      // Add user details to PDF
+      const modifiedPdfBytes = await addUserDetailsToPdf(
+        existingPdfBytes,
+        session.user.name,
+        session.user.email
+      );
 
       const modifiedBlob = new Blob([modifiedPdfBytes], {
         type: "application/pdf",
       });
       saveAs(modifiedBlob, `cn-${filename}`);
 
-      // After successful download, update metrics if user is logged in
-      if (session?.user) {
-        const metricsResponse = await fetch("/api/posts/metrics", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            postId: data.id,
-            metricType: "downloads",
-          }),
-        });
-
-        if (metricsResponse.ok) {
-          const updatedMetrics = await metricsResponse.json();
-          setMetrics((prev) => ({
-            ...prev,
-            ...updatedMetrics,
-          }));
-        }
-      }
-
-      toast.success("Post downloaded successfully!");
+      // Update download metrics
+      await updateMetric("downloads");
+      toast.success("File downloaded successfully!");
     } catch (error) {
       console.error("Download error:", error);
-      toast.error("Error downloading post");
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      // Share without login requirement
-      await handlesharebtn(SharePost);
-
-      // Update share count without requiring login
-      const response = await fetch("/api/posts/metrics", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId: data.id,
-          metricType: "shares",
-        }),
-      });
-
-      if (response.ok) {
-        const updatedMetrics = await response.json();
-        setMetrics((prev) => ({
-          ...prev,
-          ...updatedMetrics,
-        }));
-      }
-
-      toast.success("Post shared!");
-    } catch (error) {
-      console.error("Share error:", error);
-      toast.error("Error sharing post");
+      toast.error(error.message || "Error downloading file");
     }
   };
 
@@ -239,7 +188,6 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       const result = await response.json();
 
       if (response.ok) {
-        // Update local state
         setHasLiked(true);
         setMetrics((prev) => ({
           ...prev,
@@ -256,6 +204,53 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     } catch (error) {
       console.error("Like error:", error);
       toast.error(error.message || "Error liking post");
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      // Check if running in browser and if navigator.share is available
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        // Mobile share
+        await navigator.share({
+          title: SharePost.title,
+          text: SharePost.content,
+          url: SharePost.url
+        });
+      } else {
+        // Desktop fallback - copy to clipboard
+        await navigator.clipboard.writeText(
+          `${SharePost.content}\n${SharePost.url}`
+        );
+        toast.success("Link copied to clipboard!");
+      }
+
+      // Update share count without requiring login
+      const response = await fetch("/api/posts/metrics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: data.id,
+          metricType: "shares",
+        }),
+      });
+
+      if (response.ok) {
+        const updatedMetrics = await response.json();
+        setMetrics((prev) => ({
+          ...prev,
+          ...updatedMetrics,
+        }));
+      }
+    } catch (error) {
+      console.error("Share error:", error);
+      if (error.name === 'AbortError') {
+        // User cancelled the share
+        return;
+      }
+      toast.error("Error sharing post");
     }
   };
 
@@ -328,22 +323,46 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   <div className="flex w-full gap-2">
                     <button
                       type="button"
-                      className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-4 capitalize mt-4 flex-1"
-                      onClick={() => handleDownload(data.id, data.file_name)}
+                      className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300"
+                      onClick={() => {
+                        if (!session?.user) {
+                          toast.error("Please login to download files");
+                          return;
+                        }
+                        handleDownload(data.id, data.file_name);
+                      }}
                     >
-                      {data.premium && session && session.user
-                        ? session.user.userRole === "PRO"
-                          ? "Premium File - Download"
-                          : "Premium File - Upgrade to Download"
-                        : "Download"}
+                      {!session?.user ? (
+                        <span className="flex items-center justify-center gap-1 text-sm">
+                          <Lock className="w-4 h-4" />
+                          Login to Download
+                        </span>
+                      ) : data.premium ? (
+                        session.user.userRole === "PRO" ? (
+                          "Premium File - Download"
+                        ) : (
+                          "Premium File - Upgrade to Download"
+                        )
+                      ) : (
+                        "Download"
+                      )}
                     </button>
 
                     <button
-                      onClick={handleLike}
+                      onClick={() => {
+                        if (!session?.user) {
+                          toast.error("Please login to like posts");
+                          return;
+                        }
+                        handleLike();
+                      }}
                       disabled={hasLiked}
-                      className={`mt-4 p-2.5 rounded-full ${
-                        hasLiked ? "bg-red-500" : "bg-black hover:bg-gray-700"
+                      className={`mt-4 p-2.5 rounded-full transition-all duration-300 ${
+                        hasLiked 
+                          ? "bg-red-500" 
+                          : "bg-black hover:bg-gray-700"
                       }`}
+                      title={!session?.user ? "Login to Like" : hasLiked ? "Already Liked" : "Like"}
                     >
                       <HeartIcon
                         className={`h-6 w-6 ${
@@ -354,22 +373,53 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
                     <button
                       type="button"
-                      className="rounded-full items-center mt-4 p-2.5 text-white bg-black hover:bg-gray-700"
+                      className="rounded-full items-center mt-4 p-2.5 text-white bg-black hover:bg-gray-700 transition-all duration-300"
                       onClick={handleShare}
                     >
                       <ShareIcon className="h-6 w-6" />
                     </button>
                   </div>
+                  {!session?.user && (
+                    <div className="mt-4 p-4 bg-base-200 rounded-lg border border-base-300">
+                      <div className="text-center">
+                        <h4 className="font-semibold mb-2">Login Required</h4>
+                        <p className="text-sm text-gray-500 mb-4">
+                          Please login to download and like documents. It's free and takes less than a minute.
+                        </p>
+                        <div className="flex gap-2 justify-center">
+                          <Link
+                            href="/login"
+                            className="btn btn-primary btn-sm"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            href="/register"
+                            className="btn btn-outline btn-sm"
+                          >
+                            Register
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {data.premium &&
-                    session &&
-                    session.user &&
+                    session?.user &&
                     session.user.userRole !== "PRO" && (
-                      <p className="text-sm mt-2">
-                        <a href="/plans" className="text-blue-500 underline">
-                          Upgrade to PRO
-                        </a>{" "}
-                        to download premium files.
-                      </p>
+                      <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                        <div className="text-center">
+                          <h4 className="font-semibold text-amber-900 mb-2">Premium Content</h4>
+                          <p className="text-sm text-amber-800 mb-4">
+                            This is a premium document. Upgrade to PRO to access premium content.
+                          </p>
+                          <Link
+                            href="/plans"
+                            className="btn btn-warning btn-sm"
+                          >
+                            Upgrade to PRO
+                          </Link>
+                        </div>
+                      </div>
                     )}
                 </div>
               </Dialog.Panel>

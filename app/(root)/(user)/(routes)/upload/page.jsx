@@ -1,3 +1,4 @@
+// full path /app/(root)/(user)/(routes)/upload/page.jsx
 "use client";
 
 import axios from "axios";

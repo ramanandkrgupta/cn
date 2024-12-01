@@ -14,6 +14,7 @@ import {
   ChevronRight,
   LayoutDashboard,
 } from "lucide-react";
+import AppVersion from "@/app/(root)/(home)/(routes)/about/components/AppVersion";
 
 export default function Profile() {
   const router = useRouter();
@@ -100,7 +101,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="bg-base-100 min-h-screen">
+    <div className="bg-base-100 min-h">
       <div className="mx-auto px-4 max-w-lg py-6">
         {/* Profile Card (Mobile Only) */}
         <div className="block  mt-4 p-4 bg-base-300 rounded-lg shadow-lg">
@@ -166,6 +167,7 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      <AppVersion />
     </div>
   );
 }

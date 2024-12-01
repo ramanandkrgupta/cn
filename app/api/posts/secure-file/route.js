@@ -8,7 +8,15 @@ export async function POST(req) {
     const session = await getServerSession(authOptions);
     const { postId } = await req.json();
 
-    // Check if user is authenticated for premium content
+    // Check if user is logged in for any download
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Please login to download files" },
+        { status: 401 }
+      );
+    }
+
+    // Check if post exists
     const post = await prisma.post.findUnique({
       where: { id: postId },
       select: {
@@ -21,14 +29,14 @@ export async function POST(req) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    if (post.premium && (!session || session.user.userRole !== "PRO")) {
+    // Additional check for premium content
+    if (post.premium && session.user.userRole !== "PRO") {
       return NextResponse.json(
-        { error: "Unauthorized access to premium content" },
+        { error: "Premium content requires PRO membership" },
         { status: 403 }
       );
     }
 
-    // Return a temporary signed URL or process file download
     return NextResponse.json({ fileUrl: post.file_url });
   } catch (error) {
     console.error("Error accessing secure file:", error);

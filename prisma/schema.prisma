@@ -36,6 +36,11 @@ model User {
   downloads           UserDownload[]
   settings            UserSettings?
   notifications       Notification[]
+  moderatedPosts      Post[]    @relation("ModeratedPosts")
+  reputationScore     Int       @default(0)
+  uploadCount         Int       @default(0)
+  verifiedUploads     Int       @default(0)
+  reports             Report[]
 }
 
 model subject{
@@ -73,6 +78,17 @@ model post {
   shares        Int @default(0)
   userLikes     UserLike[]
   userDownloads UserDownload[]
+  fileHash      String?   // To prevent duplicates
+  status        String    @default("pending") // pending, approved, rejected
+  moderatedBy   String?   @db.ObjectId
+  moderator     User?     @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
+  moderatedAt   DateTime?
+  moderationNote String?
+  qualityScore  Float     @default(0.0)
+  reports       Report[]
+  version       Int       @default(1)  // For version control
+  previousVersion String?   @db.ObjectId  // Reference to previous version
+  isLatestVersion Boolean   @default(true)
 }
 
 
@@ -268,4 +284,27 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId      String   @db.ObjectId
+  post        Post     @relation(fields: [postId], references: [id])
+  reporterId  String   @db.ObjectId
+  reporter    User     @relation(fields: [reporterId], references: [id])
+  reason      String
+  description String?
+  status      String   @default("pending") // pending, resolved, dismissed
+  createdAt   DateTime @default(now())
+}
+
+model ContentModeration {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  status    String   // pending, approved, rejected
+  reviewedBy String? @db.ObjectId
+  reviewer  User?    @relation(fields: [reviewedBy], references: [id])
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

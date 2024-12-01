@@ -1,3 +1,4 @@
+// full path /components/admin/ui/UploadDoneModel.jsx
 import Image from "next/image";
 import { Fragment } from "react";
 import { useRouter } from "next/navigation";

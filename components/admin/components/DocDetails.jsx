@@ -1,3 +1,4 @@
+// full path /components/admin/components/DocDetails.jsx
 import { toast } from "sonner";
 import { formatFileSize } from "@edgestore/react/utils";
 import { useEffect, useState } from "react";
