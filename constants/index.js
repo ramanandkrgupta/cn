@@ -2,7 +2,7 @@ import { about, addUser, dashboard, upload , whatsapp, wa, click } from "@/publi
 import {
   Psychology,
   bba,
-  bca,
+  
   bsw,
   ca,
   coop,
@@ -30,6 +30,7 @@ import {
 
 import seven from "@/public/icons/seven.PNG";
 import eight from "@/public/icons/eight.PNG";
+import { aiml, bca, btech, ce, ec, ex, me } from "@/public/course/icons";
 
 export const navlinks = [
   {
@@ -79,8 +80,8 @@ export const category = [
     id: 3,
     name: "Question Papers",
     imgUrl: qp,
-    link: "questionpapers",
-    description: "Question Papers",
+    link: "pyq",
+    description: "Previous Year Question Papers",
   },
   {
     id: 4,
@@ -95,124 +96,61 @@ export const category = [
 export const courses = [
   {
     id: 1,
-    name: "B.Tech",
-    imgUrl: english,
-    link: "btech",
+    name: "Computer Science & Engineering (CSE)",
+    imgUrl: btech,
+    link: "cse",
     description:
-      "BA English is an academic program that explores the study of the English language, literature, and its cultural significance.",
+      "Computer Science & Engineering (CSE) is an academic program that provides in-depth knowledge of computer science and its applications.",
   },
   {
     id: 2,
-    name: "Ba History",
-    imgUrl: history,
-    link: "bahistory",
+    name: "Computer Science & Information Technology (CS & IT)",
+    imgUrl: bca,
+    link: "csit",
     description:
-      "BA History is an academic program that delves into the study of past events, societies, and cultures, shaping a deep understanding of historical contexts.",
+      "Computer Science & Information Technology (CS & IT) is an academic program that provides in-depth knowledge of computer science and its applications.",
   },
   {
     id: 3,
-    name: "Economics",
-    imgUrl: economics,
-    link: "baeconomics",
+    name: "Artificial Intelligence & Machine Learning (AIML)",
+    imgUrl: aiml,
+    link: "aiml",
     description:
-      "BA Economics is an academic program that focuses on the study of economic systems, theories, and policies, shaping insights into how societies allocate resources.",
+      "Artificial Intelligence & Machine Learning (AIML) is an academic program that provides in-depth knowledge of artificial intelligence and machine learning.",
   },
   {
     id: 4,
-    name: "Bsw",
+    name: "Electronics & Communication (EC)",
     imgUrl: bsw,
-    link: "bsw",
+    link: "ec",
     description:
-      "BSW (Bachelor of Social Work) is an academic program that equips students with the skills and understanding to address social issues and contribute to community welfare.",
+      "Electronics & Communication (EC) is an academic program that provides in-depth knowledge of electronics and communication.",
   },
   {
     id: 5,
-    name: "Mathematics",
+    name: "Electrical & Electronics (EX)",
     imgUrl: maths,
-    link: "bscmath",
+    link: "ex",
     description:
-      "BSc Mathematics is an academic program that explores various branches of mathematics, fostering analytical and problem-solving skills.",
+      "Electrical & Electronics (EX) is an academic program that provides in-depth knowledge of electrical and electronics.",
   },
   {
     id: 6,
-    name: "Psychology",
-    imgUrl: Psychology,
-    link: "bscpsychology",
+    name: "Civil Engineering (CE)",
+    imgUrl: ce,
+    link: "ce",
     description:
-      "BSc Psychology is an academic program that delves into the study of human behavior and mental processes, offering insights into understanding the mind.",
+      "Civil Engineering (CE) is an academic program that provides in-depth knowledge of civil engineering.",
   },
   {
     id: 7,
-    name: "Bca",
-    imgUrl: bca,
-    link: "bca",
+    name: "Mechanical Engineering (ME)",
+    imgUrl: me,
+    link: "me",
     description:
-      "BCA (Bachelor of Computer Applications) is a degree program that provides in-depth knowledge of computer science and its applications.",
+      "Mechanical Engineering (ME) is an academic program that provides in-depth knowledge of mechanical engineering.",
   },
-  {
-    id: 8,
-    name: "Bba",
-    imgUrl: bba,
-    link: "bba",
-    description:
-      "BBA (Bachelor of Business Administration) is an academic program that provides a foundational understanding of business management principles and practices.",
-  },
-  {
-    id: 9,
-    name: "Political Science",
-    imgUrl: polictics,
-    link: "politicalscience",
-    description:
-      "BA Political Science is an academic program that examines political systems, theories, and dynamics, fostering a comprehensive understanding of governance and public affairs.",
-  },
-  {
-    id: 10,
-    name: "Bcom Finance",
-    imgUrl: finance,
-    link: "bcomfinance",
-    description:
-      "BCom Finance is an academic program that focuses on financial management, investments, and economics, preparing students for roles in finance and accounting.",
-  },
-  {
-    id: 11,
-    name: "Bcom CA",
-    imgUrl: ca,
-    link: "bcomca",
-    description:
-      "BCom Computer Applications is an academic program that combines business studies with practical computer skills, preparing students for roles in IT-driven business environments.",
-  },
-  {
-    id: 12,
-    name: "Bcom Co-operation",
-    imgUrl: coop,
-    link: "bcomcooperation",
-    description:
-      "BCom Cooperation is an academic program that explores the principles of cooperative management and business strategies, fostering an understanding of collaborative enterprises.",
-  },
-  {
-    id: 13,
-    name: "Ma English",
-    imgUrl: maEnglish,
-    link: "maenglish",
-    description:
-      "MA English is a postgraduate program that offers in-depth exploration of the English language, literature, and critical analysis, enhancing your understanding of cultural narratives and communication.",
-  },
-  {
-    id: 14,
-    name: "Msw",
-    imgUrl: msw,
-    link: "msw",
-    description:
-      "MSW (Master of Social Work) is a postgraduate program that equips students with advanced skills in social work, empowering them to create positive change in communities and individuals' lives.",
-  },
-  {
-    id: 15,
-    name: "Mcom Finance",
-    imgUrl: mcomfinance,
-    link: "mcomfinance",
-    description:
-      "MCom Finance is a postgraduate program that offers specialized knowledge in financial management, preparing you for dynamic roles in the world of finance and business.",
-  },
+  
 ];
 
 export const semester = [
