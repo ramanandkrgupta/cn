@@ -36,7 +36,7 @@ model User {
   downloads           UserDownload[]
   settings            UserSettings?
   notifications       Notification[]
-  moderatedPosts      Post[]    @relation("ModeratedPosts")
+  moderatedPosts      post[]    @relation("ModeratedPosts")
   reputationScore     Int       @default(0)
   uploadCount         Int       @default(0)
   verifiedUploads     Int       @default(0)
@@ -289,7 +289,7 @@ model Notification {
 model Report {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   postId      String   @db.ObjectId
-  post        Post     @relation(fields: [postId], references: [id])
+  post        post     @relation(fields: [postId], references: [id])
   reporterId  String   @db.ObjectId
   reporter    User     @relation(fields: [reporterId], references: [id])
   reason      String
