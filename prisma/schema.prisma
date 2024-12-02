@@ -41,6 +41,7 @@ model User {
   uploadCount         Int       @default(0)
   verifiedUploads     Int       @default(0)
   reports             Report[]
+  contentModerations  ContentModeration[]  @relation("userContentModerations")
 }
 
 model subject{
@@ -54,8 +55,6 @@ model subject{
   videos        video[] // Corrected to match model name
   // MockTest      MockTest?
 }
-
-
 
 model post {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -90,8 +89,6 @@ model post {
   previousVersion String?   @db.ObjectId  // Reference to previous version
   isLatestVersion Boolean   @default(true)
 }
-
-
 
 model video {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -307,4 +304,5 @@ model ContentModeration {
   note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userContentModerations User[] @relation("userContentModerations")
 }
