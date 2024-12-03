@@ -2,14 +2,14 @@ import { toast } from "sonner";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { formatFileSize } from "@edgestore/react/utils";
-import { createHash } from 'crypto';
+import { createHash } from "crypto";
 import {
   DocumentCheckIcon,
   DocumentTextIcon,
   ExclamationCircleIcon,
   TrashIcon,
 } from "@heroicons/react/20/solid";
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Cloud } from "@/public/assets";
 
 const UploadDoc = ({
@@ -23,9 +23,11 @@ const UploadDoc = ({
   // Calculate file hash for duplicate detection
   const calculateFileHash = async (file) => {
     const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
     return hashHex;
   };
 
@@ -45,17 +47,20 @@ const UploadDoc = ({
   const addWatermarkToPdf = async (file) => {
     try {
       const existingPdfBytes = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(existingPdfBytes, { 
-        ignoreEncryption: true 
+      const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+        ignoreEncryption: true,
       });
       const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const pages = pdfDoc.getPages();
 
       pages.forEach((page) => {
         const { width, height } = page.getSize();
-        const watermarkText = 'collegenotes.tech';
+        const watermarkText = "collegenotes.tech";
         const fontSize = 12;
-        const textWidth = helveticaFont.widthOfTextAtSize(watermarkText, fontSize);
+        const textWidth = helveticaFont.widthOfTextAtSize(
+          watermarkText,
+          fontSize
+        );
 
         // Add watermark in multiple positions without rotation
         const positions = [
@@ -68,7 +73,7 @@ const UploadDoc = ({
           // Bottom-right
           { x: width - textWidth - 10, y: 10 },
           // Center
-          { x: (width - textWidth) / 2, y: height / 2 }
+          { x: (width - textWidth) / 2, y: height / 2 },
         ];
 
         // Add diagonal watermarks
@@ -79,19 +84,19 @@ const UploadDoc = ({
             size: fontSize,
             font: helveticaFont,
             color: rgb(0.75, 0.75, 0.75),
-            opacity: 0.3
+            opacity: 0.3,
           });
         }
 
         // Add standard positions watermarks
-        positions.forEach(pos => {
+        positions.forEach((pos) => {
           page.drawText(watermarkText, {
             x: pos.x,
             y: pos.y,
             size: fontSize,
             font: helveticaFont,
             color: rgb(0.75, 0.75, 0.75),
-            opacity: 0.3
+            opacity: 0.3,
           });
         });
       });
@@ -121,7 +126,7 @@ const UploadDoc = ({
     try {
       // Calculate file hash
       const fileHash = await calculateFileHash(file);
-      
+
       // Check for duplicates
       const isDuplicate = await checkDuplicate(fileHash);
       if (isDuplicate) {
@@ -161,10 +166,12 @@ const UploadDoc = ({
             const watermarkedFile = await addWatermarkToPdf(file);
             return {
               file: watermarkedFile,
-              hash: validation.hash
+              hash: validation.hash,
             };
           } catch (error) {
-            toast.error(error.message || `Error processing file '${file.name}'`);
+            toast.error(
+              error.message || `Error processing file '${file.name}'`
+            );
             return null;
           }
         })
@@ -187,7 +194,7 @@ const UploadDoc = ({
           file: file.file,
           key: Math.random().toString(36).slice(2),
           progress: "PENDING",
-          hash: file.hash
+          hash: file.hash,
         }));
         void onFilesAdded?.(addedFiles);
         void onChange?.([...(value ?? []), ...addedFiles]);

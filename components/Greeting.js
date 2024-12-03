@@ -1,5 +1,4 @@
-"use client"; // Ensure this is the first line in the file
-
+"use client";
 import React, { useState, useEffect } from "react";
 
 const Greeting = ({ name }) => {
@@ -15,20 +14,22 @@ const Greeting = ({ name }) => {
   };
 
   useEffect(() => {
-    setGreeting(getTimeGreeting()); // Initial greeting
-
+    setGreeting(getTimeGreeting());
     const interval = setInterval(() => {
-      setGreeting(getTimeGreeting()); // Update greeting dynamically
-    }, 60000); // Check every minute
+      setGreeting(getTimeGreeting());
+    }, 60000);
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="w-full text-center animate-fade-in text-lg font-semibold text-secondary">
-      <span className="text-2xl text-gradient bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
-        {greeting} {name ? `, ${name}!` : "!"}
-      </span>
+    <div className="animate-fade-in py-4">
+      <h1 className="text-xl md:text-2xl font-semibold text-center">
+        <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          {greeting}
+          {name ? `, ${name}` : ""}
+        </span>
+      </h1>
     </div>
   );
 };

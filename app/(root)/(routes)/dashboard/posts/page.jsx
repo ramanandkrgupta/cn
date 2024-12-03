@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  FileText, 
-  Search, 
+import {
+  FileText,
+  Search,
   Upload,
   Filter,
   MoreVertical,
@@ -15,7 +15,7 @@ import {
   Star,
   Heart,
   Share2,
-  Crown
+  Crown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,13 +29,13 @@ export default function PostsPage() {
   const [stats, setStats] = useState({
     totalDownloads: 0,
     totalLikes: 0,
-    totalShares: 0
+    totalShares: 0,
   });
   const [pagination, setPagination] = useState({
     total: 0,
     pages: 0,
     page: 1,
-    limit: 10
+    limit: 10,
   });
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function PostsPage() {
         search: searchTerm,
         category: filterCategory,
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
       });
 
       const response = await fetch(`/api/admin/posts?${params}`);
@@ -91,7 +91,7 @@ export default function PostsPage() {
 
     try {
       const response = await fetch(`/api/admin/posts?postId=${postId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
@@ -108,10 +108,10 @@ export default function PostsPage() {
 
   const togglePremium = async (postId) => {
     try {
-      const response = await fetch('/api/admin/posts', {
-        method: 'PUT',
+      const response = await fetch("/api/admin/posts", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ postId }),
       });
@@ -147,8 +147,8 @@ export default function PostsPage() {
           </h1>
           <p className="text-gray-500">Manage and monitor all documents</p>
         </div>
-        <button 
-          onClick={() => router.push('/upload')}
+        <button
+          onClick={() => router.push("/upload")}
           className="btn btn-primary w-full md:w-auto"
         >
           <Upload className="w-4 h-4 mr-2" />
@@ -163,21 +163,27 @@ export default function PostsPage() {
             <Download className="w-5 h-5 text-primary" />
             <span className="font-medium">Total Downloads</span>
           </div>
-          <p className="text-2xl font-bold">{stats.totalDownloads.toLocaleString()}</p>
+          <p className="text-2xl font-bold">
+            {stats.totalDownloads.toLocaleString()}
+          </p>
         </div>
         <div className="bg-base-200 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <Heart className="w-5 h-5 text-red-500" />
             <span className="font-medium">Total Likes</span>
           </div>
-          <p className="text-2xl font-bold">{stats.totalLikes.toLocaleString()}</p>
+          <p className="text-2xl font-bold">
+            {stats.totalLikes.toLocaleString()}
+          </p>
         </div>
         <div className="bg-base-200 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <Share2 className="w-5 h-5 text-blue-500" />
             <span className="font-medium">Total Shares</span>
           </div>
-          <p className="text-2xl font-bold">{stats.totalShares.toLocaleString()}</p>
+          <p className="text-2xl font-bold">
+            {stats.totalShares.toLocaleString()}
+          </p>
         </div>
       </div>
 
@@ -194,7 +200,7 @@ export default function PostsPage() {
           />
         </div>
         <div className="flex gap-2">
-          <select 
+          <select
             className="select select-bordered"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
@@ -213,7 +219,10 @@ export default function PostsPage() {
       {/* Posts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
-          <div key={post.id} className="bg-base-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+          <div
+            key={post.id}
+            className="bg-base-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+          >
             <div className="p-4">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
@@ -221,13 +230,24 @@ export default function PostsPage() {
                   <p className="text-sm text-gray-500">{post.subject_name}</p>
                 </div>
                 <div className="dropdown dropdown-end">
-                  <label tabIndex={0} className="btn btn-ghost btn-sm btn-square">
+                  <label
+                    tabIndex={0}
+                    className="btn btn-ghost btn-sm btn-square"
+                  >
                     <MoreVertical className="w-4 h-4" />
                   </label>
-                  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  >
                     <li>
-                      <a onClick={() => router.push(`/dashboard/posts/${post.id}`)}>
-                        <Eye className="w-4 h-4" />View Details
+                      <a
+                        onClick={() =>
+                          router.push(`/dashboard/posts/${post.id}`)
+                        }
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Details
                       </a>
                     </li>
                     <li>
@@ -237,14 +257,18 @@ export default function PostsPage() {
                       </a>
                     </li>
                     <li>
-                      <a className="text-error" onClick={() => handleDeletePost(post.id)}>
-                        <Trash className="w-4 h-4" />Delete
+                      <a
+                        className="text-error"
+                        onClick={() => handleDeletePost(post.id)}
+                      >
+                        <Trash className="w-4 h-4" />
+                        Delete
                       </a>
                     </li>
                   </ul>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 mb-4">
                 <div className="badge badge-outline">{post.category}</div>
                 {post.premium && (
@@ -280,29 +304,39 @@ export default function PostsPage() {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-6 p-4 bg-base-200 rounded-lg">
         <div className="text-sm text-gray-500">
-          Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+          Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+          {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+          {pagination.total} entries
         </div>
         <div className="join">
-          <button 
+          <button
             className="join-item btn btn-sm"
             disabled={pagination.page === 1}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+            }
           >
             Previous
           </button>
           {[...Array(pagination.pages)].map((_, i) => (
             <button
               key={i + 1}
-              className={`join-item btn btn-sm ${pagination.page === i + 1 ? 'btn-active' : ''}`}
-              onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+              className={`join-item btn btn-sm ${
+                pagination.page === i + 1 ? "btn-active" : ""
+              }`}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: i + 1 }))
+              }
             >
               {i + 1}
             </button>
           ))}
-          <button 
+          <button
             className="join-item btn btn-sm"
             disabled={pagination.page === pagination.pages}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+            }
           >
             Next
           </button>
@@ -310,4 +344,4 @@ export default function PostsPage() {
       </div>
     </div>
   );
-} 
+}

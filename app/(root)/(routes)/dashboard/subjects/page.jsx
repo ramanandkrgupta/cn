@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  BookOpen, 
-  Search, 
+import {
+  BookOpen,
+  Search,
   PlusCircle,
   Filter,
   MoreVertical,
@@ -13,7 +13,7 @@ import {
   FileText,
   Video,
   School,
-  GraduationCap
+  GraduationCap,
 } from "lucide-react";
 import { toast } from "sonner";
 import SubjectModal from "./components/SubjectModal";
@@ -30,13 +30,13 @@ export default function SubjectsPage() {
     totalSubjects: 0,
     totalCourses: 0,
     courseDistribution: [],
-    totalContent: { posts: 0, videos: 0 }
+    totalContent: { posts: 0, videos: 0 },
   });
   const [pagination, setPagination] = useState({
     total: 0,
     pages: 0,
     page: 1,
-    limit: 10
+    limit: 10,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
@@ -67,7 +67,7 @@ export default function SubjectsPage() {
         search: searchTerm,
         course: filterCourse,
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
       });
 
       const response = await fetch(`/api/admin/subjects?${params}`);
@@ -93,9 +93,12 @@ export default function SubjectsPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/subjects?subjectId=${subjectId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/admin/subjects?subjectId=${subjectId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
@@ -112,19 +115,19 @@ export default function SubjectsPage() {
 
   const handleSubjectSubmit = async (formData) => {
     try {
-      const url = editingSubject 
-        ? '/api/admin/subjects' 
-        : '/api/admin/subjects';
-      
-      const method = editingSubject ? 'PUT' : 'POST';
-      const data = editingSubject 
+      const url = editingSubject
+        ? "/api/admin/subjects"
+        : "/api/admin/subjects";
+
+      const method = editingSubject ? "PUT" : "POST";
+      const data = editingSubject
         ? { ...formData, id: editingSubject.id }
         : formData;
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
@@ -163,7 +166,7 @@ export default function SubjectsPage() {
           </h1>
           <p className="text-gray-500">Manage and organize course subjects</p>
         </div>
-        <button 
+        <button
           onClick={() => {
             setEditingSubject(null);
             setIsModalOpen(true);
@@ -220,7 +223,7 @@ export default function SubjectsPage() {
           />
         </div>
         <div className="flex gap-2">
-          <select 
+          <select
             className="select select-bordered"
             value={filterCourse}
             onChange={(e) => setFilterCourse(e.target.value)}
@@ -258,7 +261,9 @@ export default function SubjectsPage() {
                   <td>
                     <div>
                       <div className="font-bold">{subject.subject_name}</div>
-                      <div className="text-sm opacity-50">Code: {subject.subject_code}</div>
+                      <div className="text-sm opacity-50">
+                        Code: {subject.subject_code}
+                      </div>
                     </div>
                   </td>
                   <td>
@@ -278,7 +283,7 @@ export default function SubjectsPage() {
                   </td>
                   <td>
                     <div className="text-sm">
-                      {subject.User?.name || subject.User?.email || 'N/A'}
+                      {subject.User?.name || subject.User?.email || "N/A"}
                     </div>
                   </td>
                   <td>
@@ -286,18 +291,28 @@ export default function SubjectsPage() {
                       <label tabIndex={0} className="btn btn-ghost btn-sm">
                         <MoreVertical className="w-4 h-4" />
                       </label>
-                      <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                      >
                         <li>
-                          <a onClick={() => {
-                            setEditingSubject(subject);
-                            setIsModalOpen(true);
-                          }}>
-                            <Edit className="w-4 h-4" />Edit
+                          <a
+                            onClick={() => {
+                              setEditingSubject(subject);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                            Edit
                           </a>
                         </li>
                         <li>
-                          <a className="text-error" onClick={() => handleDeleteSubject(subject.id)}>
-                            <Trash className="w-4 h-4" />Delete
+                          <a
+                            className="text-error"
+                            onClick={() => handleDeleteSubject(subject.id)}
+                          >
+                            <Trash className="w-4 h-4" />
+                            Delete
                           </a>
                         </li>
                       </ul>
@@ -312,29 +327,39 @@ export default function SubjectsPage() {
         {/* Pagination */}
         <div className="flex justify-between items-center p-4">
           <div className="text-sm text-gray-500">
-            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+            {pagination.total} entries
           </div>
           <div className="join">
-            <button 
+            <button
               className="join-item btn btn-sm"
               disabled={pagination.page === 1}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
             >
               Previous
             </button>
             {[...Array(pagination.pages)].map((_, i) => (
               <button
                 key={i + 1}
-                className={`join-item btn btn-sm ${pagination.page === i + 1 ? 'btn-active' : ''}`}
-                onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+                className={`join-item btn btn-sm ${
+                  pagination.page === i + 1 ? "btn-active" : ""
+                }`}
+                onClick={() =>
+                  setPagination((prev) => ({ ...prev, page: i + 1 }))
+                }
               >
                 {i + 1}
               </button>
             ))}
-            <button 
+            <button
               className="join-item btn btn-sm"
               disabled={pagination.page === pagination.pages}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
             >
               Next
             </button>
@@ -356,4 +381,4 @@ export default function SubjectsPage() {
       )}
     </div>
   );
-} 
+}

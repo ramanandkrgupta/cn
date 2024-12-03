@@ -10,12 +10,18 @@ import { useSession, signIn } from "next-auth/react";
 import { handleSignOutButton } from "@/libs/utils";
 import Search from "../Search";
 import { navlinks } from "@/constants";
+import { usePost } from "@/libs/hooks/usePost";
+import { filterPosts } from "@/libs/hooks/usefilter";
 import { close, logo, menu, logout } from "@/public/assets";
+import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 import { newlogo } from "@/public/icons";
+import SearchFn from "./SearchFn";
 
 const NavBar = ({ showSearch = true }) => {
+  const { data: fetchedData, error } = usePost();
+  const setData = usePostStore((state) => state.setPosts);
   const { data: session } = useSession();
   const router = useRouter();
   const sidebarRef = useRef(null);
@@ -25,9 +31,25 @@ const NavBar = ({ showSearch = true }) => {
   const [toggleDrawer, setToggleDrawer] = useState(false);
   const [isPostOpen, setIsPostOpen] = useState(false);
   const [post, setPost] = useState("");
-  const [isActive, setIsActive] = useState("");
+
+  const [posts, setPosts] = useState([]);
+  const [isActive, setIsActive] = useState(""); // Define isActive state
+  // const data = useMemo(() => posts, [posts]);
 
   const [theme, setTheme] = useState("mydark");
+
+  useEffect(() => {
+    setData(posts);
+  }, [posts, setData]);
+
+  useEffect(() => {
+    if (fetchedData) {
+      setPosts(fetchedData);
+    }
+    if (error) {
+      console.error("Error fetching Search data:", error);
+    }
+  }, [fetchedData, error]);
 
   // Toggle theme between light and dark
   const toggleTheme = () => {
@@ -72,11 +94,22 @@ const NavBar = ({ showSearch = true }) => {
   const activeLink = navlinks.find((link) => link.link === currentPath);
 
   return (
-    <nav className="flex md:flex-row flex-col justify-between mb-[35px] gap-6">
+    <nav
+      className={`flex md:flex-row flex-col-reverse justify-between gap-6`}
+    >
       <p className="text-primary align-middle text-center subpixel-antialiased text-3xl font-bold hidden sm:block">
         College <span className="text-secondary">Notes</span>{" "}
         <span className="badge">.tech</span>
       </p>
+
+      {showSearch && (
+        <SearchFn
+          posts={posts}
+          setIsPostOpen={setIsPostOpen}
+          setPost={setPost}
+        />
+      )}
+
       <div className="sm:hidden flex justify-between items-center relative">
         <div
           className="w-[40px] h-[40px] rounded-[10px] bg-[#2c2f32] flex justify-center items-center cursor-pointer"
@@ -229,12 +262,6 @@ const NavBar = ({ showSearch = true }) => {
         </div>
       </div>
       {isOpen && <ShareDialogBox isOpen={isOpen} setIsOpen={setIsOpen} />}
-      {showSearch && (
-        <Search
-          setIsPostOpen={setIsPostOpen}
-          setPost={setPost}
-        />
-      )}
       {isPostOpen && (
         <div className="relative z-50">
           <PostViewDialogBox

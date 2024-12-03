@@ -177,117 +177,114 @@ export default function UsersPage() {
       {/* Users Table */}
       {/* <div className="bg-base-200 rounded-lg overflow-hidden"> */}
       <div className="overflow-x-auto">
-      <table className="table">
-            <thead>
-            
-              <tr>
-                <th></th>
-                <th>User</th>
-                <th>Role</th>
-                <th>Activity</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-            
-              {users.map((user) => (
-                <tr key={user.id} className="hover">
-                   <th>1</th>
-                  <td>
-                 
-                    <div className="flex items-center space-x-3">
-                      <div className="avatar placeholder">
-                        <div className="bg-neutral text-neutral-content rounded-full w-12">
-                          <span className="text-xl">
-                            {user.name?.[0] || user.email[0]}
-                          </span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">{user.name || "N/A"}</div>
-                        <div className="text-sm opacity-50">{user.email}</div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Activity</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="hover">
+                <th>1</th>
+                <td>
+                  <div className="flex items-center space-x-3">
+                    <div className="avatar placeholder">
+                      <div className="bg-neutral text-neutral-content rounded-full w-12">
+                        <span className="text-xl">
+                          {user.name?.[0] || user.email[0]}
+                        </span>
                       </div>
                     </div>
-                  </td>
-                  <td>
-                    <div
-                      className={`badge ${
-                        user.userRole === "PRO"
-                          ? "badge-primary"
-                          : user.userRole === "ADMIN"
-                          ? "badge-secondary"
-                          : "badge-ghost"
-                      }`}
+                    <div>
+                      <div className="font-bold">{user.name || "N/A"}</div>
+                      <div className="text-sm opacity-50">{user.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div
+                    className={`badge ${
+                      user.userRole === "PRO"
+                        ? "badge-primary"
+                        : user.userRole === "ADMIN"
+                        ? "badge-secondary"
+                        : "badge-ghost"
+                    }`}
+                  >
+                    {user.userRole}
+                  </div>
+                </td>
+                <td>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <FileText className="w-4 h-4" />
+                      <span>{user._count.posts}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Download className="w-4 h-4" />
+                      <span>{user._count.downloads}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="text-sm">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </span>
+                </td>
+                <td>
+                  <div className="dropdown dropdown-end">
+                    <label tabIndex={0} className="btn btn-ghost btn-sm">
+                      <MoreVertical className="w-4 h-4" />
+                    </label>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                     >
-                      {user.userRole}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <FileText className="w-4 h-4" />
-                        <span>{user._count.posts}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Download className="w-4 h-4" />
-                        <span>{user._count.downloads}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="text-sm">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="dropdown dropdown-end">
-                      <label tabIndex={0} className="btn btn-ghost btn-sm">
-                        <MoreVertical className="w-4 h-4" />
-                      </label>
-                      <ul
-                        tabIndex={0}
-                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                      >
-                        <li>
-                          <a
-                            onClick={() =>
-                              router.push(`/dashboard/users/${user.id}`)
-                            }
-                          >
-                            <Edit className="w-4 h-4 mr-2" />
-                            View Details
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            onClick={() =>
-                              handleRoleChange(
-                                user.id,
-                                user.userRole === "PRO" ? "FREE" : "PRO"
-                              )
-                            }
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            Toggle PRO
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            className="text-error"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            <Trash className="w-4 h-4 mr-2" />
-                            Delete User
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <li>
+                        <a
+                          onClick={() =>
+                            router.push(`/dashboard/users/${user.id}`)
+                          }
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          View Details
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          onClick={() =>
+                            handleRoleChange(
+                              user.id,
+                              user.userRole === "PRO" ? "FREE" : "PRO"
+                            )
+                          }
+                        >
+                          <Shield className="w-4 h-4 mr-2" />
+                          Toggle PRO
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="text-error"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <Trash className="w-4 h-4 mr-2" />
+                          Delete User
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         {/* </div> */}
 
         {/* Pagination */}

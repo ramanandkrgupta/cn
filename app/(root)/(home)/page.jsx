@@ -9,21 +9,25 @@ export default function Home() {
   const { data: session } = useSession();
 
   return (
-    <div className="flex flex-col items-center sm:mb-5">
+    <section className="flex flex-col items-center sm:mb-5">
+      {/* Greeting Section */}
       {session?.user?.name && (
         <div className="w-full">
           <Greeting name={session.user.name} />
         </div>
       )}
 
+      {/* Banner Section */}
       <div className="w-full">
         <Banner />
       </div>
 
-      <div className="w-full my-4">
+      {/* Notification Section */}
+      <div className="w-full">
         <Notification />
       </div>
 
+      {/* Feed Section */}
       <div className="w-full md:px-8">
         <Feed
           label="RGPV Courses"
@@ -31,6 +35,6 @@ export default function Home() {
           style="md:grid-cols-5 mt-4 gap-1.5 justify-between md:justify-start"
         />
       </div>
-    </div>
+    </section>
   );
 }
