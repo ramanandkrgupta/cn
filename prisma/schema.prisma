@@ -300,7 +300,6 @@ model Report {
 }
 
 model ContentModeration {
-<<<<<<< HEAD
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   postId      String    @db.ObjectId
   status      String    // pending, approved, rejected
@@ -309,26 +308,4 @@ model ContentModeration {
   note        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-=======
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId    String   @db.ObjectId
-  status    String   // pending, approved, rejected
-  reviewedBy String? @db.ObjectId
-  reviewer  User?    @relation(fields: [reviewedBy], references: [id])
-  note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-   userContentModerations UserContentModeration[] @relation("UserContentModerations_ContentModeration")
-}
-
-model UserContentModeration {
-  id                   String               @id @default(auto()) @map("_id") @db.ObjectId
-  userId               String               @db.ObjectId
-  contentModerationId  String               @db.ObjectId
-
-  user                 User                 @relation(fields: [userId], references: [id])
-  contentModeration    ContentModeration    @relation(fields: [contentModerationId], references: [id])
-
-  @@unique([userId, contentModerationId])
->>>>>>> 337fbf83b713553c5293af3e8f1555d177016bdc
 }
