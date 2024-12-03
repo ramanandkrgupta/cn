@@ -41,11 +41,7 @@ model User {
   uploadCount         Int       @default(0)
   verifiedUploads     Int       @default(0)
   reports             Report[]
-<<<<<<< HEAD
   moderatedContent    ContentModeration[]  @relation("ModeratedContent")
-=======
-  contentModerations  ContentModeration[]  @relation("userContentModerations")
->>>>>>> 337fbf83b713553c5293af3e8f1555d177016bdc
 }
 
 model subject{
