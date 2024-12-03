@@ -41,7 +41,11 @@ model User {
   uploadCount         Int       @default(0)
   verifiedUploads     Int       @default(0)
   reports             Report[]
+<<<<<<< HEAD
   moderatedContent    ContentModeration[]  @relation("ModeratedContent")
+=======
+  contentModerations  ContentModeration[]  @relation("userContentModerations")
+>>>>>>> 337fbf83b713553c5293af3e8f1555d177016bdc
 }
 
 model subject{
@@ -55,8 +59,6 @@ model subject{
   videos        video[] // Corrected to match model name
   // MockTest      MockTest?
 }
-
-
 
 model post {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -91,8 +93,6 @@ model post {
   previousVersion String?   @db.ObjectId  // Reference to previous version
   isLatestVersion Boolean   @default(true)
 }
-
-
 
 model video {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -300,6 +300,7 @@ model Report {
 }
 
 model ContentModeration {
+<<<<<<< HEAD
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   postId      String    @db.ObjectId
   status      String    // pending, approved, rejected
@@ -308,4 +309,26 @@ model ContentModeration {
   note        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+=======
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  status    String   // pending, approved, rejected
+  reviewedBy String? @db.ObjectId
+  reviewer  User?    @relation(fields: [reviewedBy], references: [id])
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+   userContentModerations UserContentModeration[] @relation("UserContentModerations_ContentModeration")
+}
+
+model UserContentModeration {
+  id                   String               @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String               @db.ObjectId
+  contentModerationId  String               @db.ObjectId
+
+  user                 User                 @relation(fields: [userId], references: [id])
+  contentModeration    ContentModeration    @relation(fields: [contentModerationId], references: [id])
+
+  @@unique([userId, contentModerationId])
+>>>>>>> 337fbf83b713553c5293af3e8f1555d177016bdc
 }
