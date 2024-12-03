@@ -2,14 +2,14 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookMarked, Upload, Wallet, User } from "lucide-react"; // import icons
+import { Home, BookMarked, Upload, Wallet, User, Bell } from "lucide-react"; // import icons
 
 const Navigation = () => {
   const Menus = [
     { name: "Home", icon: Home, path: "/" },
-    { name: "Library", icon: BookMarked, path: "/library" },
+    // { name: "Library", icon: BookMarked, path: "/library" },
     { name: "Upload", icon: Upload, path: "/upload" },
-    { name: "Earn Coins", icon: Wallet, path: "/earn-coins" },
+    { name: "Notifications", icon: Bell, path: "/account/notifications" },
     { name: "Profile", icon: User, path: "/account" },
   ];
 

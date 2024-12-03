@@ -16,10 +16,35 @@ import {
 } from "lucide-react";
 import AppVersion from "@/app/(root)/(home)/(routes)/about/components/AppVersion";
 
+// Skeleton loading component
+const SkeletonLoading = () => (
+  <div className="animate-pulse">
+    {/* Profile Card Skeleton */}
+    <div className="block mt-4 p-4 bg-base-300 rounded-lg shadow-lg">
+      <div className="flex items-center space-x-4">
+        <div className="w-16 h-16 rounded-full bg-gray-600"></div>
+        <div className="flex-1">
+          <div className="h-4 bg-gray-600 rounded w-1/4 mb-2"></div>
+          <div className="h-3 bg-gray-600 rounded w-3/4 mb-2"></div>
+          <div className="h-3 bg-gray-600 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
+
+    {/* Menu Items Skeleton */}
+    <div className="mt-6 space-y-4">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="h-14 bg-base-300 rounded-lg"></div>
+      ))}
+    </div>
+  </div>
+);
+
 export default function Profile() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -39,6 +64,8 @@ export default function Profile() {
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to load profile data");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,11 +85,11 @@ export default function Profile() {
       title: "My Profile",
       onClick: () => router.push("/account/profile"),
     },
-    {
-      icon: <CreditCard size={24} className="text-gray-500" />,
-      title: "Plans",
-      onClick: () => router.push("/plans"),
-    },
+    // {
+    //   icon: <CreditCard size={24} className="text-gray-500" />,
+    //   title: "Plans",
+    //   onClick: () => router.push("/plans"),
+    // },
     {
       icon: <FolderUp size={24} className="text-gray-500" />,
       title: "Your Uploads",
@@ -92,10 +119,12 @@ export default function Profile() {
         ]
       : baseMenuItems;
 
-  if (!session || !userData) {
+  if (loading || !userData) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        Loading...
+      <div className="bg-base-100 min-h">
+        <div className="mx-auto px-4 max-w-lg py-6">
+          <SkeletonLoading />
+        </div>
       </div>
     );
   }
@@ -103,8 +132,8 @@ export default function Profile() {
   return (
     <div className="bg-base-100 min-h">
       <div className="mx-auto px-4 max-w-lg py-6">
-        {/* Profile Card (Mobile Only) */}
-        <div className="block  mt-4 p-4 bg-base-300 rounded-lg shadow-lg">
+        {/* Profile Card */}
+        <div className="block mt-4 p-4 bg-base-300 rounded-lg shadow-lg">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full overflow-hidden">
               <Image

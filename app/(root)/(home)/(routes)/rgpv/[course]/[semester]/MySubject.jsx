@@ -8,6 +8,7 @@ import NoDataFound from "@/components/ui/NoDataFound";
 import { useFilterSubject } from "@/libs/hooks/useSubject";
 import SkeletonLoading from "@/components/ui/SkeletonLoading";
 import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const ViewSubjects = ({ course, semester }) => {
   const router = useRouter();
@@ -45,20 +46,8 @@ const ViewSubjects = ({ course, semester }) => {
         <h1 className="select_header">Select Subjects</h1>
       </div>
       <small className="text-gray-400">
-        Path:
-        <a
-          href={`/category?name=${course}`}
-          className="text-blue-500 hover:underline"
-        >
-          {course}
-        </a>
-        /
-        <a
-          href={`/semester?name=${course}&category=${category}`}
-          className="text-blue-500 hover:underline"
-        >
-          {category}
-        </a>
+        Path: /rgpv/
+        <Link href={`/rgpv/${course}`} className="text-blue-500 hover:underline">{course}</Link>
         /{semester}
       </small>
 

@@ -1,23 +1,44 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardSidebar from "./components/DashboardSidebar";
 import DashboardNavbar from "./components/DashboardNavbar";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Protect routes
-  // if (status === "loading") {
-  //   return <div>Loading...</div>;
-  // }
+  useEffect(() => {
+    // Only redirect if we're sure about the session status
+    if (status === "loading") return;
 
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    // Check for admin role if on admin routes
+    if (pathname.startsWith("/dashboard") && session.user.role !== "ADMIN") {
+      router.push("/");
+      return;
+    }
+  }, [session, status, router, pathname]);
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated
   if (!session) {
-    router.push("/login");
     return null;
   }
 

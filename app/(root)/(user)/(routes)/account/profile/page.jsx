@@ -4,12 +4,48 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera } from "lucide-react";
+
+// Skeleton loading component
+const SkeletonLoading = () => (
+  <div className="animate-pulse">
+    {/* Header Skeleton */}
+    <div className="flex items-center gap-2 mb-6">
+      <div className="w-6 h-6 bg-base-300 rounded"></div>
+      <div className="h-8 w-48 bg-base-300 rounded"></div>
+    </div>
+
+    {/* Avatar Section Skeleton */}
+    <div className="flex flex-col items-center mb-8">
+      <div className="w-24 h-24 rounded-full bg-base-300"></div>
+      <div className="mt-3 h-8 w-32 bg-base-300 rounded"></div>
+    </div>
+
+    {/* Form Fields Skeleton */}
+    <div className="space-y-6">
+      {/* Name Field */}
+      <div>
+        <div className="h-4 w-20 bg-base-300 rounded mb-2"></div>
+        <div className="h-12 w-full bg-base-300 rounded"></div>
+      </div>
+
+      {/* Email Field */}
+      <div>
+        <div className="h-4 w-20 bg-base-300 rounded mb-2"></div>
+        <div className="h-12 w-full bg-base-300 rounded"></div>
+      </div>
+
+      {/* Submit Button */}
+      <div className="h-12 w-full bg-base-300 rounded mt-8"></div>
+    </div>
+  </div>
+);
 
 export default function EditProfile() {
   const router = useRouter();
   const { data: session, status, update: updateSession } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [userData, setUserData] = useState({
     name: "",
     avatar: "",
@@ -36,6 +72,8 @@ export default function EditProfile() {
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to load profile data");
+    } finally {
+      setPageLoading(false);
     }
   };
 
@@ -110,22 +148,32 @@ export default function EditProfile() {
     }
   };
 
-  return (
-    <div className="bg-base-100 min-h-screen">
-      <div className="mx-auto px-4 max-w-lg py-6">
-      <div className="flex items-center gap-2 mb-6">
-      {/* Back Button */}
-      <button onClick={() => router.back()} aria-label="Go Back">
-        <ArrowLeft className="w-6 h-6" />
-      </button>
-        <h1 className="text-2xl font-semibold text-secondary text-center">
-          Edit Profile
-        </h1>
+  if (pageLoading) {
+    return (
+      <div className="bg-base-100 min-h-screen">
+        <div className="mx-auto px-4 max-w-lg py-6">
+          <SkeletonLoading />
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-base-100 min-h">
+      <div className="mx-auto px-4 max-w-lg py-6">
+        <div className="flex items-center gap-2 mb-6">
+          <button onClick={() => router.back()} aria-label="Go Back">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-semibold text-secondary">
+            Edit Profile
+          </h1>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Section */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg">
+            <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg relative group">
               <Image
                 src={userData.avatar || "/team/member-1.jpeg"}
                 alt="avatar"
@@ -133,13 +181,13 @@ export default function EditProfile() {
                 height={100}
                 className="object-cover w-full h-full"
               />
+              <label
+                htmlFor="avatar"
+                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <Camera className="w-6 h-6 text-white" />
+              </label>
             </div>
-            <label
-              htmlFor="avatar"
-              className="mt-3 px-4 py-2 bg-primary text-secondary text-sm font-medium rounded cursor-pointer hover:bg-primary-focus"
-            >
-              Change Avatar
-            </label>
             <input
               id="avatar"
               type="file"
@@ -147,6 +195,7 @@ export default function EditProfile() {
               className="hidden"
               onChange={handleAvatarChange}
             />
+            <p className="text-sm text-gray-500 mt-2">Click to change avatar</p>
           </div>
 
           {/* Name Field */}
@@ -161,7 +210,7 @@ export default function EditProfile() {
               value={userData.name}
               onChange={handleInputChange}
               placeholder="Enter your name"
-              className="w-full p-3  rounded-lg shadow-sm "
+              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
               required
             />
           </div>
@@ -176,7 +225,7 @@ export default function EditProfile() {
               type="email"
               value={session?.user.email || ""}
               disabled
-              className="w-full p-3 border border-gray-300 bg-gray-100 rounded-lg shadow-sm cursor-not-allowed"
+              className="w-full p-3 rounded-lg shadow-sm bg-base-200 cursor-not-allowed"
             />
           </div>
 

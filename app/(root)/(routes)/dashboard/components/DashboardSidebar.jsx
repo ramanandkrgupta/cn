@@ -9,7 +9,8 @@ import {
   Settings,
   Bell,
   ArrowLeft,
-  LogOut
+  LogOut,
+  ShieldCheck
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -38,6 +39,11 @@ const menuItems = [
     title: "Notifications",
     icon: <Bell className="w-5 h-5" />,
     href: "/dashboard/notifications"
+  },
+  {
+    title: "Moderation",
+    icon: <ShieldCheck className="w-5 h-5" />,
+    href: "/dashboard/moderation"
   },
   {
     title: "Settings",

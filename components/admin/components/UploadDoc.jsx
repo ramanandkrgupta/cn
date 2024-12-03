@@ -1,8 +1,8 @@
-// full path /components/admin/components/UploadDoc.jsx
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { formatFileSize } from "@edgestore/react/utils";
+import { createHash } from 'crypto';
 import {
   DocumentCheckIcon,
   DocumentTextIcon,
@@ -11,7 +11,6 @@ import {
 } from "@heroicons/react/20/solid";
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { Cloud } from "@/public/assets";
-import { createHash } from 'crypto';
 
 const UploadDoc = ({
   files,
@@ -21,56 +20,91 @@ const UploadDoc = ({
   onChange,
   onFilesAdded,
 }) => {
-  const addWatermarkToPdf = async (file) => {
-    const existingPdfBytes = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(existingPdfBytes);
-    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const pages = pdfDoc.getPages();
-
-    pages.forEach((page) => {
-      const { width, height } = page.getSize();
-      const watermarkText = 'https://collegenotes.tech';
-      const fontSize = 12;
-      const textWidth = helveticaFont.widthOfTextAtSize(watermarkText, fontSize);
-
-      // Top-left corner
-      page.drawText(watermarkText, {
-        x: 10,
-        y: height - fontSize - 10,
-        size: fontSize,
-        font: helveticaFont,
-        color: rgb(0.247, 0.149, 0.29),
-        opacity: 0.8,
-      });
-
-      // Top-right corner
-      page.drawText(watermarkText, {
-        x: width - textWidth - 10,
-        y: height - fontSize - 10,
-        size: fontSize,
-        font: helveticaFont,
-        color: rgb(0.247, 0.149, 0.29),
-        opacity: 0.8,
-      });
-    });
-
-    const pdfBytes = await pdfDoc.save();
-    return new File([pdfBytes], file.name, { type: file.type });
-  };
-
+  // Calculate file hash for duplicate detection
   const calculateFileHash = async (file) => {
     const buffer = await file.arrayBuffer();
-    const hash = createHash('sha256');
-    hash.update(Buffer.from(buffer));
-    return hash.digest('hex');
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
   };
 
+  // Check for duplicate files
   const checkDuplicate = async (hash) => {
-    const response = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
-    const data = await response.json();
-    return data.isDuplicate;
+    try {
+      const response = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
+      const data = await response.json();
+      return data.isDuplicate;
+    } catch (error) {
+      console.error("Error checking duplicate:", error);
+      return false;
+    }
   };
 
+  // Add watermark to PDF
+  const addWatermarkToPdf = async (file) => {
+    try {
+      const existingPdfBytes = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(existingPdfBytes, { 
+        ignoreEncryption: true 
+      });
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const pages = pdfDoc.getPages();
+
+      pages.forEach((page) => {
+        const { width, height } = page.getSize();
+        const watermarkText = 'collegenotes.tech';
+        const fontSize = 12;
+        const textWidth = helveticaFont.widthOfTextAtSize(watermarkText, fontSize);
+
+        // Add watermark in multiple positions without rotation
+        const positions = [
+          // Top-left
+          { x: 10, y: height - fontSize - 10 },
+          // Top-right
+          { x: width - textWidth - 10, y: height - fontSize - 10 },
+          // Bottom-left
+          { x: 10, y: 10 },
+          // Bottom-right
+          { x: width - textWidth - 10, y: 10 },
+          // Center
+          { x: (width - textWidth) / 2, y: height / 2 }
+        ];
+
+        // Add diagonal watermarks
+        for (let i = 0; i < height; i += 150) {
+          page.drawText(watermarkText, {
+            x: 20,
+            y: i,
+            size: fontSize,
+            font: helveticaFont,
+            color: rgb(0.75, 0.75, 0.75),
+            opacity: 0.3
+          });
+        }
+
+        // Add standard positions watermarks
+        positions.forEach(pos => {
+          page.drawText(watermarkText, {
+            x: pos.x,
+            y: pos.y,
+            size: fontSize,
+            font: helveticaFont,
+            color: rgb(0.75, 0.75, 0.75),
+            opacity: 0.3
+          });
+        });
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      return new File([pdfBytes], file.name, { type: file.type });
+    } catch (error) {
+      console.error("Error adding watermark:", error);
+      throw new Error(`Error processing ${file.name}: ${error.message}`);
+    }
+  };
+
+  // Validate file
   const validateFile = async (file) => {
     // Check file type
     if (!["application/pdf"].includes(file.type)) {
@@ -78,46 +112,68 @@ const UploadDoc = ({
       return false;
     }
 
-    // Check file size (e.g., 10MB limit)
+    // Check file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("File size should be less than 10MB");
       return false;
     }
 
-    // Calculate file hash
-    const fileHash = await calculateFileHash(file);
-    
-    // Check for duplicates
-    const isDuplicate = await checkDuplicate(fileHash);
-    if (isDuplicate) {
-      toast.error("This file has already been uploaded");
+    try {
+      // Calculate file hash
+      const fileHash = await calculateFileHash(file);
+      
+      // Check for duplicates
+      const isDuplicate = await checkDuplicate(fileHash);
+      if (isDuplicate) {
+        toast.error("This file has already been uploaded");
+        return false;
+      }
+
+      return { isValid: true, hash: fileHash };
+    } catch (error) {
+      console.error("Error validating file:", error);
+      toast.error("Error processing file");
       return false;
     }
-
-    return { isValid: true, hash: fileHash };
   };
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
+      if (files.length + acceptedFiles.length > 3) {
+        toast.error("You can only upload up to three files.");
+        return [];
+      }
+
       const processedFiles = await Promise.all(
         acceptedFiles.map(async (file) => {
-          const validation = await validateFile(file);
-          if (!validation.isValid) {
+          try {
+            if (files.some((existingFile) => existingFile.name === file.name)) {
+              toast.error(`File '${file.name}' is already selected.`);
+              return null;
+            }
+
+            const validation = await validateFile(file);
+            if (!validation) {
+              return null;
+            }
+
+            // Add watermark to PDF
+            const watermarkedFile = await addWatermarkToPdf(file);
+            return {
+              file: watermarkedFile,
+              hash: validation.hash
+            };
+          } catch (error) {
+            toast.error(error.message || `Error processing file '${file.name}'`);
             return null;
           }
-
-          // Add watermark
-          const watermarkedFile = await addWatermarkToPdf(file);
-          
-          return {
-            file: watermarkedFile,
-            hash: validation.hash
-          };
         })
       );
 
       const validFiles = processedFiles.filter(Boolean);
-      setFiles(prev => [...prev, ...validFiles]);
+      if (validFiles.length > 0) {
+        setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+      }
       return validFiles;
     },
     [files, setFiles]
@@ -126,12 +182,12 @@ const UploadDoc = ({
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
       const validFiles = await onDrop(acceptedFiles);
-
       if (validFiles && validFiles.length > 0) {
         const addedFiles = validFiles.map((file) => ({
-          file,
+          file: file.file,
           key: Math.random().toString(36).slice(2),
           progress: "PENDING",
+          hash: file.hash
         }));
         void onFilesAdded?.(addedFiles);
         void onChange?.([...(value ?? []), ...addedFiles]);
@@ -139,11 +195,6 @@ const UploadDoc = ({
     },
     accept: {
       "application/pdf": [".pdf"],
-      "application/msword": [".doc"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        [".docx"],
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-        [".pptx"],
     },
   });
 

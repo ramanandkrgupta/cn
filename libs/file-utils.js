@@ -54,3 +54,10 @@ export async function getFileWithWatermark(fileId, user, isPremium) {
     throw new Error("Unable to download or process the file. Please check access permissions or file ID.");
   }
 }
+
+export const calculateFileHash = async (file) => {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};

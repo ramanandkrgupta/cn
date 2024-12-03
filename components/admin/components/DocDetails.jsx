@@ -1,228 +1,258 @@
-// full path /components/admin/components/DocDetails.jsx
+"use client";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { formatFileSize } from "@edgestore/react/utils";
-import { useEffect, useState } from "react";
-import { DocumentTextIcon, TrashIcon } from "@heroicons/react/20/solid";
-
-import ComboBox from "../ui/ComboBox";
-import RoleSelect from "../ui/ListBox";
-import FormField from "@/components/ui/FormField";
-import { useFilterSubject } from "@/libs/hooks/useSubject";
 import { courses, semester, category } from "@/constants";
+import PropTypes from "prop-types";
 
-const DocDetails = ({
-  files,
-  removeFile,
-  fileDetails,
-  setFileDetails,
-  handlePreviousBtn,
-}) => {
-  const [subjectData, setSubjectData] = useState([]);
-  const [userCourse, setUserCourses] = useState(courses[6]);
-  const [userSemester, setUserSemester] = useState(semester[2]);
-  const [userSubject, setUserSubject] = useState("");
-  const [tempData, setTempData] = useState([]);
+const DocDetails = ({ files, onSubmit }) => {
+  const [fileDetails, setFileDetails] = useState(
+    files?.map((file) => ({
+      title: file?.file?.name?.split('.')[0] || "",
+      description: "",
+      category: category[0]?.name || "",
+      course: courses[0]?.link || "",
+      semester: semester[0]?.link || "",
+      subject: null,
+    })) || []
+  );
 
-  const {
-    data: fetchedData,
-    error,
-    isLoading: loading,
-  } = useFilterSubject({
-    course: userCourse.link,
-    semester: userSemester.link,
-  });
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch subjects when course or semester changes
+  const fetchSubjects = async (courseLink, semesterLink) => {
+    try {
+      setLoading(true);
+      
+      if (!courseLink || !semesterLink) {
+        setSubjects([]);
+        return;
+      }
+
+      const response = await fetch(
+        `/api/subjects?course=${courseLink}&semester=${semesterLink}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch subjects');
+      }
+
+      const data = await response.json();
+      setSubjects(data);
+    } catch (error) {
+      console.error("Error fetching subjects:", error);
+      toast.error("Failed to load subjects");
+      setSubjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Watch for course/semester changes to fetch subjects
   useEffect(() => {
-    if (fetchedData) {
-      const subjects = fetchedData.map((data) => ({
-        id: data.id,
-        name: data.subject_name,
-        link: data.subject_code,
+    fileDetails.forEach((detail) => {
+      if (detail.course && detail.semester) {
+        fetchSubjects(detail.course, detail.semester);
+      }
+    });
+  }, [fileDetails.map(d => `${d.course}-${d.semester}`).join(',')]);
+
+  const handleInputChange = (index, field, value) => {
+    setFileDetails((prev) =>
+      prev.map((detail, i) => {
+        if (i !== index) return detail;
+
+        // If changing course or semester, reset subject selection
+        if (field === "course" || field === "semester") {
+          return {
+            ...detail,
+            [field]: value,
+            subject: null,
+          };
+        }
+
+        return { ...detail, [field]: value };
+      })
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate all required fields
+    const isValid = fileDetails.every((detail) => {
+      if (
+        !detail.title ||
+        !detail.description ||
+        !detail.category ||
+        !detail.course ||
+        !detail.semester ||
+        !detail.subject
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    if (!isValid) {
+      toast.error("Please fill in all required fields for each file");
+      return;
+    }
+
+    try {
+      // Format the data for submission
+      const formattedDetails = fileDetails.map((detail, index) => ({
+        title: detail.title,
+        description: detail.description,
+        category: detail.category,
+        course_name: detail.course,
+        semester_code: detail.semester,
+        subject_name: detail.subject.subject_name,
+        subject_code: detail.subject.subject_code,
+        file_name: files[index].file.name
       }));
 
-      setSubjectData(subjects);
-      // Set default value if userSubject is not already set
-      if (!userSubject && subjects.length > 0) {
-        setUserSubject(subjects[0]);
-      }
+      // Call the onSubmit prop function with formatted details
+      await onSubmit(formattedDetails);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error('Failed to submit document details');
     }
-
-    if (error) {
-      console.error("Error fetching subject data:", error);
-      toast.error("Something went wrong in fetching subjects");
-    }
-  }, [fetchedData, error, userSubject]);
-
-  // useEffect to update fileDetails when dependencies change
-  useEffect(() => {
-    setFileDetails(
-      files.map((file, index) => ({
-        title: tempData[index]?.title || file.name.replace(/\.[^/.]+$/, ""),
-        description: tempData[index]?.description || "",
-        category: tempData[index]?.category || category[0].name,
-        course: userCourse.link,
-        semester: userSemester.link,
-        subject: userSubject,
-      }))
-    );
-  }, [files, userCourse, userSubject, userSemester, setFileDetails, tempData]);
-
-  useEffect(() => {
-    setTempData(
-      files.map(() => ({
-        title: "",
-        description: "",
-        category: category[0].name,
-      }))
-    );
-  }, [files]);
-
-  const handleTitleChange = (index, value) => {
-    const updatedTempData = [...tempData];
-    updatedTempData[index].title = value;
-    setTempData(updatedTempData);
-  };
-
-  const handleDescriptionChange = (index, value) => {
-    const updatedTempData = [...tempData];
-    updatedTempData[index].description = value;
-    setTempData(updatedTempData);
-  };
-
-  const handleCategoryChange = (index, value) => {
-    const updatedTempData = [...tempData];
-    updatedTempData[index].category = value;
-    setTempData(updatedTempData);
-  };
-
-  //Extract data
-  const filteredCategory = category.map((data) => data.name);
-
-  const styleDocDetails = {
-    classlabel: "text-white font-medium md:font-semibold",
-    classInput:
-      "w-full bg-gray-300 py-2 pl-3 pr-10 text-sm text-black font-medium",
   };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap justify-between mb-4 items-center space-y-1">
-        <ComboBox
-          value={userCourse}
-          onChange={setUserCourses}
-          data={courses}
-          label="Enter the Course Name"
-          zIndex={5}
-          classLabel={styleDocDetails.classlabel}
-          classInput={styleDocDetails.classInput}
-        />
-        <ComboBox
-          value={userSemester}
-          onChange={setUserSemester}
-          data={semester}
-          label="Enter the Semester"
-          zIndex={4}
-          classLabel={styleDocDetails.classlabel}
-          classInput={styleDocDetails.classInput}
-        />
-        <ComboBox
-          value={userSubject}
-          onChange={setUserSubject}
-          data={subjectData}
-          label="Enter the Subject Name"
-          zIndex={3}
-          classLabel={styleDocDetails.classlabel}
-          classInput={styleDocDetails.classInput}
-          subTrue="subject"
-          isloading={loading}
-        />
-      </div>
-      <hr className="bg-gray-700 h-[2px] rounded mx-2 my-2 border-none" />
-      {files.length > 0 && (
-        <div className="w-full">
-          {files.map((file, index) => (
-            <div key={index}>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <DocumentTextIcon className="text-gray-400 w-6" />
-                  <p className="grid">
-                    <span className="text-white font-medium text-sm">
-                      {file.name}
-                    </span>
-                    <span className="text-xs">{formatFileSize(file.size)}</span>
-                  </p>
-                </div>
-                {files.length === 1 ? (
-                  // If there are no files
-                  <p className="text-gray-400 hover:text-white w-5">
-                    <TrashIcon
-                      onClick={() => {
-                        removeFile(index);
-                        handlePreviousBtn();
-                      }}
-                    />
-                  </p>
-                ) : (
-                  // If there are files
-                  <p className="text-gray-400 hover:text-white w-5">
-                    <TrashIcon onClick={() => removeFile(index)} />
-                  </p>
-                )}
-              </div>
-              <hr className="bg-gray-700 h-[2px] rounded mx-2 my-2 border-none" />
-              <div className="space-y-2">
-                <div className="flex flex-wrap lg:flex-nowrap justify-between w-full items-center lg:space-x-2">
-                  <div className="relative w-full lg:w-1/2">
-                    <FormField
-                      label="title"
-                      type="text"
-                      name={`text-${index}`}
-                      placeholder="Enter your title here"
-                      value={fileDetails[index]?.title || ""}
-                      onChange={(e) => handleTitleChange(index, e.target.value)}
-                      classLabel="label_loinForm capitalize"
-                      classInput="input_loinForm"
-                    />
-                  </div>
-                  <div className="relative w-full lg:w-1/2">
-                    <label className="label_loinForm capitalize">
-                      category
-                    </label>
-                    <RoleSelect
-                      value={fileDetails[index]?.category || ""}
-                      onChange={(value) => handleCategoryChange(index, value)}
-                      data={filteredCategory}
-                      style={{ bg: "bg-gray-300" }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor={`description-${index}`}
-                    className="label_loinForm capitalize"
-                  >
-                    description
-                  </label>
-                  <textarea
-                    id={`description-${index}`}
-                    name={`description-${index}`}
-                    rows="3"
-                    className="input_loinForm"
-                    placeholder="Write document description here"
-                    value={fileDetails[index]?.description || ""}
-                    onChange={(e) =>
-                      handleDescriptionChange(index, e.target.value)
-                    }
-                  ></textarea>
-                </div>
-              </div>
-              <hr className="bg-gray-700 h-[2px] rounded mx-2 my-2 border-none" />
-            </div>
-          ))}
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {fileDetails.map((detail, index) => (
+        <div key={index} className="bg-base-200 p-6 rounded-lg space-y-4 relative">
+          <span className="absolute top-2 right-2 text-sm text-gray-500">
+            File: {files[index]?.file?.name}
+          </span>
+
+          {/* Title */}
+          <div>
+            <label className="label">Title</label>
+            <input
+              type="text"
+              value={detail.title}
+              onChange={(e) => handleInputChange(index, "title", e.target.value)}
+              className="input input-bordered w-full"
+              placeholder="Enter document title"
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="label">Description</label>
+            <textarea
+              value={detail.description}
+              onChange={(e) => handleInputChange(index, "description", e.target.value)}
+              className="textarea textarea-bordered w-full"
+              placeholder="Enter document description"
+              required
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="label">Category</label>
+            <select
+              value={detail.category}
+              onChange={(e) => handleInputChange(index, "category", e.target.value)}
+              className="select select-bordered w-full"
+              required
+            >
+              <option value="">Select Category</option>
+              {category.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Course */}
+          <div>
+            <label className="label">Course</label>
+            <select
+              value={detail.course}
+              onChange={(e) => handleInputChange(index, "course", e.target.value)}
+              className="select select-bordered w-full"
+              required
+            >
+              <option value="">Select Course</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.link}>
+                  {course.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Semester */}
+          <div>
+            <label className="label">Semester</label>
+            <select
+              value={detail.semester}
+              onChange={(e) => handleInputChange(index, "semester", e.target.value)}
+              className="select select-bordered w-full"
+              required
+            >
+              <option value="">Select Semester</option>
+              {semester.map((sem) => (
+                <option key={sem.id} value={sem.link}>
+                  {sem.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subject Selection */}
+          <div>
+            <label className="label">Subject</label>
+            <select
+              value={detail.subject?.id || ""}
+              onChange={(e) => {
+                const selectedSubject = subjects.find(s => s.id === e.target.value);
+                handleInputChange(index, "subject", selectedSubject);
+              }}
+              className="select select-bordered w-full"
+              required
+              disabled={loading || !subjects.length}
+            >
+              <option value="">
+                {loading 
+                  ? "Loading subjects..." 
+                  : subjects.length 
+                    ? "Select Subject" 
+                    : "Select course and semester first"
+                }
+              </option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.subject_name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      )}
-    </div>
+      ))}
+
+      <button 
+        type="submit" 
+        className="btn btn-primary w-full"
+        disabled={loading}
+      >
+        {loading ? "Loading..." : "Upload Files"}
+      </button>
+    </form>
   );
+};
+
+// Add prop types validation
+DocDetails.propTypes = {
+  files: PropTypes.array.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default DocDetails;

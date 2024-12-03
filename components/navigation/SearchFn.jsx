@@ -38,4 +38,4 @@ const SearchFn = ({ posts, setIsPostOpen, setPost }) => {
   );
 };
 
-export default SearchFn; 
+export default SearchFn;

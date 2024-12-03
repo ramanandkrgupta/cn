@@ -1,205 +1,123 @@
-// full path /app/(root)/(user)/(routes)/upload/page.jsx
 "use client";
-
-import axios from "axios";
-import { toast } from "sonner";
 import { useState } from "react";
-import dynamic from "next/dynamic";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-
 import { useEdgeStore } from "@/libs/edgestore";
-import { PostValidation } from "@/libs/validations/post";
+import { calculateFileHash } from "@/libs/file-utils";
 import UploadDoc from "@/components/admin/components/UploadDoc";
 import DocDetails from "@/components/admin/components/DocDetails";
-import UploadDoneModel from "@/components/admin/ui/UploadDoneModel";
 
-const Stepper = dynamic(() => import("@/components/admin/ui/Stepper"));
-
-const Upload = () => {
-  const { edgestore } = useEdgeStore();
+export default function UploadPage() {
+  const router = useRouter();
   const { data: session } = useSession();
-
-  const [activeStep, setActiveStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitModalOpen, setSubmitModalOpen] = useState(false);
-
-  //for edgeStore
-  const [fileStates, setFileStates] = useState([]);
-  const [uploadRes, setUploadRes] = useState([]);
-
-  //for loaclStore
+  const { edgestore } = useEdgeStore();
+  
   const [files, setFiles] = useState([]);
-  const [fileDetails, setFileDetails] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Array of ste
-  const steps = ["UPLOAD", "DETAILS", "DONE"];
-
-  // Function to get the appropriate section component based on the active step
-  const getSectionComponent = () => {
-    switch (activeStep) {
-      case 0:
-        return (
-          <UploadDoc
-            files={files}
-            setFiles={setFiles}
-            removeFile={removeFile}
-            value={fileStates}
-            onChange={setFileStates}
-            onFilesAdded={async (addedFiles) => {
-              setFileStates([...fileStates, ...addedFiles]);
-            }}
-          />
-        );
-      case 1:
-        return (
-          <DocDetails
-            files={files}
-            removeFile={removeFile}
-            setFileDetails={setFileDetails}
-            fileDetails={fileDetails}
-            handlePreviousBtn={handlePreviousBtn}
-          />
-        );
-      default:
-        return null;
+  const handleFileSelect = async (selectedFiles) => {
+    if (selectedFiles && selectedFiles.length > 0) {
+      setFiles(selectedFiles);
+      setShowDetails(true);
     }
   };
 
-  const updateFileProgress = (key, progress) => {
-    setFileStates((fileStates) => {
-      const newFileStates = [...fileStates];
-      const fileState = newFileStates.find(
-        (fileState) => fileState.key === key
-      );
-      if (fileState) {
-        fileState.progress = progress;
+  const handleFileUpload = async (fileDetails) => {
+    try {
+      if (!session?.user) {
+        toast.error("Please login to upload files");
+        return;
       }
-      return newFileStates;
-    });
-  };
 
-  //Function to handle remove items from the list
-  const removeFile = (fileIndex) => {
-    const updatedFiles = [...files];
-    updatedFiles.splice(fileIndex, 1);
-    setFiles(updatedFiles);
-    const updatedFile = [...fileStates];
-    updatedFile.splice(fileIndex, 1);
-    setFileStates(updatedFile);
-  };
+      toast.loading("Uploading files...");
 
-  // Function to handle the "Previous" button click
-  const handlePreviousBtn = () => {
-    setActiveStep(activeStep - 1);
-  };
+      // Upload files to EdgeStore and calculate hashes
+      const uploadPromises = files.map(async (file) => {
+        try {
+          // Calculate file hash
+          const hash = await calculateFileHash(file.file);
 
-  // Function to handle the "Next" button click
-  const handleNextBtn = async () => {
-    setIsLoading(true);
-
-    // Validate that at least one file is selected
-    if (fileStates.length < 1) {
-      toast.error("One document must be selected for the next step");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      await Promise.all(
-        fileStates.map(async (fileState) => {
-          try {
-            if (fileState.progress !== "PENDING") return;
-            const res = await edgestore.publicFiles.upload({
-              file: fileState.file,
-              options: {
-                temporary: true,
-              },
-              onProgressChange: async (progress) => {
-                updateFileProgress(fileState.key, progress);
-                if (progress === 100) {
-                  await new Promise((resolve) => setTimeout(resolve, 1000));
-                  updateFileProgress(fileState.key, "COMPLETE");
-                }
-              },
-            });
-            setUploadRes((uploadRes) => [
-              ...uploadRes,
-              {
-                url: res.url,
-                filename: fileState.file.name,
-              },
-            ]);
-          } catch (err) {
-            updateFileProgress(fileState.key, "ERROR");
+          // Check for duplicates
+          const dupCheck = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
+          const dupData = await dupCheck.json();
+          
+          if (dupData.isDuplicate) {
+            throw new Error(`File '${file.file.name}' has already been uploaded`);
           }
-        })
-      );
-      setActiveStep(activeStep + 1);
-    } catch (error) {
-      console.error("An error occurred during file upload:", error);
-      toast.error("An error occurred during file upload");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // Function to handle the "Submit" button click
-  const handleSubmitBtn = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+          // Upload to EdgeStore
+          const res = await edgestore.publicFiles.upload({
+            file: file.file,
+            options: {
+              temporary: false
+            },
+            onProgressChange: (progress) => {
+              console.log('Upload progress:', progress);
+            },
+          });
 
-    // Validate each fileDetail in the array
-    const validationResults = fileDetails.map((fileDetail, index) => {
-      const userInput = {
-        postTitle: fileDetail.title,
-        postDesc: fileDetail.description,
-      };
-
-      return PostValidation.addPost.safeParse(userInput);
-    });
-
-    try {
-      // Check if any validation failed
-      const hasValidationErrors = validationResults.some(
-        (validation) => validation.success === false
-      );
-
-      //if validation is failure, return error message
-      if (hasValidationErrors) {
-        // Display error messages for each failed validation
-        validationResults.forEach((validation, index) => {
-          if (validation.success === false) {
-            const { issues } = validation.error;
-            issues.forEach((err) => {
-              toast.error(
-                `Validation error for ${fileDetails[index].title}: ${err.message}`
-              );
-            });
-          }
-        });
-      } else {
-        // If validation is successful, make the API request
-        const response = await axios.post("/api/post", {
-          fileDetails,
-          uploadRes,
-          userEmail: session.user.email,
-        });
-        if (response.statusText === "FAILED") {
-          toast.error(response.data);
-        } else {
-          for (const upload of uploadRes) {
-            await edgestore.publicFiles.confirmUpload({ url: upload.url });
-          }
-          setSubmitModalOpen(true);
+          return {
+            ...res,
+            hash,
+            filename: file.file.name
+          };
+        } catch (error) {
+          console.error('File upload error:', error);
+          throw new Error(`Failed to upload ${file.file.name}: ${error.message}`);
         }
+      });
+
+      const uploadRes = await Promise.all(uploadPromises);
+
+      // Create post entries
+      const formData = new FormData();
+      formData.append('fileDetails', JSON.stringify(fileDetails));
+      formData.append('userEmail', session.user.email);
+      formData.append('uploadRes', JSON.stringify(uploadRes));
+
+      const response = await fetch('/api/post', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.dismiss();
+        toast.success('Files uploaded successfully and pending moderation');
+        router.push('/dashboard');
+      } else {
+        throw new Error('Upload failed');
       }
     } catch (error) {
-      console.error("An error occurred during file upload:", error);
-      toast.error("An error occurred during file upload");
-    } finally {
-      setIsLoading(false);
+      toast.dismiss();
+      console.error('Upload error:', error);
+      toast.error(error.message || 'Failed to upload files');
     }
   };
+
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    if (files.length <= 1) {
+      setShowDetails(false);
+    }
+  };
+
+  if (!session) {
+    return (
+      <div className="container mx-auto p-4 text-center">
+        <p>Please login to upload files</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -213,46 +131,36 @@ const Upload = () => {
         </p>
       </div>
 
-      {/* Stepper component */}
-      <Stepper steps={steps} activeStep={activeStep} />
-
-      {/* Section component based on the active step*/}
-
+      {/* Upload section */}
       <div className="bg-[#1d232a] p-3 rounded-lg mt-5 border border-orange-400 w-full max-h-[490px] mb-5 overflow-auto">
-        {getSectionComponent()}
+        {!showDetails ? (
+          <UploadDoc
+            files={files}
+            setFiles={setFiles}
+            removeFile={removeFile}
+            value={uploadedFiles}
+            onChange={setUploadedFiles}
+            onFilesAdded={handleFileSelect}
+          />
+        ) : (
+          <DocDetails
+            files={files}
+            onSubmit={handleFileUpload}
+          />
+        )}
       </div>
 
       {/* Navigation buttons */}
-      <div className="md:w-full md:flex md:justify-end">
-        {/* Previous button */}
-        {activeStep !== 0 && (
+      {showDetails && (
+        <div className="md:w-full md:flex md:justify-end">
           <button
-            onClick={handlePreviousBtn}
-            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-orange-400 border hover:border-orange-400 right-0"
+            onClick={() => setShowDetails(false)}
+            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-orange-400 border hover:border-orange-400 right-0 mr-2"
           >
-            Previous
+            Back
           </button>
-        )}
-        {/* Next button */}
-        {activeStep !== steps.length - 1 && (
-          <div
-            onClick={activeStep === 0 ? handleNextBtn : handleSubmitBtn}
-            className="btn bg-[#1d232a] text-white w-[11rem] text-center border-orange-400 border hover:border-orange-400 right-0"
-          >
-            {activeStep === 0 ? "Upload" : "Submit"}
-            {isLoading && "ing..."}
-          </div>
-        )}
-      </div>
-
-      {submitModalOpen && (
-        <UploadDoneModel
-          isOpen={submitModalOpen}
-          setIsOpen={setSubmitModalOpen}
-        />
+        </div>
       )}
     </div>
   );
-};
-
-export default Upload;
+}

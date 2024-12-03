@@ -58,10 +58,8 @@ const UserSemester = ({ course }) => {
       <h1 className="select_header">Select Category</h1>
     </div>
       <small className="text-gray-400">
-        Path:
-        <a href={`/${course}`} className="text-blue-500 hover:underline">
-          {course}
-        </a>
+        Path: /rgpv/
+        <Link href={`/rgpv/${course}`} className="text-blue-500 hover:underline">{course}</Link>
         /{category}
       </small>
       {/* Display the "name" query parameter */}

@@ -34,5 +34,5 @@ const useFilterPost = ({ course, semester, category, subId }) => {
     mutate,
   };
 };
-
 export { usePost, useUserPost, useFilterPost };
+

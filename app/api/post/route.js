@@ -32,18 +32,41 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fileDetails, uploadRes, userEmail } = await req.json();
+    const formData = await req.formData();
+    const fileDetailsStr = formData.get('fileDetails');
+    const userEmail = formData.get('userEmail');
+    const uploadResStr = formData.get('uploadRes');
 
-    // Get user's reputation
+    if (!fileDetailsStr || !userEmail || !uploadResStr) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const fileDetails = JSON.parse(fileDetailsStr);
+    const uploadRes = JSON.parse(uploadResStr);
+
+    // Get user
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
-      select: { reputationScore: true, id: true }
+      select: { 
+        id: true,
+        reputationScore: true 
+      }
     });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
 
     // Determine initial status based on user reputation
     const initialStatus = user.reputationScore > 100 ? "approved" : "pending";
 
-    // Create posts with moderation status
+    // Create posts
     const posts = await Promise.all(
       fileDetails.map(async (detail, index) => {
         const post = await prisma.post.create({
@@ -51,15 +74,18 @@ export async function POST(req) {
             title: detail.title,
             description: detail.description,
             category: detail.category,
-            course_name: detail.course,
-            semester_code: detail.semester,
-            subject_name: detail.subject.name,
-            subject_code: detail.subject.link,
+            course_name: detail.course_name,
+            semester_code: detail.semester_code,
+            subject_name: detail.subject_name,
+            subject_code: detail.subject_code,
             file_url: uploadRes[index].url,
-            file_name: uploadRes[index].filename,
+            file_name: detail.file_name,
             fileHash: uploadRes[index].hash,
+            userId: user.id,
             status: initialStatus,
-            userId: user.id
+            qualityScore: 0,
+            version: 1,
+            isLatestVersion: true
           }
         });
 
@@ -73,22 +99,24 @@ export async function POST(req) {
           });
         }
 
-        // Update user stats
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            uploadCount: { increment: 1 }
-          }
-        });
-
         return post;
       })
     );
 
-    return NextResponse.json({ success: true, posts });
+    return NextResponse.json({ 
+      success: true, 
+      posts 
+    });
+
   } catch (error) {
     console.error("Error creating post:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { 
+        error: "Error creating post",
+        details: error.message 
+      }, 
+      { status: 500 }
+    );
   }
 }
 

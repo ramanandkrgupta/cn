@@ -36,11 +36,12 @@ model User {
   downloads           UserDownload[]
   settings            UserSettings?
   notifications       Notification[]
-  moderatedPosts      Post[]    @relation("ModeratedPosts")
+  moderatedPosts      post[]    @relation("ModeratedPosts")
   reputationScore     Int       @default(0)
   uploadCount         Int       @default(0)
   verifiedUploads     Int       @default(0)
   reports             Report[]
+  moderatedContent    ContentModeration[]  @relation("ModeratedContent")
 }
 
 model subject{
@@ -289,7 +290,7 @@ model Notification {
 model Report {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   postId      String   @db.ObjectId
-  post        Post     @relation(fields: [postId], references: [id])
+  post        post     @relation(fields: [postId], references: [id])
   reporterId  String   @db.ObjectId
   reporter    User     @relation(fields: [reporterId], references: [id])
   reason      String
@@ -299,12 +300,12 @@ model Report {
 }
 
 model ContentModeration {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId    String   @db.ObjectId
-  status    String   // pending, approved, rejected
-  reviewedBy String? @db.ObjectId
-  reviewer  User?    @relation(fields: [reviewedBy], references: [id])
-  note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  postId      String    @db.ObjectId
+  status      String    // pending, approved, rejected
+  reviewedBy  String?   @db.ObjectId
+  reviewer    User?     @relation("ModeratedContent", fields: [reviewedBy], references: [id])
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
