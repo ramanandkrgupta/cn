@@ -12,7 +12,7 @@ const About = () => {
     <div className="flex justify-center items-start px-2 w-full">
       <div className="xl:max-w-[1280px] w-full">
         <Hero />
-        {/*<Aboutus />
+        {/* <Aboutus />
         <Howitworks /> */}
         <Team />
         <Contribution />

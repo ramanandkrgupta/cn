@@ -10,18 +10,12 @@ import { useSession, signIn } from "next-auth/react";
 import { handleSignOutButton } from "@/libs/utils";
 import Search from "../Search";
 import { navlinks } from "@/constants";
-import { usePost } from "@/libs/hooks/usePost";
-import { filterPosts } from "@/libs/hooks/usefilter";
 import { close, logo, menu, logout } from "@/public/assets";
-import { usePostStore } from "@/libs/state/useStore";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 import { newlogo } from "@/public/icons";
-import SearchFn from "./SearchFn";
 
 const NavBar = ({ showSearch = true }) => {
-  const { data: fetchedData, error } = usePost();
-  const setData = usePostStore((state) => state.setPosts);
   const { data: session } = useSession();
   const router = useRouter();
   const sidebarRef = useRef(null);
@@ -31,25 +25,9 @@ const NavBar = ({ showSearch = true }) => {
   const [toggleDrawer, setToggleDrawer] = useState(false);
   const [isPostOpen, setIsPostOpen] = useState(false);
   const [post, setPost] = useState("");
-
-  const [posts, setPosts] = useState([]);
-  const [isActive, setIsActive] = useState(""); // Define isActive state
-  // const data = useMemo(() => posts, [posts]);
+  const [isActive, setIsActive] = useState("");
 
   const [theme, setTheme] = useState("mydark");
-
-  useEffect(() => {
-    setData(posts);
-  }, [posts, setData]);
-
-  useEffect(() => {
-    if (fetchedData) {
-      setPosts(fetchedData);
-    }
-    if (error) {
-      console.error("Error fetching Search data:", error);
-    }
-  }, [fetchedData, error]);
 
   // Toggle theme between light and dark
   const toggleTheme = () => {
@@ -98,13 +76,12 @@ const NavBar = ({ showSearch = true }) => {
       className={`flex md:flex-row flex-col-reverse justify-between gap-6`}
     >
       <p className="text-primary align-middle text-center subpixel-antialiased text-3xl font-bold hidden sm:block">
-        College <span className="text-secondary">Notes</span>{" "}
-        <span className="badge">.tech</span>
+        Notes <span className="text-secondary">Mates</span>{" "}
+        <span className="badge">.in</span>
       </p>
 
       {showSearch && (
-        <SearchFn
-          posts={posts}
+        <Search
           setIsPostOpen={setIsPostOpen}
           setPost={setPost}
         />
@@ -118,12 +95,12 @@ const NavBar = ({ showSearch = true }) => {
           <Image
             src={newlogo}
             alt="user icon"
-            className="w-[60%] h-[60%] object-contain"
+            className="w-[95%] h-[95%] "
           />
         </div>
         <p className="text-primary align-middle text-center subpixel-antialiased text-2xl font-bold">
-          College <span className="text-secondary">Notes</span>
-          <span className="badge">.tech</span>
+          Notes <span className="text-secondary">Mates</span>
+          <span className="badge">.in</span>
         </p>
 
         <label className="swap swap-rotate">

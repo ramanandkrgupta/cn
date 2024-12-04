@@ -14,13 +14,11 @@ export default function RootLayout({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  
-
   return (
     <EdgeStoreProvider>
       <html lang="en">
         <head>
-          <title>college notes.tech</title>
+          <title>Notes Mates.in</title>
           <meta name="description" content="description" />
           <meta
             name="keywords"

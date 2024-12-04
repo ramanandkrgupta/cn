@@ -85,11 +85,11 @@ export default function Profile() {
       title: "My Profile",
       onClick: () => router.push("/account/profile"),
     },
-    // {
-    //   icon: <CreditCard size={24} className="text-gray-500" />,
-    //   title: "Plans",
-    //   onClick: () => router.push("/plans"),
-    // },
+    {
+      icon: <CreditCard size={24} className="text-gray-500" />,
+      title: "Plans",
+      onClick: () => router.push("/account/plans"),
+    },
     {
       icon: <FolderUp size={24} className="text-gray-500" />,
       title: "Your Uploads",
@@ -108,7 +108,7 @@ export default function Profile() {
   ];
 
   const menuItems =
-    session?.user?.role === "ADMIN"
+    userData?.userRole === "ADMIN"
       ? [
           {
             icon: <LayoutDashboard size={24} className="text-primary" />,
@@ -150,7 +150,9 @@ export default function Profile() {
                 {userData.name}
               </div>
               <div className="text-sm text-gray-500">{userData.email}</div>
-              <div className="text-sm text-gray-500">Mobile: {userData.mobile || "N/A"}</div>
+              <div className="text-sm text-gray-500">
+                Mobile: {userData.mobile || "N/A"}
+              </div>
               <span
                 className={`mt-2 px-3 py-1 rounded-full text-xs font-medium block
                   ${

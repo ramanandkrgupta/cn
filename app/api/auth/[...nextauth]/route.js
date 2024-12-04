@@ -8,13 +8,10 @@ import prisma from "@/libs/prisma";
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    // GitHub Provider
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
-
-    // Credentials Provider
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
@@ -28,6 +25,14 @@ export const authOptions = {
         try {
           const user = await prisma.user.findUnique({
             where: { email: email },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              password: true,
+              userRole: true,
+              avatar: true
+            }
           });
 
           if (!user) {
@@ -39,11 +44,14 @@ export const authOptions = {
             throw new Error("Incorrect password!");
           }
 
-          // Include phoneNumber and userRole in the returned user object
+          // Return user data without password
           return {
-            ...user,
-            phoneNumber: user.phoneNumber,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.userRole, // For backward compatibility
             userRole: user.userRole,
+            avatar: user.avatar
           };
         } catch (error) {
           console.error("Error during authorization:", error);
@@ -66,49 +74,62 @@ export const authOptions = {
       if (account.provider === "github") {
         try {
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email },
+            where: { email: user.email }
           });
 
           if (!existingUser) {
-            // Create a new user if not already in the database
             await prisma.user.create({
               data: {
                 email: user.email,
                 name: user.name || user.login,
-                image: user.image || user.avatar_url, // Store GitHub avatar
-                phoneNumber: user.phoneNumber || '', // Default to empty string if not provided
-                userRole: user.userRole || 'user', // Default role
+                image: user.image || user.avatar_url,
+                phoneNumber: '',
+                userRole: 'FREE',
+                password: await bcrypt.hash(Math.random().toString(36), 10)
               },
             });
           }
-
           return true;
         } catch (error) {
           console.error("Error during GitHub sign-in:", error);
           return false;
         }
       }
-
-      // For credentials provider, simply allow sign-in to proceed
       return true;
     },
-    async jwt({ token, user }) {
+
+    async jwt({ token, user, trigger, session }) {
       if (user) {
+        // Initial sign in
         token.id = user.id;
         token.role = user.userRole;
+        token.userRole = user.userRole;
       }
+
+      // Handle session update
+      if (trigger === "update" && session?.user) {
+        token.role = session.user.role;
+        token.userRole = session.user.userRole;
+      }
+
       return token;
     },
+
     async session({ session, token }) {
-      if (session.user) {
+      if (session?.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.userRole = token.userRole;
       }
       return session;
     }
   },
+  events: {
+    async signOut({ token }) {
+      // Clean up any necessary session data
+    }
+  }
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

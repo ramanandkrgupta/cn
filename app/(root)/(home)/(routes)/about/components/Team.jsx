@@ -63,13 +63,37 @@ const SocialLink = ({ icon, tooltip, url }) => {
 const Team = () => {
   const teamMembers = [
     {
+      name: "Lokendra Patel",
+      role: "Founder & CEO",
+      img: "/team/member-02.jpg",
+      githubUsername: "lokendra508",
+      xUsername: "Lokendr52277034",
+      linkedinUsername: "lokendra-patel-233719220",
+      instagramUsername: "_lokendra_022"
+    },
+    {
       name: "Ramanand Kumar Gupta",
       role: "Full Stack Web Developer",
       img: "/team/member-1.jpeg",
       githubUsername: "ramanandkrgupta",
       xUsername: "RAMANANDKUMARSAW",
       linkedinUsername: "ramanand-kumar-saw",
+      instagramUsername: "ramanand-kumar-18"
     },
+    {
+      name: " Ashutosh Tripathi",
+      role: "Advertising Head",
+      img: "/team/member-03.jpg",
+      linkedinUsername: "ashutosh-tripathi-315386169",
+    },
+    {
+      name: "Samradh Patel",
+      role: " ",
+      img: "/team/member-04.jpg",
+      githubUsername: "    ",
+      xUsername: "PatelSamradh",
+      linkedinUsername: "samradhpatel",
+    },
 
     {
       name: "Prankur Patel",
@@ -90,6 +114,12 @@ const Team = () => {
       instagramUsername: "sumitt.singh_"
       
     },
+    {
+      name: "Anit Bajpai",
+      role: "Content Management Head & Advertising Coordinator ",
+      img: "/team/member-08.jpg",
+      xUsername: "AnitBajpai1",
+    },
 
    
   ];
@@ -100,7 +130,7 @@ const Team = () => {
         <p className="text-gray-500 text-lg text-center font-normal pb-3">
           Meet the team
         </p>
-        <h1 className="mx-auto text-3xl text-center text-gray-200  font-extrabold ">
+        <h1 className="mx-auto text-3xl text-center text-secondary  font-extrabold ">
           The Talented People Behind the Scenes of the Organization
         </h1>
       </div>
@@ -116,7 +146,7 @@ const Team = () => {
                 alt="Person"
               />
               <div className="flex flex-col items-start justify-center text-center capitalize">
-                <p className="text-base font-bold tracking-tighter text-gray-300">
+                <p className="text-base font-bold tracking-tighter text-secondary">
                   {member.name}
                 </p>
                 <p className="text-sm text-[#808191] tracking-tighter">

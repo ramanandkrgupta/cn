@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IconBrandGithub } from "@tabler/icons-react";
 const Contribution = () => {
   const contributeText = {
-    title: "College Notes is an open source project built with 💖",
+    title: "Notes Mates is an open source project built with 💖",
     desc: "Open-source, passion-fueled project. Revolutionizing education with an intuitive platform for seamless student-teacher interaction.",
     subDesc:
       "We highly appreciate any feedback or contribution that could help us improve.",
@@ -23,7 +23,7 @@ const Contribution = () => {
           <p className="text-gray-500 text-lg text-center font-normal pb-3">
             Contribute.
           </p>
-          <h3 className="text-3xl font-bold text-white mb-2">
+          <h3 className="text-3xl font-bold text-secondary mb-2">
             {contributeText.title}
           </h3>
           <p>{contributeText.desc}</p>

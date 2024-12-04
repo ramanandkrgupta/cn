@@ -55,7 +55,7 @@ const UploadDoc = ({
 
       pages.forEach((page) => {
         const { width, height } = page.getSize();
-        const watermarkText = "collegenotes.tech";
+        const watermarkText = "https://notesmates.in";
         const fontSize = 12;
         const textWidth = helveticaFont.widthOfTextAtSize(
           watermarkText,

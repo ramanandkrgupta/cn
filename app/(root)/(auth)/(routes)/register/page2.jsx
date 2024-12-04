@@ -1,5 +1,5 @@
 "use client";
-var zxcvbn = require('zxcvbn');
+var zxcvbn = require("zxcvbn");
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -12,18 +12,16 @@ import FormButtons from "@/components/ui/FormButtons";
 import FormField from "@/components/ui/FormField";
 import { UserValidation } from "@/libs/validations/user";
 
-
 const RegisterPage = () => {
-  
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
+  const [RawPhoneNumber, setRawPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -62,14 +60,10 @@ const [ RawPhoneNumber, setRawPhoneNumber ] = useState("");
     setPasswordMatch(password === value);
   };
 
-  
-
-    
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-const phoneNumber = `+91${ RawPhoneNumber}`;
+    const phoneNumber = `+91${RawPhoneNumber}`;
 
     // Validate user input using the schema
     const userInput = { name, email, phoneNumber, password, confirmPassword };
@@ -90,8 +84,8 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
         // If validation is successful, make the API request
         const response = await axios.post("/api/user/register", userInput, {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.status === 201) {
@@ -111,23 +105,22 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
     }
   };
 
-  
-
   return (
-    
     <section className="flex items-center justify-center">
-      
       <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
         <div>
-          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-secondary">
+          <a
+            href="/"
+            className="flex items-center mb-6 text-2xl font-semibold text-secondary"
+          >
             <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
-            College Notes
+            Notes Mates
           </a>
         </div>
         <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0  border-secondary">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-secondary">
-              Create  account
+              Create account
             </h1>
 
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
@@ -155,20 +148,18 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
                 classInput="input_loinForm"
                 required
               />
-             
-         
-  
-  <FormField
-    label="Mobile"
-    type="tel"
-    name="phoneNumber"
-    value={RawPhoneNumber}
-    placeholder="1234567890"
-    onChange={(e) => setRawPhoneNumber(e.target.value)}
-    autoComplete="tel"
-    classLabel="label_loinForm"
-    classInput="input_loinForm rounded-l-none"
-  />
+
+              <FormField
+                label="Mobile"
+                type="tel"
+                name="phoneNumber"
+                value={RawPhoneNumber}
+                placeholder="1234567890"
+                onChange={(e) => setRawPhoneNumber(e.target.value)}
+                autoComplete="tel"
+                classLabel="label_loinForm"
+                classInput="input_loinForm rounded-l-none"
+              />
 
               <FormField
                 label="Password"
@@ -206,7 +197,9 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
                   onChange={() => setShowPassword(!showPassword)}
                   className="mr-2"
                 />
-                <label htmlFor="showPassword" className="text-white">Show Password</label>
+                <label htmlFor="showPassword" className="text-white">
+                  Show Password
+                </label>
               </div>
               {!passwordMatch && (
                 <p className="text-red-500">Passwords do not match</p>
@@ -228,7 +221,7 @@ const phoneNumber = `+91${ RawPhoneNumber}`;
               <button
                 type="button"
                 className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/login')}
+                onClick={() => router.push("/login")}
                 disabled={isLoading}
               >
                 {isLoading ? "Loading..." : "Login"}

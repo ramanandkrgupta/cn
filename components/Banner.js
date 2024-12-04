@@ -54,7 +54,7 @@ export default function Banner() {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Main Banner Container */}
-      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl bg-base-300">
+      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl bg-base-300 mt-2">
         {/* Banner Images */}
         <div 
           className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out"
@@ -78,30 +78,55 @@ export default function Banner() {
               />
               
               {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-base-300/80 via-base-300/50 to-transparent" />
+<div 
+  className={`absolute inset-0 
+    bg-gradient-to-r 
+    from-white/80 via-white/60 to-transparent
+    dark:from-black/70 dark:via-black/50 dark:to-transparent
+  `}
+/>
 
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12">
-                {/* Tag */}
-                <span className="w-fit px-3 py-1 mb-2 text-xs font-medium rounded-full bg-primary/20 text-primary">
-                  {item.tag}
-                </span>
-                
-                {/* Title */}
-                <h2 className="text-xl md:text-3xl lg:text-4xl font-bold mb-2 text-base-content">
-                  {item.title}
-                </h2>
-                
-                {/* Description */}
-                <p className="text-sm md:text-base text-base-content/70 max-w-md">
-                  {item.description}
-                </p>
+{/* Content */}
+<div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12">
+  {/* Tag */}
+  <span 
+    className={`w-fit px-3 py-1 mb-2 text-xs font-medium rounded-full 
+      bg-primary/20 text-primary
+      dark:bg-primary/30 dark:text-primary/90
+    `}
+  >
+    {item.tag}
+  </span>
 
-                {/* CTA Button */}
-                <button className="mt-4 w-fit px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
-                  Learn More
-                </button>
-              </div>
+  {/* Title */}
+  <h2 
+    className={`text-xl md:text-3xl lg:text-4xl font-bold mb-2 
+      text-base-content dark:text-white
+    `}
+  >
+    {item.title}
+  </h2>
+
+  {/* Description */}
+  <p 
+    className={`text-sm md:text-base max-w-md 
+      text-base-content/70 dark:text-white/80
+    `}
+  >
+    {item.description}
+  </p>
+
+  {/* CTA Button */}
+  <button 
+    className={`mt-4 w-fit px-4 py-2 text-sm font-medium rounded-lg 
+      bg-primary text-white hover:bg-primary/90 transition-colors
+      dark:bg-primary/80 dark:hover:bg-primary/70
+    `}
+  >
+    Learn More
+  </button>
+</div>
+
             </Link>
           ))}
         </div>

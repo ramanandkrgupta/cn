@@ -12,7 +12,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { edgestore } = useEdgeStore();
-  
+
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [showDetails, setShowDetails] = useState(false);
@@ -40,32 +40,38 @@ export default function UploadPage() {
           const hash = await calculateFileHash(file.file);
 
           // Check for duplicates
-          const dupCheck = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
+          const dupCheck = await fetch(
+            `/api/posts/check-duplicate?hash=${hash}`
+          );
           const dupData = await dupCheck.json();
-          
+
           if (dupData.isDuplicate) {
-            throw new Error(`File '${file.file.name}' has already been uploaded`);
+            throw new Error(
+              `File '${file.file.name}' has already been uploaded`
+            );
           }
 
           // Upload to EdgeStore
           const res = await edgestore.publicFiles.upload({
             file: file.file,
             options: {
-              temporary: false
+              temporary: false,
             },
             onProgressChange: (progress) => {
-              console.log('Upload progress:', progress);
+              console.log("Upload progress:", progress);
             },
           });
 
           return {
             ...res,
             hash,
-            filename: file.file.name
+            filename: file.file.name,
           };
         } catch (error) {
-          console.error('File upload error:', error);
-          throw new Error(`Failed to upload ${file.file.name}: ${error.message}`);
+          console.error("File upload error:", error);
+          throw new Error(
+            `Failed to upload ${file.file.name}: ${error.message}`
+          );
         }
       });
 
@@ -73,39 +79,39 @@ export default function UploadPage() {
 
       // Create post entries
       const formData = new FormData();
-      formData.append('fileDetails', JSON.stringify(fileDetails));
-      formData.append('userEmail', session.user.email);
-      formData.append('uploadRes', JSON.stringify(uploadRes));
+      formData.append("fileDetails", JSON.stringify(fileDetails));
+      formData.append("userEmail", session.user.email);
+      formData.append("uploadRes", JSON.stringify(uploadRes));
 
-      const response = await fetch('/api/post', {
-        method: 'POST',
+      const response = await fetch("/api/post", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
+        throw new Error(error.message || "Upload failed");
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.dismiss();
-        toast.success('Files uploaded successfully and pending moderation');
-        router.push('/dashboard');
+        toast.success("Files uploaded successfully and pending moderation");
+        router.push("/dashboard");
       } else {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
     } catch (error) {
       toast.dismiss();
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload files');
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload files");
     }
   };
 
   const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
     if (files.length <= 1) {
       setShowDetails(false);
     }
@@ -127,7 +133,7 @@ export default function UploadPage() {
           Upload document
         </h3>
         <p className="text-secondary mt-2 text-sm font-medium text-center align-bottom mb-2">
-          Upload your summaries and other study documents to College Notes
+          Upload your summaries and other study documents to Notes Mates
         </p>
       </div>
 
@@ -143,10 +149,7 @@ export default function UploadPage() {
             onFilesAdded={handleFileSelect}
           />
         ) : (
-          <DocDetails
-            files={files}
-            onSubmit={handleFileUpload}
-          />
+          <DocDetails files={files} onSubmit={handleFileUpload} />
         )}
       </div>
 

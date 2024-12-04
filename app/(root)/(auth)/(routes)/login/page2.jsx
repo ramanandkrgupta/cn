@@ -18,58 +18,61 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  // Validate user input using the schema
-  const userInput = { email, password };
+    // Validate user input using the schema
+    const userInput = { email, password };
 
-  try {
-    // Validate the user input
-    const validation = UserValidation.UserLogin.safeParse(userInput);
+    try {
+      // Validate the user input
+      const validation = UserValidation.UserLogin.safeParse(userInput);
 
-    // If validation fails, return error message
-    if (!validation.success) {
-      validation.error.issues.forEach((err) => {
-        toast.error(err.message);
+      // If validation fails, return error message
+      if (!validation.success) {
+        validation.error.issues.forEach((err) => {
+          toast.error(err.message);
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // If validation is successful, make the API request
+      const response = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
       });
+
+      console.log("SignIn Response:", response);
+
+      if (response.error) {
+        toast.error(response.error);
+        console.error("SignIn Error:", response.error);
+      } else {
+        // Redirect to the dashboard on successful login
+        toast.success("Successfully Logged in");
+        window.location.href = "/dashboard";
+      }
+    } catch (error) {
+      console.error("NEXT_AUTH Error:", error);
+      toast.error("Something went wrong during login attempt");
+      console.error("Full Error Response:", error);
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // If validation is successful, make the API request
-    const response = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    console.log("SignIn Response:", response);
-
-    if (response.error) {
-      toast.error(response.error);
-      console.error("SignIn Error:", response.error);
-    } else {
-      // Redirect to the dashboard on successful login
-      toast.success("Successfully Logged in");
-      window.location.href = "/dashboard";
-    }
-  } catch (error) {
-    console.error("NEXT_AUTH Error:", error);
-    toast.error("Something went wrong during login attempt");
-    console.error("Full Error Response:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <section className="flex items-center justify-center">
       <div className="flex flex-col items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
         <div>
-          <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-white">
+          <a
+            href="/"
+            className="flex items-center mb-6 text-2xl font-semibold text-white"
+          >
             <Image className="w-8 h-8 mr-2" src={logo} alt="logo" />
-            College Notes
+            Notes Mates
           </a>
         </div>
         <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-[#1c1c24] border-gray-700">
@@ -118,7 +121,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => router.push('/register')}
+                onClick={() => router.push("/register")}
                 disabled={isLoading}
               >
                 {isLoading ? "Loading..." : "Register"}

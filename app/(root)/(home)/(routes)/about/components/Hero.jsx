@@ -3,10 +3,10 @@ const Hero = () => {
     tittle_one: "Dive into the Sea of ",
     tittle_two: "Study Resources 🌊",
     descrption:
-      "Join the community on a mission to make education more accessible and enjoyable. Start your journey with College Notes today!",
+      "Join the community on a mission to make education more accessible and enjoyable. Start your journey with Notes Mates today!",
   };
   return (
-    <section className="text-white">
+    <section className="text-secondary">
       <div className="mx-auto text-center mt-10 items-center justify-center max-w-3xl">
         <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-5xl font-extrabold text-transparent sm:text-5xl md:text-7xl">
           {text.tittle_one}

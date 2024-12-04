@@ -1,4 +1,5 @@
-# College Notes 📚
+# Notes Mates 📚
+
 A full stack web application that makes studying easier for students and document management hassle-free for teachers. **Students can easily find study materials sorted by subjects and courses, while teachers can upload, organize, and manage resources effortlessly**. StudyHub encourages teamwork, makes study materials easy to access, and acts as a hub for all educational resources 🚀
 
 ## Features 🌟
@@ -12,7 +13,7 @@ A full stack web application that makes studying easier for students and documen
 - **Security Measures:** Ensuring secure file upload and storage..
 - **User Authentication:** Secure login for teachers and admin.
 - **Responsive Design:** User-friendly experience on various devices.
-  
+
 ## Tech Stack 🛠️
 
 - **NEXT.JS:** React-based framework for building modern web applications.
@@ -32,22 +33,22 @@ A full stack web application that makes studying easier for students and documen
 - [Edgestore](https://edgestore.dev/) for managing all the uploaded douments
 - [MongoDB](https://www.mongodb.com/) for persisting data.
 
-
 ### Environment Variables ⚙️
 
 To run this project, you will need to add the following environment variables to your .env file:
 
-* `NEXTAUTH_URL `:The public URL of your NextAuth authentication service.
-* `NEXTAUTH_URL_INTERNAL` :The internal URL used for authentication within the project.
-* `NEXTAUTH_SECRET `:A secret key for securing sessions and tokens in NextAuth.  
-* `NEXT_SHARP_PATH`:Path for Next.js image processing with Sharp.
-* `NEXT_DEFAULT_PASSWORD`:Default password used during project setup or user creation.
-* `NEXT_PUBLIC_APP_URL`:The public URL of your application.
-* `DATABASE_URL `:Your MongoDB connection URL.
-* `EDGE_STORE_ACCESS_KEY`:Access key for Edge Store,  
-* `EDGE_STORE_SECRET_KEY`:Secret key for Edge Store
- 
+- `NEXTAUTH_URL `:The public URL of your NextAuth authentication service.
+- `NEXTAUTH_URL_INTERNAL` :The internal URL used for authentication within the project.
+- `NEXTAUTH_SECRET `:A secret key for securing sessions and tokens in NextAuth.
+- `NEXT_SHARP_PATH`:Path for Next.js image processing with Sharp.
+- `NEXT_DEFAULT_PASSWORD`:Default password used during project setup or user creation.
+- `NEXT_PUBLIC_APP_URL`:The public URL of your application.
+- `DATABASE_URL `:Your MongoDB connection URL.
+- `EDGE_STORE_ACCESS_KEY`:Access key for Edge Store,
+- `EDGE_STORE_SECRET_KEY`:Secret key for Edge Store
+
 ### How To Use 🚀
+
 From your command line:
 
 ```bash
@@ -61,29 +62,28 @@ From your command line:
   $npm install
   # <Create .env appropriately>
 
-# This is needed if you are planning to run studydrive locally
+# This is needed if you are planning to run Notes Mates locally
   $npx prisma db push
 
 # Start the app in development mode with hot-code reloading by running:
   $npm run dev
-````
+```
+
 ## Contributing 🤝
-   We welcome contributions from the community. Please fork the repository and submit pull requests.
-   **Make sure to see [contributing.md](https://github.com/ramanandkrgupta/cn/blob/main/CONTRIBUTING.md) for instructions on contributing to the project!**
-   
-   
-   
-Report Bugs, Give Feature Requests There..   
+
+We welcome contributions from the community. Please fork the repository and submit pull requests.
+**Make sure to see [contributing.md](https://github.com/ramanandkrgupta/cn/blob/main/CONTRIBUTING.md) for instructions on contributing to the project!**
+
+Report Bugs, Give Feature Requests There..
 
 ## Licence 📝
-[Studydrive](https://github.com/ramanandkrgupta/cn) is Free Software: You can use, study share and improve it at your
+
+[Notes Mates](https://github.com/ramanandkrgupta/cn) is Free Software: You can use, study share and improve it at your
 will. Specifically you can redistribute and/or modify it under the terms of the
 [MIT License](https://opensource.org/license/mit/l) as
 published by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version. 
-
+(at your option) any later version.
 
 ##
 
-  **⭐️ Star this Repo if you Liked it! ⭐️**
-
+**⭐️ Star this Repo if you Liked it! ⭐️**

@@ -8,17 +8,8 @@ import axios from "axios";
 import { motion } from "framer-motion";
 //import {profile}  from "../../../../../public/img/profile.jpg";
 import { newlogo } from "@/public/icons";
-import {
-  User,
-  Lock,
-  Download,
-  Heart,
-  LogOut,
-  Menu,
-} from "lucide-react";
-import ChangePassword from '@/components/admin/components/ChangePassword';
-
-
+import { User, Lock, Download, Heart, LogOut, Menu } from "lucide-react";
+import ChangePassword from "@/components/admin/components/ChangePassword";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -64,7 +55,7 @@ const ProfilePage = () => {
         key: process.env.RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: "College Notes PVT",
+        name: "Notes Mates PVT",
         description: "Plan Upgrade",
         order_id: order.id,
         handler: async (response) => {
@@ -115,8 +106,6 @@ const ProfilePage = () => {
     }
   };
 
-  
-
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -161,14 +150,13 @@ const ProfilePage = () => {
             <h2 className="text-2xl font-bold">Profile Information</h2>
             <div className="bg-base-100 rounded-lg shadow-md p-6 space-y-4">
               <div className="flex items-center space-x-4">
-                
                 <Image
-                className="h-20 w-20 rounded-full"
+                  className="h-20 w-20 rounded-full"
                   src={user.image || "/img/profile.jpg"}
                   alt={user.name}
-                  width={200} 
+                  width={200}
                   height={200}
-                  />
+                />
                 <div>
                   <h3 className="text-xl font-semibold">{user.name}</h3>
                   <p className="text-gray-500">{user.email}</p>
@@ -232,7 +220,8 @@ const ProfilePage = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Profile Information</h2>
-          <ChangePassword sessionData={user.email} /></div>
+            <ChangePassword sessionData={user.email} />
+          </div>
         );
       case "downloads":
         return (
@@ -293,11 +282,11 @@ const ProfilePage = () => {
                             {favorite.description}
                           </p>
                         </div>
-                        <Image className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+                        <Image
+                          className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
                           src={favorite.image}
-                          alt=""/>
-                          
-                        
+                          alt=""
+                        />
                       </div>
                       <div>
                         <div className="-mt-px flex divide-x divide-gray-200">
@@ -354,7 +343,7 @@ const ProfilePage = () => {
           </div>
           <div className="hidden lg:flex items-center">
             <span className="text-gray-700 mr-4">{user.name}</span>
-           <Image
+            <Image
               className="h-8 w-8 rounded-full"
               src={user.image || "/img/profile.jpg"}
               alt={user.name}

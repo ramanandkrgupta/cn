@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
           sizes="180x180"
           href="/favicon/apple-touch-icon.png"
         />
-        <meta name="apple-mobile-web-app-title" content="College Notes" />
+        <meta name="apple-mobile-web-app-title" content="Notes Mates" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className={`${inter.className} min-h-screen bg-base-100`}>

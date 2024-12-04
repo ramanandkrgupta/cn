@@ -40,7 +40,7 @@ const AdminNavbar = ({ label }) => {
         <div className="flex-1">
           <Link href="/admin">
             <p className="text-[#32CD32] subpixel-antialiased text-2xl font-bold ml-5">
-              College Notes
+              Notes Mates
               <span className="text-white text-sm ml-1">{label}</span>
             </p>
           </Link>
