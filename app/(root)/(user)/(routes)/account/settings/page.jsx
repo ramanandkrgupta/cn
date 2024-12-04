@@ -6,47 +6,62 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function Settings() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: true,
     darkMode: false,
-    language: 'en', // Default language
-    fontSize: '2', // Default font size (medium) as string
+    language: 'en',
+    fontSize: '2',
   })
 
-  // Handle font size change
+  useEffect(() => {
+    // Restore scroll position from localStorage if it exists
+    const savedScrollPosition = localStorage.getItem('scrollPosition')
+    if (savedScrollPosition) {
+      window.scrollTo(0, parseInt(savedScrollPosition, 10))
+    }
+
+    // Get font size from localStorage if available
+    const savedFontSize = localStorage.getItem('fontSize')
+    if (savedFontSize) {
+      setSettings((prev) => ({ ...prev, fontSize: savedFontSize }))
+      updateGlobalFontSize(savedFontSize)
+    } else {
+      localStorage.setItem('fontSize', '2')
+      updateGlobalFontSize('2')
+    }
+
+    // Fetch user settings
+    fetchSettings()
+  }, [])
+
+  // Save scroll position to localStorage whenever the user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      localStorage.setItem('scrollPosition', window.scrollY.toString())
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   const handleFontSizeChange = (e) => {
     const value = e.target.value
     setSettings((prev) => ({ ...prev, fontSize: value }))
-    localStorage.setItem('fontSize', value) // Store font size in localStorage
+    localStorage.setItem('fontSize', value)
+    updateGlobalFontSize(value)
     toast.success('Font size updated')
   }
 
-  // Handle language change
   const handleLanguageChange = (e) => {
     const selectedLanguage = e.target.value
     setSettings((prev) => ({ ...prev, language: selectedLanguage }))
     toast.success(`Language updated to ${selectedLanguage}`)
   }
 
-  useEffect(() => {
-    // Get font size from localStorage if available
-    const savedFontSize = localStorage.getItem('fontSize')
-    if (savedFontSize) {
-      setSettings((prev) => ({ ...prev, fontSize: savedFontSize }))
-    } else {
-      // Default to '2' (medium) if no font size is found
-      localStorage.setItem('fontSize', '2')
-    }
-
-    // Apply the font size globally
-    updateGlobalFontSize()
-
-    fetchSettings()
-  }, [])
-
-  // Fetch settings from API
   const fetchSettings = async () => {
     try {
       const response = await fetch('/api/users/settings')
@@ -57,49 +72,13 @@ export default function Settings() {
     } catch (error) {
       console.error('Error fetching settings:', error)
       toast.error('Failed to load settings')
-    } finally {
-      setLoading(false)
     }
   }
 
-  // Handle toggles for email, push notifications, and dark mode
-  const handleToggle = async (setting) => {
-    try {
-      const newValue = !settings[setting]
-      const response = await fetch('/api/users/settings', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [setting]: newValue,
-        }),
-      })
-
-      if (response.ok) {
-        setSettings((prev) => ({
-          ...prev,
-          [setting]: newValue,
-        }))
-        toast.success(`${setting} setting updated`)
-      } else {
-        throw new Error('Failed to update setting')
-      }
-    } catch (error) {
-      console.error('Error updating setting:', error)
-      toast.error('Failed to update setting')
-    }
-  }
-
-  // Update the font size globally based on settings
-  useEffect(() => {
-    updateGlobalFontSize()
-  }, [settings.fontSize])
-
-  const updateGlobalFontSize = () => {
-    const fontSizeValue = getFontSizeValue(settings.fontSize)
+  const updateGlobalFontSize = (fontSize) => {
+    const fontSizeValue = getFontSizeValue(fontSize)
     document.documentElement.style.setProperty('--font-size', fontSizeValue)
-    console.log(`Applying font size: ${fontSizeValue}`) // Debugging log
+    console.log(`Applied font size: ${fontSizeValue}`)
   }
 
   const getFontSizeValue = (fontSize) => {
@@ -115,21 +94,19 @@ export default function Settings() {
       case '4':
         return 'var(--font-size-xxlarge)'
       default:
-        return 'var(--font-size-medium)' // Default case
+        return 'var(--font-size-medium)'
     }
   }
 
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
-        {/* Back Button */}
         <button onClick={() => router.back()} aria-label="Go Back">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-2xl font-bold">Settings</h1>
       </div>
       <div className="space-y-6">
-        {/* Notifications */}
         <div className="bg-base-200 p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Notifications</h2>
           <div className="space-y-4">
@@ -170,7 +147,6 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Appearance */}
         <div className="bg-base-200 p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Appearance</h2>
           <div className="space-y-4">
@@ -192,7 +168,6 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Language and Font Size */}
         <div className="bg-base-200 p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Language</h2>
           <select
@@ -206,7 +181,6 @@ export default function Settings() {
             <option value="de">German</option>
           </select>
 
-          {/* Font Size Selection - Slider */}
           <h2 className="text-lg font-semibold mt-4 mb-4">Font Size</h2>
           <div className="flex justify-between">
             <span className="text-sm">Small</span>
@@ -218,7 +192,7 @@ export default function Settings() {
             min="0"
             max="4"
             step="1"
-            value={settings.fontSize || '2'} // Ensure the value is always set
+            value={settings.fontSize}
             onChange={handleFontSizeChange}
             className="w-full mt-2"
           />

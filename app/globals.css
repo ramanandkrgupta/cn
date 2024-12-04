@@ -21,7 +21,23 @@
 
 body {
   font-size: var(--font-size);
-  /* Applying the global font size */
+  /* Ensure that all text uses the global font size */
+}
+
+/* Optional: Apply font size to other UI elements like buttons, inputs */
+button,
+input,
+label,
+select,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size);
+  /* Ensures UI elements follow the font size */
 }
 
 
@@ -246,5 +262,6 @@ body {
   padding: 10px;
   display: block;
 }
+
 
 /*menu*/
