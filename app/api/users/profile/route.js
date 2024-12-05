@@ -30,9 +30,9 @@ export async function PUT(req) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating profile:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating profile",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -51,13 +51,14 @@ export async function GET(req) {
         name: true,
         email: true,
         userRole: true,
-        avatar: true
-      }
-    });
+        avatar: true,
+        phoneNumber: true,
+      },
+    })
 
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error fetching profile:", error);
     return NextResponse.json({ error: "Error fetching profile" }, { status: 500 });
   }
-} 
+}

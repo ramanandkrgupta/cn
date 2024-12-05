@@ -119,6 +119,8 @@ export default function Profile() {
         ]
       : baseMenuItems;
 
+
+
   if (loading || !userData) {
     return (
       <div className="bg-base-100 min-h">
@@ -137,7 +139,7 @@ export default function Profile() {
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full overflow-hidden">
               <Image
-                src={userData.avatar || "/team/member-1.jpeg"}
+                src={userData.avatar || '/icons/icon.png'}
                 alt="profile"
                 width={64}
                 height={64}
@@ -151,19 +153,19 @@ export default function Profile() {
               </div>
               <div className="text-sm text-gray-500">{userData.email}</div>
               <div className="text-sm text-gray-500">
-                Mobile: {userData.mobile || "N/A"}
+                Mobile: {userData.phoneNumber || 'N/A'}
               </div>
               <span
                 className={`mt-2 px-3 py-1 rounded-full text-xs font-medium block
                   ${
-                    userData.userRole === "PRO"
-                      ? "bg-green-100 text-green-800"
-                      : userData.userRole === "ADMIN"
-                      ? "bg-purple-100 text-purple-800"
-                      : "bg-blue-100 text-blue-800"
+                    userData.userRole === 'PRO'
+                      ? 'bg-green-100 text-green-800'
+                      : userData.userRole === 'ADMIN'
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'bg-blue-100 text-blue-800'
                   }`}
               >
-                {userData.userRole || "FREE"} User
+                {userData.userRole || 'FREE'} User
               </span>
             </div>
           </div>
@@ -200,5 +202,5 @@ export default function Profile() {
       </div>
       <AppVersion />
     </div>
-  );
+  )
 }
