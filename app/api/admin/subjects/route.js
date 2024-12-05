@@ -46,6 +46,11 @@ export async function GET(req) {
               id: true
             }
           },
+          Post: {
+            select: {
+              id: true
+            }
+          },
           User: {
             select: {
               name: true,
@@ -79,7 +84,8 @@ export async function GET(req) {
     const transformedSubjects = subjects.map(subject => ({
       ...subject,
       _count: {
-        videos: subject.videos.length
+        videos: subject.videos.length,
+        posts: subject.Post?.length || 0
       }
     }));
 
@@ -90,7 +96,8 @@ export async function GET(req) {
         totalCourses: courseStats.length,
         courseDistribution: courseStats,
         totalContent: {
-          videos: await prisma.video.count()
+          videos: await prisma.video.count(),
+          posts: await prisma.post.count()
         }
       },
       pagination: {

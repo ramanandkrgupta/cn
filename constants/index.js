@@ -1,3 +1,4 @@
+import { Home, Upload, Info, MessageCircle, Sun, Moon, Menu, X, LogOut, LogIn } from "lucide-react";
 import { about, addUser, dashboard, upload , whatsapp, wa, click } from "@/public/assets";
 import {
   Psychology,
@@ -31,31 +32,29 @@ import {
 import seven from "@/public/icons/seven.PNG";
 import eight from "@/public/icons/eight.PNG";
 import { aiml, bca, btech, ce, ec, ex, me } from "@/public/course/icons";
+import { LayoutGrid } from "lucide-react";
+
+
 
 export const navlinks = [
   {
     name: "Home",
-    imgUrl: dashboard,
+    icon: Home,
     link: "/",
   },
   {
     name: "Upload",
-    imgUrl: upload,
-    link: "/dashboard",
+    icon: Upload,
+    link: "/upload",
   },
   {
     name: "About Us",
-    imgUrl: about,
+    icon: Info,
     link: "/about",
   },
-  // {
-  //   name: "Share app",
-  //   imgUrl: addUser,
-  //   btn: true,
-  // },
   {
     name: "Join WA group",
-    imgUrl: whatsapp,
+    icon: MessageCircle,
     link: "https://chat.whatsapp.com/JotgzAmp62YLOwQScP29iD"
   },
 ];

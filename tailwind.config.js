@@ -33,10 +33,20 @@ module.exports = {
         'fade-in': {
           '0%': { opacity: '0', transform: 'translateY(-10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        press: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(0.95)' },
+        },
+        'fade-theme': {
+          '0%': { opacity: '0.5' },
+          '100%': { opacity: '0' }
         }
       },
       animation: {
-        'fade-in': 'fade-in 0.5s ease-out'
+        'fade-in': 'fade-in 0.5s ease-out',
+        press: 'press 200ms ease-in-out',
+        'fade-theme': 'fade-theme 300ms ease-out forwards'
       }
     },
   },

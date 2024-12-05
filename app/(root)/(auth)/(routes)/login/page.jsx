@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons
-import Link from "next/link"; // Using Next.js Link
+import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
@@ -55,6 +55,10 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="container items-center justify-center">
       <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
@@ -62,7 +66,7 @@ const LoginPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
         >
           <div className="p-8">
             <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
@@ -76,7 +80,7 @@ const LoginPage = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autocomplete="on"
+                autoComplete="on"
               />
 
               <div className="relative">
@@ -87,7 +91,6 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {/* Eye icon for show/hide password */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -115,7 +118,7 @@ const LoginPage = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
+                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none"
                 type="submit"
                 disabled={isLoading}
               >
@@ -126,6 +129,15 @@ const LoginPage = () => {
                 )}
               </motion.button>
             </form>
+
+            <div className="mt-4">
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
+              >
+                Continue with Google
+              </button>
+            </div>
           </div>
           <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
             <p className="text-sm text-gray-400">

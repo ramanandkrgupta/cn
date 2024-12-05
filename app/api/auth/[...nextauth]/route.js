@@ -3,6 +3,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google"; // Add this line
 import prisma from "@/libs/prisma";
 
 export const authOptions = {
@@ -11,6 +12,10 @@ export const authOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+    GoogleProvider({ // Add this block
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       id: "credentials",
@@ -71,7 +76,7 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account.provider === "github") {
+      if (account.provider === "github" || account.provider === "google") { // Add google to the condition
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email }
@@ -91,7 +96,7 @@ export const authOptions = {
           }
           return true;
         } catch (error) {
-          console.error("Error during GitHub sign-in:", error);
+          console.error(`Error during ${account.provider} sign-in:`, error);
           return false;
         }
       }

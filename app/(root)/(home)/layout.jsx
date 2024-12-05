@@ -2,8 +2,8 @@ import { Navbar, Navigation, Sidebar } from "@/components/navigation";
 
 export const metadata = {
   title: {
-    template: "%s | Acme",
-    default: "Acme", // a default is required when creating a template
+    template: "%s | NotesMates.in",
+    default: "Home | NotesMates.in", // a default is required when creating a template
   },
 };
 

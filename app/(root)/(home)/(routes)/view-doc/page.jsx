@@ -5,19 +5,34 @@ import { useEffect, useMemo, useState } from "react";
 import PostCard from "@/components/cards/PostCard";
 import { useFilterPost } from "@/libs/hooks/usePost";
 import NoDataFound from "@/components/ui/NoDataFound";
-// import SkeletonLoading from "@/components/ui/SkeletonLoading";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from 'next';
 
-const ViewDoc = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const course = searchParams.get("name");
-  const semester = searchParams.get("sem");
-  const category = searchParams.get("category");
-  const subId = searchParams.get("subId");
+// Format subject code (BT101 -> BT-101)
+const formatSubjectCode = (code) => {
+  if (!code) return '';
+  const match = code.match(/([A-Za-z]+)(\d+)/);
+  return match ? `${match[1]}-${match[2]}` : code;
+};
 
-  // Skeleton loading component
+// Format semester (one -> First)
+const formatSemester = (sem) => {
+  if (!sem) return '';
+  const semesterMap = {
+    one: 'First',
+    two: 'Second',
+    three: 'Third',
+    four: 'Fourth',
+    five: 'Fifth',
+    six: 'Sixth',
+    seven: 'Seventh',
+    eight: 'Eighth'
+  };
+  return semesterMap[sem.toLowerCase()] || sem;
+};
+
+// Skeleton loading component
 const SkeletonLoading = () => (
   <div className="animate-pulse">
     {/* Header Skeleton */}
@@ -57,6 +72,51 @@ const SkeletonLoading = () => (
   </div>
 );
 
+const ViewDoc = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const course = searchParams.get("name");
+  const semester = searchParams.get("sem");
+  const category = searchParams.get("category");
+  const subId = searchParams.get("subId");
+
+  useEffect(() => {
+    // Update document title and meta tags dynamically
+    const title = `${category} - ${formatSubjectCode(subId)} - ${course?.toUpperCase()} - ${formatSemester(semester)} Semester | RGPV Notes`;
+    const description = `Access free ${category?.toLowerCase()} for ${formatSubjectCode(subId)} (${course?.toUpperCase()}) ${formatSemester(semester)} Semester at RGPV University. Download lecture notes, previous year question papers, syllabus, and video lectures.`;
+    
+    document.title = title;
+    
+    // Update meta tags
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', description);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = description;
+      document.head.appendChild(meta);
+    }
+
+    // Update Open Graph tags
+    const updateMetaTag = (property, content) => {
+      const tag = document.querySelector(`meta[property="${property}"]`);
+      if (tag) {
+        tag.setAttribute('content', content);
+      } else {
+        const meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    updateMetaTag('og:title', title);
+    updateMetaTag('og:description', description);
+    updateMetaTag('og:type', 'website');
+    updateMetaTag('og:site_name', 'RGPV Notes');
+  }, [course, semester, category, subId]);
+
   const {
     data: fetchedData,
     error,
@@ -80,19 +140,16 @@ const SkeletonLoading = () => (
   return (
     <div>
       <div className="flex items-center gap-2">
-      {/* Back Button */}
-      <button onClick={() => router.back()} aria-label="Go Back">
-        <ArrowLeft className="w-6 h-6" />
-      </button>
-      <h1 className="select_header">{category}</h1>
+        <button onClick={() => router.back()} aria-label="Go Back">
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="select_header">{category}</h1>
       </div>
       <small className="text-gray-400">
         Path: rgpv/
-        
         <Link href={`/rgpv/${course}`} className="text-blue-500 hover:underline">{course}</Link>/
         <Link href={`/rgpv/${course}/${semester}`} className="text-blue-500 hover:underline">{semester}</Link>/  
         <Link href={`/rgpv/${course}/${semester}/${subId}`} className="text-blue-500 hover:underline">{subId}</Link>
-
         /{category}
       </small>
 

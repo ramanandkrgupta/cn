@@ -1,10 +1,10 @@
 "use client";
 import Head from "next/head";
-
-import { motion } from "framer-motion";
-import { Loader, Lock, Mail, Phone, User, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // Add this import
+import { signIn } from "next-auth/react";
+import { motion } from "framer-motion";
+import { Mail, Lock, Loader, Eye, EyeOff, User, Phone } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 import Input from "@/components/ui/Input";
@@ -15,58 +15,55 @@ import { toast } from "sonner";
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // const [phoneNumber, setPhoneNumber] = useState("");
   const [RawPhoneNumber, setRawPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const router = useRouter();
+  const router = useRouter(); // Ensure useRouter is defined
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log(RawPhoneNumber);
+
     const phoneNumber = `+91${RawPhoneNumber}`;
-    console.log("phone", phoneNumber);
-    // Validate user input using the schema
     const userInput = { name, email, phoneNumber, password };
 
     try {
-      // Validate the user input
       const validation = UserValidation.registration.safeParse(userInput);
 
-      // If validation fails, return error message
       if (!validation.success) {
         validation.error.issues.forEach((err) => {
           toast.error(err.message);
         });
-        console.error("Validation errors:", validation.error.issues);
-      } else {
-        // If validation is successful, make the API request
-        const response = await axios.post("/api/user/register", userInput, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        setIsLoading(false);
+        return;
+      }
 
-        if (response.status === 201) {
-          toast.success("Successfully registered! Redirecting to login...");
-          router.push("/login");
-        } else if (response.statusText === "FAILED") {
-          toast.error("User with this email already exists");
-        } else {
-          toast.error("Registration failed");
-        }
+      const response = await axios.post("/api/user/register", userInput, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 201) {
+        toast.success("Successfully registered! Redirecting to login...");
+        router.push("/login");
+      } else if (response.statusText === "FAILED") {
+        toast.error("User with this email already exists");
+      } else {
+        toast.error("Registration failed");
       }
     } catch (error) {
-      console.error("Registration Error: " + error);
       toast.error("Something went wrong during registration");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
   };
 
   return (
@@ -80,7 +77,7 @@ const RegisterPage = () => {
       </Head>
 
       <div className="container items-center justify-center">
-        <div className="container items-center justify-center  md:h-screen lg:py-0">
+        <div className="container items-center justify-center md:h-screen lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -105,7 +102,6 @@ const RegisterPage = () => {
                   type="email"
                   placeholder="Email Address"
                   value={email}
-                  // autocomplete="new-email"
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
@@ -123,7 +119,6 @@ const RegisterPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  {/* Eye icon for show/hide password */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -158,6 +153,15 @@ const RegisterPage = () => {
                   )}
                 </motion.button>
               </form>
+
+              <div className="mt-4">
+                <button
+                  onClick={handleGoogleLogin}
+                  className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
+                >
+                  Continue with Google
+                </button>
+              </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
               <p className="text-sm text-gray-400">
