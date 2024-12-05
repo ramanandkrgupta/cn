@@ -55,6 +55,10 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="container items-center justify-center">
       <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
@@ -115,7 +119,7 @@ const LoginPage = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
+                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:[...]
                 type="submit"
                 disabled={isLoading}
               >
@@ -126,6 +130,15 @@ const LoginPage = () => {
                 )}
               </motion.button>
             </form>
+
+            <div className="mt-4">
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
+              >
+                Continue with Google
+              </button>
+            </div>
           </div>
           <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
             <p className="text-sm text-gray-400">
