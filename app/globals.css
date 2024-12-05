@@ -222,3 +222,40 @@ body {
 }
 
 /*menu*/
+
+/* Theme transition styles */
+body {
+  transition: background-color 0.3s ease-out, color 0.3s ease-out;
+}
+
+.dark-theme-wave {
+  box-shadow: 0 0 40px 20px rgba(0, 0, 0, 0.3);
+}
+
+.light-theme-wave {
+  box-shadow: 0 0 40px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth transition for all color changes - faster now */
+*, *::before, *::after {
+  transition: background-color 0.3s ease-out, 
+              border-color 0.3s ease-out, 
+              color 0.3s ease-out, 
+              fill 0.3s ease-out, 
+              stroke 0.3s ease-out;
+}
+
+/* Exception for animations and transforms */
+*[class*="animate-"], *[style*="transform"] {
+  transition: transform 0.3s ease-out;
+}
+
+/* Add fade-theme animation */
+@keyframes fade-theme {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 0;
+  }
+}

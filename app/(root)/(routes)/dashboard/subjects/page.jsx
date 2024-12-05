@@ -179,7 +179,7 @@ export default function SubjectsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-base-200 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-5 h-5 text-primary" />
@@ -197,7 +197,7 @@ export default function SubjectsPage() {
         <div className="bg-base-200 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <FileText className="w-5 h-5 text-accent" />
-            <span className="font-medium">Total Documents</span>
+            <span className="font-medium">Total Posts</span>
           </div>
           <p className="text-2xl font-bold">{stats.totalContent.posts}</p>
         </div>
@@ -276,8 +276,12 @@ export default function SubjectsPage() {
                   <td>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
+                        <FileText className="w-4 h-4" />
+                        <span>{subject._count?.posts || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
                         <Video className="w-4 h-4" />
-                        <span>{subject._count.videos}</span>
+                        <span>{subject._count?.videos || 0}</span>
                       </div>
                     </div>
                   </td>

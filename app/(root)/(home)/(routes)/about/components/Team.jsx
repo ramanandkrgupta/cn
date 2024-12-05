@@ -87,6 +87,12 @@ const Team = () => {
       linkedinUsername: "ashutosh-tripathi-315386169",
     },
     {
+      name: "Anit Bajpai",
+      role: "Content Management Head & Advertising Coordinator ",
+      img: "/team/member-08.jpg",
+      xUsername: "AnitBajpai1",
+    },
+    {
       name: "Samradh Patel",
       role: " ",
       img: "/team/member-04.jpg",
@@ -104,22 +110,17 @@ const Team = () => {
       linkedinUsername: "prankur-patel-b3076a30a",
     },
 
-    {
-      name: "Sumit Singh Raghuwanshi",
-      role: "Web Developer",
-      img: "/team/member-6.jpg",
-      githubUsername: "SumitSinghRaghuwanshi1245",
-      xUsername: "Sumit_Singh_R",
-      linkedinUsername: "sumit-singh-raghuwanshi",
-      instagramUsername: "sumitt.singh_"
+    // {
+    //   name: "Sumit Singh Raghuwanshi",
+    //   role: "Web Developer",
+    //   img: "/team/member-6.jpg",
+    //   githubUsername: "SumitSinghRaghuwanshi1245",
+    //   xUsername: "Sumit_Singh_R",
+    //   linkedinUsername: "sumit-singh-raghuwanshi",
+    //   instagramUsername: "sumitt.singh_"
       
-    },
-    {
-      name: "Anit Bajpai",
-      role: "Content Management Head & Advertising Coordinator ",
-      img: "/team/member-08.jpg",
-      xUsername: "AnitBajpai1",
-    },
+    // },
+    
 
    
   ];
