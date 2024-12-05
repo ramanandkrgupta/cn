@@ -13,11 +13,11 @@ export default function Home() {
   return (
     <section className="flex flex-col items-center sm:mb-5">
       {/* Greeting Section */}
-      {session?.user?.name && (
+      {session && session.user?.name ? (
         <div className="w-full">
           <Greeting name={session.user.name} />
         </div>
-      )}
+      ) : null}
 
       {/* Banner Section */}
       <div className="w-full">
