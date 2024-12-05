@@ -5,6 +5,12 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV !== "development", // Remove console.log in production
   },
+  images: {
+    domains: [
+      'lh3.googleusercontent.com', // For Google profile photos
+      'avatars.githubusercontent.com', // For GitHub profile photos (if you're using GitHub auth)
+    ],
+  },
 };
 
 // Configuration object tells the next-pwa plugin

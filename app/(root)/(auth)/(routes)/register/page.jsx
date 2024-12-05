@@ -11,6 +11,7 @@ import Input from "@/components/ui/Input";
 import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
+import { FcGoogle } from 'react-icons/fc'; // Add this import
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -20,6 +21,7 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Add new state
 
   const router = useRouter(); // Ensure useRouter is defined
 
@@ -63,7 +65,35 @@ const RegisterPage = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl: "/dashboard" });
+    try {
+      setIsGoogleLoading(true); // Use separate loading state for Google
+      const result = await signIn("google", {
+        redirect: false,
+        callbackUrl: `${window.location.origin}/dashboard`,
+      });
+
+      console.log("Google Sign In Result:", result);
+
+      if (result?.error) {
+        console.error("Google sign in error:", result.error);
+        toast.error(
+          result.error === "AccessDenied"
+            ? "Failed to create account. Please try again."
+            : result.error
+        );
+        return;
+      }
+
+      if (result?.url) {
+        toast.success("Successfully signed up with Google");
+        window.location.href = result.url;
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error(error.message || "An error occurred during Google sign up");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -157,9 +187,15 @@ const RegisterPage = () => {
               <div className="mt-4">
                 <button
                   onClick={handleGoogleLogin}
-                  className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
+                  disabled={isGoogleLoading}
+                  className="w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 flex items-center justify-center gap-2 relative"
                 >
-                  Continue with Google
+                  {isGoogleLoading ? (
+                    <Loader className="w-5 h-5 animate-spin text-gray-600" />
+                  ) : (
+                    <FcGoogle className="w-5 h-5" />
+                  )}
+                  <span>{isGoogleLoading ? "Signing up..." : "Continue with Google"}</span>
                 </button>
               </div>
             </div>

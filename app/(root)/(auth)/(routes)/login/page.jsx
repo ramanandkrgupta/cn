@@ -7,12 +7,15 @@ import Link from "next/link";
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
+import { FcGoogle } from 'react-icons/fc';
+import GoogleOneTap from '@/components/auth/GoogleOneTap';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,100 +59,125 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl: "/dashboard" });
+    try {
+      setIsGoogleLoading(true);
+      const result = await signIn("google", {
+        redirect: false,
+        callbackUrl: `${window.location.origin}/dashboard`,
+      });
+
+      console.log("Google Sign In Result:", result);
+
+      if (result?.error) {
+        console.error("Google sign in error:", result.error);
+        toast.error(
+          result.error === "AccessDenied"
+            ? "Failed to create account. Please try again."
+            : result.error
+        );
+        return;
+      }
+
+      if (result?.url) {
+        toast.success("Successfully logged in with Google");
+        window.location.href = result.url;
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error(error.message || "An error occurred during Google login");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
-    <div className="container items-center justify-center">
-      <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
-        >
-          <div className="p-8">
-            <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
-              Welcome Back
-            </h2>
+    <>
+      <div className="container items-center justify-center">
+        <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+          >
+            <div className="p-8">
+              <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+                Welcome Back
+              </h2>
 
-            <form onSubmit={handleSubmit}>
-              <Input
-                icon={Mail}
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="on"
-              />
-
-              <div className="relative">
+              <form onSubmit={handleSubmit}>
                 <Input
-                  icon={Lock}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  icon={Mail}
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="on"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+
+                <div className="relative">
+                  <Input
+                    icon={Lock}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <Eye className="w-5 h-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex items-center mb-6">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-green-400 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <p className="text-red-500 font-semibold mb-2"></p>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none"
+                  type="submit"
+                  disabled={isLoading}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  {isLoading ? (
+                    <Loader className="w-6 h-6 animate-spin mx-auto" />
                   ) : (
-                    <Eye className="w-5 h-5 text-gray-400" />
+                    "Login"
                   )}
-                </button>
+                </motion.button>
+              </form>
+
+              <div className="mt-4">
+                <GoogleOneTap />
               </div>
-
-              <div className="flex items-center mb-6">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-green-400 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <p className="text-red-500 font-semibold mb-2"></p>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader className="w-6 h-6 animate-spin mx-auto" />
-                ) : (
-                  "Login"
-                )}
-              </motion.button>
-            </form>
-
-            <div className="mt-4">
-              <button
-                onClick={handleGoogleLogin}
-                className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
-              >
-                Continue with Google
-              </button>
             </div>
-          </div>
-          <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
-            <p className="text-sm text-gray-400">
-              Don't have an account?{" "}
-              <Link href="/register" className="text-green-400 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </div>
-        </motion.div>
+            <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+              <p className="text-sm text-gray-400">
+                Don't have an account?{" "}
+                <Link href="/register" className="text-green-400 hover:underline">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

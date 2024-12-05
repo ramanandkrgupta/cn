@@ -30,6 +30,7 @@
     "framer-motion": "^11.11.10",
     "https": "^1.0.0",
     "ionicons": "^7.4.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.438.0",
     "next": "^14.0.3",
     "next-auth": "^4.24.5",

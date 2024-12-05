@@ -3,19 +3,56 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google"; // Add this line
+import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/libs/prisma";
+import jwt from "jsonwebtoken";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
-    GoogleProvider({ // Add this block
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "none",
+          access_type: "offline",
+          response_type: "code"
+        }
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          avatar: profile.picture,
+          userRole: "FREE"
+        }
+      },
+      credentials: {
+        credential: { type: "text" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.credential) return null;
+
+        try {
+          const decoded = jwt.decode(credentials.credential);
+          return {
+            id: decoded.sub,
+            name: decoded.name,
+            email: decoded.email,
+            image: decoded.picture,
+          };
+        } catch (error) {
+          console.error("Failed to decode Google credential:", error);
+          return null;
+        }
+      }
     }),
     CredentialsProvider({
       id: "credentials",
@@ -59,7 +96,7 @@ export const authOptions = {
             avatar: user.avatar
           };
         } catch (error) {
-          console.error("Error during authorization:", error);
+          // console.error("Error during authorization:", error);
           throw new Error("Authorization failed!");
         }
       },
@@ -75,56 +112,117 @@ export const authOptions = {
     error: "/login",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      if (account.provider === "github" || account.provider === "google") { // Add google to the condition
+    async signIn({ user, account, profile }) {
+      // console.log("SignIn Callback - User:", user);
+      // console.log("SignIn Callback - Account:", account);
+      // console.log("SignIn Callback - Profile:", profile);
+      
+      if (account?.provider === "google") {
         try {
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email }
+            where: { email: user.email },
+            include: {
+              accounts: true
+            }
           });
 
+          // console.log("Existing User:", existingUser);
+
           if (!existingUser) {
-            await prisma.user.create({
+            // console.log("Creating new user for:", user.email);
+            try {
+              const newUser = await prisma.user.create({
+                data: {
+                  email: user.email,
+                  name: user.name || '',
+                  avatar: profile.picture || '',
+                  phoneNumber: 'temp-' + Math.random().toString(36).substr(2, 9),
+                  userRole: 'FREE',
+                  password: await bcrypt.hash(Math.random().toString(36), 10),
+                  isEmailVerified: true,
+                  isMobileVerified: false,
+                  reputationScore: 0,
+                  uploadCount: 0,
+                  verifiedUploads: 0,
+                  accounts: {
+                    create: {
+                      type: account.type,
+                      provider: account.provider,
+                      providerAccountId: account.providerAccountId,
+                      access_token: account.access_token,
+                      token_type: account.token_type,
+                      scope: account.scope,
+                      id_token: account.id_token,
+                    }
+                  }
+                },
+              });
+              // console.log("New user created:", newUser);
+              return true;
+            } catch (createError) {
+              // console.error("Error creating new user:", createError);
+              throw createError;
+            }
+          }
+
+          // If user exists but no Google account linked
+          if (!existingUser.accounts?.some(acc => acc.provider === 'google')) {
+            // console.log("Linking Google account to existing user:", existingUser.id);
+            if (!existingUser.avatar) {
+              await prisma.user.update({
+                where: { id: existingUser.id },
+                data: { avatar: profile.picture }
+              });
+            }
+            await prisma.account.create({
               data: {
-                email: user.email,
-                name: user.name || user.login,
-                image: user.image || user.avatar_url,
-                phoneNumber: '',
-                userRole: 'FREE',
-                password: await bcrypt.hash(Math.random().toString(36), 10)
-              },
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+              }
             });
           }
           return true;
         } catch (error) {
-          console.error(`Error during ${account.provider} sign-in:`, error);
-          return false;
+          // console.error("Detailed Google sign-in error:", error);
+          throw new Error(error.message);
         }
       }
       return true;
     },
 
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        // Initial sign in
-        token.id = user.id;
-        token.role = user.userRole;
         token.userRole = user.userRole;
       }
-
-      // Handle session update
-      if (trigger === "update" && session?.user) {
-        token.role = session.user.role;
-        token.userRole = session.user.userRole;
+      if (account) {
+        token.accessToken = account.access_token;
       }
-
       return token;
     },
 
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       if (session?.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.userRole = token.userRole;
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: {
+            id: true,
+            userRole: true,
+            avatar: true
+          }
+        });
+
+        if (dbUser) {
+          session.user.id = dbUser.id;
+          session.user.role = dbUser.userRole || "FREE";
+          session.user.userRole = dbUser.userRole || "FREE";
+          session.user.avatar = dbUser.avatar;
+        }
       }
       return session;
     }
