@@ -26,7 +26,8 @@ const GoogleOneTap = () => {
                 prompt: 'none',
                 authorization: {
                   params: {
-                    prompt: 'none'
+                    prompt: 'none',
+                    redirect_uri: `${window.location.origin}/api/auth/callback/google`
                   }
                 }
               });
@@ -55,7 +56,9 @@ const GoogleOneTap = () => {
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left',
-            width: '100%'
+            width: '100%',
+            height: 50,
+            longtitle: true
           }
         );
 
@@ -88,8 +91,12 @@ const GoogleOneTap = () => {
   return (
     <div 
       id="googleButton" 
-      className="w-full"
-      style={{ minHeight: '40px' }}
+      className="w-full flex justify-center items-center"
+      style={{ 
+        minHeight: '50px',
+        maxHeight: '50px',
+        overflow: 'hidden'
+      }}
     />
   );
 };

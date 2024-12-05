@@ -9,7 +9,30 @@ const nextConfig = {
     domains: [
       'lh3.googleusercontent.com', // For Google profile photos
       'avatars.githubusercontent.com', // For GitHub profile photos (if you're using GitHub auth)
+      'www.notesmates.in',
+      'notesmates.in'
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/api/auth/callback/google',
+        destination: '/dashboard',
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: 'https://www.notesmates.in' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+    ];
   },
 };
 

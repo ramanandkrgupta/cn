@@ -7,6 +7,8 @@ import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/libs/prisma";
 import jwt from "jsonwebtoken";
 
+const productionUrl = process.env.NEXTAUTH_URL || 'https://www.notesmates.in';
+
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   debug: process.env.NODE_ENV === 'development',
@@ -22,7 +24,10 @@ export const authOptions = {
         params: {
           prompt: "none",
           access_type: "offline",
-          response_type: "code"
+          response_type: "code",
+          redirect_uri: process.env.NODE_ENV === 'development' 
+            ? 'http://localhost:3000/api/auth/callback/google'
+            : `${productionUrl}/api/auth/callback/google`
         }
       },
       profile(profile) {
