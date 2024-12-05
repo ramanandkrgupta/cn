@@ -31,6 +31,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.className} min-h-screen bg-base-100`}>
         <SessionWrapper>{children}</SessionWrapper>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="ce416d58-503a-40cd-9663-7e7618ecc8f7"></script>
       </body>
     </html>
   );
