@@ -22,12 +22,9 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
-          prompt: "none",
           access_type: "offline",
           response_type: "code",
-          redirect_uri: process.env.NODE_ENV === 'development' 
-            ? 'http://localhost:3000/api/auth/callback/google'
-            : `${productionUrl}/api/auth/callback/google`
+          prompt: "consent"
         }
       },
       profile(profile) {
@@ -230,7 +227,14 @@ export const authOptions = {
         }
       }
       return session;
-    }
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Handle redirect after sign in
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
   },
   events: {
     async signOut({ token }) {
