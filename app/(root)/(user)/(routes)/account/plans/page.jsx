@@ -34,7 +34,7 @@ const plans = [
   {
     id: "pro",
     name: "Pro",
-    price: 499,
+    price: 1,
     description: "Full access to all features",
     features: [
       "Access to all study materials",
