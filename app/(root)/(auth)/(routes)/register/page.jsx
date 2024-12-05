@@ -3,9 +3,11 @@ import Head from "next/head";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Loader, Eye, EyeOff, User, Phone } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 import Input from "@/components/ui/Input";
+import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 
