@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const GoogleOneTap = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (session) {
+    if (status === "loading") return;
+    if (status === "authenticated") {
       router.push('/dashboard');
       return;
     }
@@ -22,18 +23,34 @@ const GoogleOneTap = () => {
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: async (response) => {
             try {
-              await signIn("google", {
+              const result = await signIn("google", {
                 credential: response.credential,
-                redirect: true,
-                callbackUrl: '/dashboard',
+                redirect: false,
               });
+
+              if (result?.error) {
+                toast.error(result.error);
+                return;
+              }
+
+              if (result?.ok) {
+                toast.success("Successfully logged in!");
+                router.push('/dashboard');
+                window.google.accounts.id.cancel();
+              }
             } catch (error) {
               console.error("Sign in error:", error);
               toast.error("Failed to sign in");
             }
           },
-          auto_select: true,
+          auto_select: false,
           prompt_parent_id: "googleButton",
+          allowed_parent_origin: [
+            "https://www.notesmates.in",
+            "https://notesmates.in",
+            "https://cn-eta.vercel.app",
+            "http://localhost:3000"
+          ]
         });
 
         window.google.accounts.id.renderButton(
@@ -51,14 +68,13 @@ const GoogleOneTap = () => {
           }
         );
 
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed()) {
-            console.log(
-              "One Tap not displayed:",
-              notification.getNotDisplayedReason()
-            );
-          }
-        });
+        if (!sessionStorage.getItem('googleOneTapDismissed')) {
+          window.google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              sessionStorage.setItem('googleOneTapDismissed', 'true');
+            }
+          });
+        }
       } catch (error) {
         console.error("Google Sign In Error:", error);
       }
@@ -80,7 +96,9 @@ const GoogleOneTap = () => {
         window.google.accounts.id.cancel();
       }
     };
-  }, [session, router]);
+  }, [status, router]);
+
+  if (status === "authenticated") return null;
 
   return (
     <div

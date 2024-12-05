@@ -210,6 +210,22 @@ export const authOptions = {
       return token;
     },
 
+    async redirect({ url, baseUrl }) {
+      // More strict redirect logic
+      if (url.startsWith('/dashboard')) {
+        return '/dashboard';
+      }
+      if (url.startsWith('/login')) {
+        return baseUrl;
+      }
+      // If the url is already an absolute URL and matches our domain, use it
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // Default to homepage
+      return baseUrl;
+    },
+
     async session({ session, token, user }) {
       if (session?.user) {
         const dbUser = await prisma.user.findUnique({
@@ -217,7 +233,8 @@ export const authOptions = {
           select: {
             id: true,
             userRole: true,
-            avatar: true
+            avatar: true,
+            isEmailVerified: true
           }
         });
 
@@ -226,18 +243,11 @@ export const authOptions = {
           session.user.role = dbUser.userRole || "FREE";
           session.user.userRole = dbUser.userRole || "FREE";
           session.user.avatar = dbUser.avatar;
+          session.user.isEmailVerified = dbUser.isEmailVerified;
         }
       }
       return session;
-    },
-
-    async redirect({ url, baseUrl }) {
-      // Simplified redirect logic
-      if (url.includes('/dashboard')) {
-        return '/dashboard'  // Always redirect to dashboard directly
-      }
-      return baseUrl  // Default to base URL
-    },
+    }
   },
   events: {
     async signOut({ token }) {
