@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons
-import Link from "next/link"; // Using Next.js Link
+import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
@@ -66,7 +66,10 @@ const LoginPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdroptext-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+        >
+          <div className="p-8">
+            <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
               Welcome Back
             </h2>
 
@@ -88,21 +91,10 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {/* Eye icon for show/hide password */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <Eye className="w-5 h-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-
-              <div className="flex items-center mb-6">
+                  className="absolute right-              <div className="flex items-center mb-6">
                 <Link
                   href="/forgot-password"
                   className="text-sm text-green-400 hover:underline"
