@@ -112,6 +112,8 @@ export const authOptions = {
   pages: {
     signIn: "/login",
     error: "/login",
+    signOut: "/",
+    newUser: "/dashboard"
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -230,10 +232,11 @@ export const authOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      // Handle redirect after sign in
-      if (url.startsWith('/')) return `${baseUrl}${url}`
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
+      // Simplified redirect logic
+      if (url.includes('/dashboard')) {
+        return '/dashboard'  // Always redirect to dashboard directly
+      }
+      return baseUrl  // Default to base URL
     },
   },
   events: {

@@ -8,16 +8,11 @@ const GoogleOneTap = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const getRedirectUri = () => {
-    const baseUrl =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : "https://www.notesmates.in";
-    return `${baseUrl}/api/auth/callback/google`;
-  };
-
   useEffect(() => {
-    if (session) return;
+    if (session) {
+      router.push('/dashboard');
+      return;
+    }
 
     const initializeGsi = () => {
       if (!window.google || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return;
@@ -27,25 +22,11 @@ const GoogleOneTap = () => {
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: async (response) => {
             try {
-              const result = await signIn("google", {
+              await signIn("google", {
                 credential: response.credential,
-                redirect: false,
-                callbackUrl: "/dashboard",
-                prompt: "none",
-                authorization: {
-                  params: {
-                    prompt: "none",
-                    redirect_uri: getRedirectUri(),
-                  },
-                },
+                redirect: true,
+                callbackUrl: '/dashboard',
               });
-
-              if (result?.error) {
-                toast.error(result.error);
-              } else if (result?.url) {
-                toast.success("Successfully logged in!");
-                router.push("/dashboard");
-              }
             } catch (error) {
               console.error("Sign in error:", error);
               toast.error("Failed to sign in");
