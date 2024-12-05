@@ -1,6 +1,7 @@
 "use client";
 import Head from "next/head";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Add this import
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader, Eye, EyeOff, User, Phone } from "lucide-react";
@@ -20,7 +21,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
 
-  const router = useRouter();
+  const router = useRouter(); // Ensure useRouter is defined
 
   const handleSignUp = async (e) => {
     e.preventDefault();
