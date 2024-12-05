@@ -69,6 +69,10 @@ const RegisterPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <>
       <Head>
@@ -158,6 +162,15 @@ const RegisterPage = () => {
                   )}
                 </motion.button>
               </form>
+
+              <div className="mt-4">
+                <button
+                  onClick={handleGoogleLogin}
+                  className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-lg hover:bg-red-600 focus:outline-none"
+                >
+                  Continue with Google
+                </button>
+              </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
               <p className="text-sm text-gray-400">
