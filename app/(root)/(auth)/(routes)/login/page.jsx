@@ -80,7 +80,7 @@ const LoginPage = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autocomplete="on"
+                autoComplete="on"
               />
 
               <div className="relative">
@@ -94,7 +94,17 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-              <div className="flex items-center mb-6">
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center mb-6">
                 <Link
                   href="/forgot-password"
                   className="text-sm text-green-400 hover:underline"
