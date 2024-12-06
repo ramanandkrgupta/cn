@@ -28,10 +28,20 @@ export default function RootLayout({ children }) {
         />
         <meta name="apple-mobile-web-app-title" content="Notes Mates" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
+        <meta 
+          name="google-signin-client_id" 
+          content={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID} 
+        />
+        <script 
+          src="https://accounts.google.com/gsi/client" 
+          async 
+          defer
+        />
       </head>
       <body className={`${inter.className} min-h-screen bg-base-100`}>
-        <SessionWrapper>{children}</SessionWrapper>
-<script defer src="https://cloud.umami.is/script.js" data-website-id="ce416d58-503a-40cd-9663-7e7618ecc8f7"></script>
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
       </body>
     </html>
   );
