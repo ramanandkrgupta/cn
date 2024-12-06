@@ -2,259 +2,192 @@ import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
 import prisma from "@/libs/prisma";
-import jwt from "jsonwebtoken";
-
-const productionUrl = process.env.NEXTAUTH_URL || 'https://www.notesmates.in';
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
-  debug: process.env.NODE_ENV === 'development',
+  debug: true,
+  
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
+          prompt: "select_account",
           access_type: "offline",
-          response_type: "code",
-          prompt: "consent"
-        }
-      },
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          avatar: profile.picture,
-          userRole: "FREE"
-        }
-      },
-      credentials: {
-        credential: { type: "text" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.credential) return null;
-
-        try {
-          const decoded = jwt.decode(credentials.credential);
-          return {
-            id: decoded.sub,
-            name: decoded.name,
-            email: decoded.email,
-            image: decoded.picture,
-          };
-        } catch (error) {
-          console.error("Failed to decode Google credential:", error);
-          return null;
+          response_type: "code"
         }
       }
     }),
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
+      credentials: {},
       async authorize(credentials) {
         const { email, password } = credentials;
 
         try {
+          console.log("Authorizing credentials for:", email);
+          
           const user = await prisma.user.findUnique({
-            where: { email: email },
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              password: true,
-              userRole: true,
-              avatar: true
-            }
+            where: { email }
           });
 
           if (!user) {
-            throw new Error("No user found with this email!");
+            console.log("User not found:", email);
+            throw new Error("Invalid email address!");
           }
 
-          const isPasswordCorrect = await bcrypt.compare(password, user.password);
-          if (!isPasswordCorrect) {
-            throw new Error("Incorrect password!");
+          if (!user.password) {
+            console.log("No password set for user:", email);
+            throw new Error("Please use Google login for this account");
           }
 
-          // Return user data without password
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.userRole, // For backward compatibility
-            userRole: user.userRole,
-            avatar: user.avatar
-          };
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) {
+            console.log("Password mismatch for:", email);
+            throw new Error("Invalid password!");
+          }
+
+          console.log("Successfully authorized:", email);
+          return user;
         } catch (error) {
-          // console.error("Error during authorization:", error);
-          throw new Error("Authorization failed!");
+          console.error("Authorization error:", error);
+          throw error;
         }
       },
     }),
   ],
+
+  pages: {
+    signIn: "/login",
+    error: "/login",
+    newUser: "/account"
+  },
+
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  pages: {
-    signIn: "/login",
-    error: "/login",
-    signOut: "/",
-    newUser: "/dashboard"
-  },
+
   callbacks: {
     async signIn({ user, account, profile }) {
-      // console.log("SignIn Callback - User:", user);
-      // console.log("SignIn Callback - Account:", account);
-      // console.log("SignIn Callback - Profile:", profile);
+      console.log("\n==================== AUTH DATA ====================");
+      console.log("\n1. Raw User Data:", JSON.stringify(user, null, 2));
+      console.log("\n2. Raw Account Data:", JSON.stringify(account, null, 2));
+      console.log("\n3. Raw Profile Data:", JSON.stringify(profile, null, 2));
       
-      if (account?.provider === "google") {
-        try {
+      try {
+        if (account?.provider === "github" || account?.provider === "google") {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email },
-            include: {
-              accounts: true
-            }
+            include: { accounts: true }
           });
 
-          // console.log("Existing User:", existingUser);
-
           if (!existingUser) {
-            // console.log("Creating new user for:", user.email);
-            try {
-              const newUser = await prisma.user.create({
-                data: {
-                  email: user.email,
-                  name: user.name || '',
-                  avatar: profile.picture || '',
-                  phoneNumber: 'temp-' + Math.random().toString(36).substr(2, 9),
-                  userRole: 'FREE',
-                  password: await bcrypt.hash(Math.random().toString(36), 10),
-                  isEmailVerified: true,
-                  isMobileVerified: false,
-                  reputationScore: 0,
-                  uploadCount: 0,
-                  verifiedUploads: 0,
-                  accounts: {
-                    create: {
-                      type: account.type,
-                      provider: account.provider,
-                      providerAccountId: account.providerAccountId,
-                      access_token: account.access_token,
-                      token_type: account.token_type,
-                      scope: account.scope,
-                      id_token: account.id_token,
-                    }
-                  }
-                },
-              });
-              // console.log("New user created:", newUser);
-              return true;
-            } catch (createError) {
-              // console.error("Error creating new user:", createError);
-              throw createError;
-            }
-          }
-
-          // If user exists but no Google account linked
-          if (!existingUser.accounts?.some(acc => acc.provider === 'google')) {
-            // console.log("Linking Google account to existing user:", existingUser.id);
-            if (!existingUser.avatar) {
-              await prisma.user.update({
-                where: { id: existingUser.id },
-                data: { avatar: profile.picture }
-              });
-            }
-            await prisma.account.create({
+            await prisma.user.create({
               data: {
-                userId: existingUser.id,
-                type: account.type,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                token_type: account.token_type,
-                scope: account.scope,
-                id_token: account.id_token,
+                email: user.email,
+                name: user.name,
+                avatar: account.provider === "github" ? profile.avatar_url : profile.picture,
+                userRole: "FREE",
+                isEmailVerified: true,
+                password: await bcrypt.hash(Math.random().toString(36), 10),
+                accounts: {
+                  create: {
+                    type: account.type,
+                    provider: account.provider,
+                    providerAccountId: account.providerAccountId,
+                    access_token: account.access_token,
+                    token_type: account.token_type,
+                    scope: account.scope,
+                  }
+                }
               }
             });
+            console.log(`New ${account.provider} user created:`, user.email);
+          } else {
+            const existingAccount = existingUser.accounts.find(
+              (acc) => acc.provider === account.provider
+            );
+
+            if (!existingAccount) {
+              await prisma.account.create({
+                data: {
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  access_token: account.access_token,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                }
+              });
+              console.log(`Linked ${account.provider} to existing user:`, user.email);
+            }
           }
           return true;
-        } catch (error) {
-          // console.error("Detailed Google sign-in error:", error);
-          throw new Error(error.message);
         }
+        return true;
+      } catch (error) {
+        console.error("\nError in signIn callback:", error);
+        return false;
       }
-      return true;
     },
 
     async jwt({ token, user, account }) {
       if (user) {
-        token.userRole = user.userRole;
-      }
-      if (account) {
-        token.accessToken = account.access_token;
+        token.id = user.id;
+        token.role = user.userRole || "FREE";
+        token.email = user.email;
+        token.provider = account?.provider;
       }
       return token;
     },
 
-    async redirect({ url, baseUrl }) {
-      // More strict redirect logic
-      if (url.startsWith('/dashboard')) {
-        return '/dashboard';
-      }
-      if (url.startsWith('/login')) {
-        return baseUrl;
-      }
-      // If the url is already an absolute URL and matches our domain, use it
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      // Default to homepage
-      return baseUrl;
-    },
-
-    async session({ session, token, user }) {
-      if (session?.user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: session.user.email },
-          select: {
-            id: true,
-            userRole: true,
-            avatar: true,
-            isEmailVerified: true
-          }
-        });
-
-        if (dbUser) {
-          session.user.id = dbUser.id;
-          session.user.role = dbUser.userRole || "FREE";
-          session.user.userRole = dbUser.userRole || "FREE";
-          session.user.avatar = dbUser.avatar;
-          session.user.isEmailVerified = dbUser.isEmailVerified;
-        }
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id,
+          role: token.role,
+          provider: token.provider
+        };
       }
       return session;
+    },
+
+    async redirect({ url, baseUrl }) {
+      console.log("\n==================== REDIRECT CALLBACK ====================");
+      console.log("URL:", url);
+      console.log("Base URL:", baseUrl);
+
+      // Handle callback URLs
+      if (url.includes('/api/auth/callback') || url.includes('state=')) {
+        return `${baseUrl}/account`;
+      }
+
+      // Handle other URLs
+      return url.startsWith(baseUrl) ? url : `${baseUrl}/account`;
+    },
+  },
+
+  events: {
+    async signIn(message) {
+      console.log("\n==================== SIGN IN EVENT ====================");
+      console.log("Sign In Event:", JSON.stringify(message, null, 2));
     }
   },
-  events: {
-    async signOut({ token }) {
-      // Clean up any necessary session data
-    }
-  }
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }; 

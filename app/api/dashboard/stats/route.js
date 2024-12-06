@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET() {
   try {
@@ -74,9 +74,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching stats:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching stats",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

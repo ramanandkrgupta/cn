@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET(req) {
   try {
@@ -95,9 +95,9 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching posts",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -120,9 +120,9 @@ export async function DELETE(req) {
     return NextResponse.json({ message: "Post deleted successfully" });
   } catch (error) {
     console.error("Error deleting post:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error deleting post",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -153,9 +153,9 @@ export async function PUT(req) {
     return NextResponse.json(post);
   } catch (error) {
     console.error("Error updating post:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating post",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

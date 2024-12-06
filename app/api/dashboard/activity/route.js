@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET() {
   try {
@@ -71,16 +71,16 @@ export async function GET() {
         link: `/dashboard/users/${u.id}`
       }))
     ]
-    .filter(activity => activity.timestamp) // Filter out invalid timestamps
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .slice(0, 10);
+      .filter(activity => activity.timestamp) // Filter out invalid timestamps
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 10);
 
     return NextResponse.json(activities);
   } catch (error) {
     console.error("Error fetching activity:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching activity",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

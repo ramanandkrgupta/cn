@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET(req) {
   try {
@@ -109,9 +109,9 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("Error fetching subjects:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching subjects",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -143,8 +143,8 @@ export async function POST(req) {
     });
 
     if (existingSubject) {
-      return NextResponse.json({ 
-        error: "Subject already exists" 
+      return NextResponse.json({
+        error: "Subject already exists"
       }, { status: 400 });
     }
 
@@ -161,9 +161,9 @@ export async function POST(req) {
     return NextResponse.json(subject);
   } catch (error) {
     console.error("Error creating subject:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error creating subject",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -201,8 +201,8 @@ export async function PUT(req) {
     });
 
     if (existingSubject) {
-      return NextResponse.json({ 
-        error: "Subject already exists" 
+      return NextResponse.json({
+        error: "Subject already exists"
       }, { status: 400 });
     }
 
@@ -214,9 +214,9 @@ export async function PUT(req) {
     return NextResponse.json(subject);
   } catch (error) {
     console.error("Error updating subject:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating subject",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -250,8 +250,8 @@ export async function DELETE(req) {
     }
 
     if (subject._count.posts > 0 || subject._count.videos > 0) {
-      return NextResponse.json({ 
-        error: "Cannot delete subject with existing content" 
+      return NextResponse.json({
+        error: "Cannot delete subject with existing content"
       }, { status: 400 });
     }
 
@@ -262,9 +262,9 @@ export async function DELETE(req) {
     return NextResponse.json({ message: "Subject deleted successfully" });
   } catch (error) {
     console.error("Error deleting subject:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error deleting subject",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

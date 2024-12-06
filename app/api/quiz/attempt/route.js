@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 import prisma from "@/libs/prisma";
 
 export async function POST(req) {
@@ -44,7 +44,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error submitting quiz attempt:", error);
     return new Response(
-      JSON.stringify({ error: "Failed to submit quiz", details: error.message }), 
+      JSON.stringify({ error: "Failed to submit quiz", details: error.message }),
       { status: 500 }
     );
   }

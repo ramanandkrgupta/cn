@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET(req, { params }) {
   try {
@@ -34,9 +34,9 @@ export async function GET(req, { params }) {
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error fetching user details:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching user details",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

@@ -11,7 +11,7 @@ import Input from "@/components/ui/Input";
 import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
-import { FcGoogle } from 'react-icons/fc'; // Add this import
+import { FcGoogle } from "react-icons/fc"; // Add this import
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -66,32 +66,18 @@ const RegisterPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      setIsGoogleLoading(true); // Use separate loading state for Google
-      const result = await signIn("google", {
-        redirect: false,
-        callbackUrl: `${window.location.origin}/dashboard`,
+      setIsGoogleLoading(true);
+      console.log("Initiating Google signup...");
+
+      await signIn("google", {
+        callbackUrl: "/account",
+        redirect: true,
       });
 
-      console.log("Google Sign In Result:", result);
-
-      if (result?.error) {
-        console.error("Google sign in error:", result.error);
-        toast.error(
-          result.error === "AccessDenied"
-            ? "Failed to create account. Please try again."
-            : result.error
-        );
-        return;
-      }
-
-      if (result?.url) {
-        toast.success("Successfully signed up with Google");
-        window.location.href = result.url;
-      }
+      // Note: The code below won't execute due to redirect: true
     } catch (error) {
-      console.error("Google login error:", error);
-      toast.error(error.message || "An error occurred during Google sign up");
-    } finally {
+      console.error("Google signup error:", error);
+      toast.error("An error occurred during Google sign up");
       setIsGoogleLoading(false);
     }
   };
@@ -195,7 +181,9 @@ const RegisterPage = () => {
                   ) : (
                     <FcGoogle className="w-5 h-5" />
                   )}
-                  <span>{isGoogleLoading ? "Signing up..." : "Continue with Google"}</span>
+                  <span>
+                    {isGoogleLoading ? "Signing up..." : "Continue with Google"}
+                  </span>
                 </button>
               </div>
             </div>

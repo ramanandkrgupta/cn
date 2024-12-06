@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 import bcrypt from "bcrypt";
 
 export async function GET(req) {
@@ -68,9 +68,9 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("Error fetching users:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching users",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -99,9 +99,9 @@ export async function PUT(req) {
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error updating user:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating user",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -124,9 +124,9 @@ export async function DELETE(req) {
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error deleting user",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }

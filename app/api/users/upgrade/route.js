@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function POST(req) {
   try {
@@ -27,8 +27,8 @@ export async function POST(req) {
     try {
       // Update user with new role
       const updatedUser = await prisma.user.update({
-        where: { 
-          id: session.user.id 
+        where: {
+          id: session.user.id
         },
         data: {
           userRole: plan.toUpperCase()
@@ -53,7 +53,7 @@ export async function POST(req) {
       };
 
       // Return formatted response
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: true,
         user: sessionUser,
         session: {
@@ -64,17 +64,17 @@ export async function POST(req) {
 
     } catch (updateError) {
       console.error("Error updating user:", updateError);
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "Failed to update user role",
-        details: updateError.message 
+        details: updateError.message
       }, { status: 500 });
     }
 
   } catch (error) {
     console.error("Error in upgrade process:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error upgrading user",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

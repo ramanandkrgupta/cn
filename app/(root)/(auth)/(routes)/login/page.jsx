@@ -7,8 +7,9 @@ import Link from "next/link";
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
-import { FcGoogle } from 'react-icons/fc';
-import GoogleOneTap from '@/components/auth/GoogleOneTap';
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,32 +63,32 @@ const LoginPage = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsGoogleLoading(true);
-      const result = await signIn("google", {
-        redirect: false,
-        callbackUrl: `${window.location.origin}/dashboard`,
+      console.log("Starting Google login...");
+
+      await signIn("google", {
+        callbackUrl: "/account",
+        redirect: true
       });
-
-      console.log("Google Sign In Result:", result);
-
-      if (result?.error) {
-        console.error("Google sign in error:", result.error);
-        toast.error(
-          result.error === "AccessDenied"
-            ? "Failed to create account. Please try again."
-            : result.error
-        );
-        return;
-      }
-
-      if (result?.url) {
-        toast.success("Successfully logged in with Google");
-        window.location.href = result.url;
-      }
     } catch (error) {
       console.error("Google login error:", error);
-      toast.error(error.message || "An error occurred during Google login");
-    } finally {
+      toast.error("An error occurred during Google login");
       setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      setIsGithubLoading(true);
+      console.log("Starting GitHub login...");
+
+      await signIn("github", {
+        callbackUrl: "/account",
+        redirect: true
+      });
+    } catch (error) {
+      console.error("GitHub login error:", error);
+      toast.error("An error occurred during GitHub login");
+      setIsGithubLoading(false);
     }
   };
 
@@ -163,13 +165,44 @@ const LoginPage = () => {
               </form>
 
               <div className="mt-4">
-                <GoogleOneTap />
+                <button
+                  onClick={handleGoogleLogin}
+                  disabled={isGoogleLoading}
+                  className="w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 flex items-center justify-center gap-2 relative"
+                >
+                  {isGoogleLoading ? (
+                    <Loader className="w-5 h-5 animate-spin text-gray-600" />
+                  ) : (
+                    <FcGoogle className="w-5 h-5" />
+                  )}
+                  <span>
+                    {isGoogleLoading ? "Signing up..." : "Continue with Google"}
+                  </span>
+                </button>
+
+                <button
+                  onClick={handleGithubLogin}
+                  disabled={isGithubLoading}
+                  className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
+                >
+                  {isGithubLoading ? (
+                    <Loader className="w-5 h-5 animate-spin text-gray-400" />
+                  ) : (
+                    <FaGithub className="w-5 h-5" />
+                  )}
+                  <span>
+                    {isGithubLoading ? "Signing in..." : "Continue with GitHub"}
+                  </span>
+                </button>
               </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
               <p className="text-sm text-gray-400">
                 Don't have an account?{" "}
-                <Link href="/register" className="text-green-400 hover:underline">
+                <Link
+                  href="/register"
+                  className="text-green-400 hover:underline"
+                >
                   Sign up
                 </Link>
               </p>

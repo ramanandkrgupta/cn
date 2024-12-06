@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 import prisma from "@/libs/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -45,7 +45,7 @@ export async function POST(req) {
 
     const result = await model.generateContent(prompt);
     const response = result.response.text();
-    
+
     // Clean and parse the response
     let quizData;
     try {
@@ -93,12 +93,12 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error generating quiz:", error);
     return new Response(
-      JSON.stringify({ 
-        error: "Failed to generate quiz", 
+      JSON.stringify({
+        error: "Failed to generate quiz",
         details: error.message,
         // Add stack trace in development
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      }), 
+      }),
       { status: 500 }
     );
   }
@@ -136,11 +136,10 @@ export async function GET(req) {
   } catch (error) {
     console.error("Error fetching quizzes:", error);
     return new Response(
-      JSON.stringify({ error: "Failed to fetch quizzes", details: error.message }), 
+      JSON.stringify({ error: "Failed to fetch quizzes", details: error.message }),
       { status: 500 }
     );
   }
 }
 
 
- 

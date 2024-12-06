@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function PUT(req) {
   try {
@@ -30,9 +30,9 @@ export async function PUT(req) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating profile:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating profile",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }

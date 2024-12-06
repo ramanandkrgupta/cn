@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET() {
   try {
     const allPosts = await prisma.post.findMany();
-    
+
     // Exclude file_url from each post
     const filteredPosts = allPosts.map(({ file_url, ...rest }) => rest);
 
@@ -50,9 +50,9 @@ export async function POST(req) {
     // Get user
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
-      select: { 
+      select: {
         id: true,
-        reputationScore: true 
+        reputationScore: true
       }
     });
 
@@ -103,18 +103,18 @@ export async function POST(req) {
       })
     );
 
-    return NextResponse.json({ 
-      success: true, 
-      posts 
+    return NextResponse.json({
+      success: true,
+      posts
     });
 
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Error creating post",
-        details: error.message 
-      }, 
+        details: error.message
+      },
       { status: 500 }
     );
   }

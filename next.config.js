@@ -13,15 +13,15 @@ const nextConfig = {
       'notesmates.in'
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: '/api/auth/callback/google',
-        destination: '/dashboard',
-        permanent: true,
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/api/auth/callback/google',
+  //       destination: '/dashboard',
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
   async headers() {
     return [
       {
@@ -30,6 +30,15 @@ const nextConfig = {
           { key: 'Access-Control-Allow-Origin', value: 'https://www.notesmates.in' },
           { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
           { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+      {
+        source: '/favicon/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
         ],
       },
     ];

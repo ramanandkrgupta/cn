@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 import { createNotification } from "@/libs/notifications";
 
 export async function POST(req) {
@@ -28,7 +28,7 @@ export async function POST(req) {
     if (metricType === 'shares') {
       const session = await getServerSession(authOptions);
       const sharerName = session?.user?.name || "Someone";
-      
+
       const newShareCount = currentPost.shares + 1;
       const updatedPost = await prisma.post.update({
         where: { id: postId },
@@ -142,9 +142,9 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid metric type" }, { status: 400 });
   } catch (error) {
     console.error("Error updating metrics:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error updating metrics",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }

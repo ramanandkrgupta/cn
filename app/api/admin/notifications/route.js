@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/send-code/route";
 
 // Get all notifications
 export async function GET(req) {
@@ -54,9 +54,9 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error fetching notifications",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -72,8 +72,8 @@ export async function POST(req) {
     const { userIds, message, type = 'admin', image, link } = await req.json();
 
     if (!userIds?.length || !message) {
-      return NextResponse.json({ 
-        error: "Missing required fields" 
+      return NextResponse.json({
+        error: "Missing required fields"
       }, { status: 400 });
     }
 
@@ -95,9 +95,9 @@ export async function POST(req) {
     return NextResponse.json(notifications);
   } catch (error) {
     console.error("Error sending notifications:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error sending notifications",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 }
@@ -120,9 +120,9 @@ export async function DELETE(req) {
     return NextResponse.json({ message: "Notification deleted successfully" });
   } catch (error) {
     console.error("Error deleting notification:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Error deleting notification",
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 
