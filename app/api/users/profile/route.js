@@ -51,13 +51,14 @@ export async function GET(req) {
         name: true,
         email: true,
         userRole: true,
-        avatar: true
-      }
-    });
+        avatar: true,
+        phoneNumber: true,
+      },
+    })
 
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error fetching profile:", error);
     return NextResponse.json({ error: "Error fetching profile" }, { status: 500 });
   }
-} 
+}

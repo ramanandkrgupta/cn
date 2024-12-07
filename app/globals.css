@@ -2,13 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* styles/globals.css */
+/* styles/globals.css */
+
+/* Define the CSS variables for font sizes */
+/* globals.css */
+/* globals.css */
+
+:root {
+  --font-size-small: 12px;
+  --font-size-medium: 14px;
+  --font-size-large: 16px;
+  --font-size-xlarge: 18px;
+  --font-size-xxlarge: 20px;
+  --font-size: var(--font-size-medium);
+  /* Default font size */
+}
+
+body {
+  font-size: var(--font-size);
+  /* Ensure that all text uses the global font size */
+}
+
+/* Optional: Apply font size to other UI elements like buttons, inputs */
+button,
+input,
+label,
+select,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size);
+  /* Ensures UI elements follow the font size */
+}
+
+
+
+
 :root {
   /* --primary: #13131a;
   --primarySun: #ffffffd0;
   --secondary: #1c1c24;
-  --primaryh1: #f7941d; 
+  --primaryh1: #f7941d;
   --darkTextWhite: #fff; */
 }
+
 html,
 body {
   background-color: bg-secondary !important;
@@ -220,6 +262,7 @@ body {
   padding: 10px;
   display: block;
 }
+
 
 /*menu*/
 
