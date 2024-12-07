@@ -38,9 +38,9 @@ const ViewSubjects = ({ course, semester }) => {
 
   return (
     <div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2"onClick={() => router.back()}>
       {/* Back Button */}
-      <button onClick={() => router.back()} aria-label="Go Back">
+      <button  aria-label="Go Back">
         <ArrowLeft className="w-6 h-6" />
       </button>
         <h1 className="select_header">Select Subjects</h1>

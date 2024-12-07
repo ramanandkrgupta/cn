@@ -4,13 +4,14 @@ import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
 import Notification from "@/components/Notification";
 import Greeting from "@/components/Greeting";
-
+import Footer from "@/components/Footer";
 
 
 export default function Home() {
   const { data: session } = useSession();
 
   return (
+    <>
     <section className="flex flex-col items-center sm:mb-5">
       {/* Greeting Section */}
       {session && session.user?.name ? (
@@ -37,6 +38,9 @@ export default function Home() {
           style="md:grid-cols-5 mt-4 gap-1.5 justify-between md:justify-start"
         />
       </div>
+      
     </section>
+    <Footer />
+    </>
   );
 }

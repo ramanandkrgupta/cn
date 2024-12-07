@@ -1,3 +1,5 @@
+// app/(root)/(user)/layout.jsx
+
 "use client";
 import { Navbar, Sidebar } from "@/components/navigation";
 import { ProtectedLayout } from "@/components/layouts/protectLayouts";
@@ -20,11 +22,11 @@ export default function AccountLayout({ children }) {
     
     <ProtectedLayout>
       <section>
-        <div className="relative sm:p-8 p-4 flex flex-row">
-          <div className="sm:flex hidden mr-10 relative">
+        <div className="relative sm:p-4 p-2 flex flex-row">
+          <div className="sm:flex hidden mr-2">
             <Sidebar />
           </div>
-          <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-5">
+          <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-2">
             <Navbar showSearch={false} />
             {children}
             

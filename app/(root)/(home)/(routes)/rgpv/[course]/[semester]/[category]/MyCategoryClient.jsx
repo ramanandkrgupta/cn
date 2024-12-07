@@ -12,7 +12,7 @@ const MyCategoryClient = ({ course, semester, subId }) => {
   console.log(course);
   return (
     <div>
-     <div className="flex items-center gap-2">
+     <div className="flex items-center gap-2 onClick={() => router.back()}">
       {/* Back Button */}
       <button onClick={() => router.back()} aria-label="Go Back">
         <ArrowLeft className="w-6 h-6" />

@@ -43,7 +43,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
   };
 
   return (
-    <div className="md:flex-1 max-w-[658px] py-1.5 pl-4 pr-2 h-[52px] bg-[#1c1c24] rounded-[100px]">
+    <div className="md:flex-1 max-w-[658px] py-1.5 pl-4 pr-2 h-[52px] bg-[#1c1c24] rounded-xl">
       <div className="flex flex-row ">
         <div className="flex w-full">
           <input
@@ -105,7 +105,7 @@ const SearchDropDown = ({
           className="text-[#32CD32] hover:text-gray-300 absolute right-4 text-lg cursor-pointer w-6 h-6"
           onClick={closeSearch}
         />
-        <div className="">
+        <div className="text-white font-semibold text-xs">
           {loading ? (
             'Searching...'
           ) : (

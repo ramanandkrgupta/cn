@@ -139,7 +139,7 @@ const ViewDoc = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" onClick={() => router.back()}>
         <button onClick={() => router.back()} aria-label="Go Back">
           <ArrowLeft className="w-6 h-6" />
         </button>
@@ -165,6 +165,7 @@ const ViewDoc = () => {
                 {data.map((item, index) => (
                   <PostCard key={index} data={item} />
                 ))}
+                <p className="text-secondary text-center">No more data found</p>
               </div>
             )}
           </>

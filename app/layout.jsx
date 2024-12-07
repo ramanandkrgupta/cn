@@ -5,8 +5,19 @@ import SessionWrapper from "@/components/providers/SessionWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Admin Dashboard",
-  description: "Admin dashboard for managing the application",
+  title: "Notes Mates.in - Notes, Papers, Videos, Groups",
+  description: "Notes, Papers, Videos, Groups",
+  keywords: "notes mates, notes, papers, videos, groups",
+  author: "Ramanand Kumar Gupta",
+  // viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon/icon-128x128.png",
+  },
+  googleSignin: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  script: "https://accounts.google.com/gsi/client",
+  async: true,
+  defer: true,
 };
 
 export default function RootLayout({ children }) {
@@ -34,8 +45,7 @@ export default function RootLayout({ children }) {
         />
         <script 
           src="https://accounts.google.com/gsi/client" 
-          async 
-          defer
+          async defer
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-base-100`}>

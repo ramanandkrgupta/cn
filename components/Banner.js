@@ -81,18 +81,20 @@ export default function Banner() {
 <div 
   className={`absolute inset-0 
     bg-gradient-to-r 
-    from-white/80 via-white/60 to-transparent
+    from-black/80 via-black/60 to-transparent
     dark:from-black/70 dark:via-black/50 dark:to-transparent
+    transition-opacity duration-300
+    group-hover:opacity-90
   `}
 />
 
 {/* Content */}
-<div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12">
+<div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12 z-10">
   {/* Tag */}
   <span 
     className={`w-fit px-3 py-1 mb-2 text-xs font-medium rounded-full 
-      bg-primary/20 text-primary
-      dark:bg-primary/30 dark:text-primary/90
+      bg-primary/30 text-primary
+      dark:bg-primary/30 dark:text-primary-content
     `}
   >
     {item.tag}
@@ -101,7 +103,7 @@ export default function Banner() {
   {/* Title */}
   <h2 
     className={`text-xl md:text-3xl lg:text-4xl font-bold mb-2 
-      text-base-content dark:text-white
+      text-white drop-shadow-md
     `}
   >
     {item.title}
@@ -110,7 +112,8 @@ export default function Banner() {
   {/* Description */}
   <p 
     className={`text-sm md:text-base max-w-md 
-      text-base-content/70 dark:text-white/80
+      text-white/90 drop-shadow
+      dark:text-white/80
     `}
   >
     {item.description}
@@ -119,8 +122,10 @@ export default function Banner() {
   {/* CTA Button */}
   <button 
     className={`mt-4 w-fit px-4 py-2 text-sm font-medium rounded-lg 
-      bg-primary text-white hover:bg-primary/90 transition-colors
-      dark:bg-primary/80 dark:hover:bg-primary/70
+      bg-primary text-primary-content 
+      hover:bg-primary/90 
+      dark:bg-primary/90 dark:hover:bg-primary/80
+      transition-colors shadow-md
     `}
   >
     Learn More

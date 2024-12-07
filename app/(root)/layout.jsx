@@ -1,3 +1,5 @@
+// app/(root)/layout.jsx
+
 "use client";
 import { Toaster } from "sonner";
 import { useState } from "react";
@@ -7,6 +9,7 @@ import AdminSidebar from "@/components/shared/admin/Sidebar";
 import AdminHeader from "@/components/shared/admin/Header";
 import { Navigation } from "@/components/navigation";
 import { EdgeStoreProvider } from "@/libs/edgestore";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({ children }) {
   const router = useRouter();
@@ -18,7 +21,7 @@ export default function RootLayout({ children }) {
     <EdgeStoreProvider>
       <html lang="en">
         <head>
-          <title>Notes Mates.in</title>
+          <title>Notes Mates.in - Notes, Papers, Videos, Groups</title>
           <meta name="description" content="description" />
           <meta
             name="keywords"
@@ -35,10 +38,12 @@ export default function RootLayout({ children }) {
         </head>
         <body className="bg-base-100 min-h-screen">
           <Toaster richColors closeButton position="top-center" />
-          <main className="pb-16">
+          <main className="pb-3">
             {children}
-            <Navigation />
+            
+            
           </main>
+          <Navigation />
         </body>
       </html>
     </EdgeStoreProvider>
