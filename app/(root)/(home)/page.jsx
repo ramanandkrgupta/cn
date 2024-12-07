@@ -4,7 +4,7 @@ import Feed from "@/components/Feed";
 import Banner from "@/components/Banner";
 import Notification from "@/components/Notification";
 import Greeting from "@/components/Greeting";
-import Footer from "@/components/Footer";
+import Footer from "./(routes)/about/components/Footer";
 
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
       </div>
 
       {/* Feed Section */}
-      <div className="w-full md:px-8">
+      <div className="w-full md:px-8 sm:mb-16">
         <Feed
           label="RGPV Courses"
           styleHead="mt-3"
