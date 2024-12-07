@@ -12,6 +12,7 @@ import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc"; // Add this import
+import { FaGithub } from "react-icons/fa"; // Add this import
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -22,12 +23,14 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Add new state
+  const [isGithubLoading, setIsGithubLoading] = useState(false); // Add new state
 
   const router = useRouter(); // Ensure useRouter is defined
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     const phoneNumber = `+91${RawPhoneNumber}`;
     const userInput = { name, email, phoneNumber, password };
@@ -43,22 +46,22 @@ const RegisterPage = () => {
         return;
       }
 
-      const response = await axios.post("/api/user/register", userInput, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post("/api/user/register", userInput);
+      const data = response.data;
 
       if (response.status === 201) {
         toast.success("Successfully registered! Redirecting to login...");
-        router.push("/login");
-      } else if (response.statusText === "FAILED") {
-        toast.error("User with this email already exists");
-      } else {
-        toast.error("Registration failed");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
       }
     } catch (error) {
-      toast.error("Something went wrong during registration");
+      if (error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Something went wrong during registration");
+      }
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +82,24 @@ const RegisterPage = () => {
       console.error("Google signup error:", error);
       toast.error("An error occurred during Google sign up");
       setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      setIsGithubLoading(true);
+      console.log("Starting GitHub signup...");
+
+      await signIn("github", {
+        callbackUrl: "/account",
+        redirect: true
+      });
+      
+      // Note: The code below won't execute due to redirect: true
+    } catch (error) {
+      console.error("GitHub signup error:", error);
+      toast.error("An error occurred during GitHub sign up");
+      setIsGithubLoading(false);
     }
   };
 
@@ -183,6 +204,21 @@ const RegisterPage = () => {
                   )}
                   <span>
                     {isGoogleLoading ? "Signing up..." : "Continue with Google"}
+                  </span>
+                </button>
+
+                <button
+                  onClick={handleGithubLogin}
+                  disabled={isGithubLoading}
+                  className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
+                >
+                  {isGithubLoading ? (
+                    <Loader className="w-5 h-5 animate-spin text-gray-400" />
+                  ) : (
+                    <FaGithub className="w-5 h-5" />
+                  )}
+                  <span>
+                    {isGithubLoading ? "Signing up..." : "Continue with GitHub"}
                   </span>
                 </button>
               </div>

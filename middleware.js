@@ -3,27 +3,15 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    // Skip middleware for auth-related paths
-    if (req.nextUrl.pathname.startsWith('/api/auth/') || 
-        req.nextUrl.pathname.startsWith('/login') || 
-        req.nextUrl.pathname.startsWith('/register') ||
-        req.nextUrl.pathname.includes('callback')) {
-      return NextResponse.next();
-    }
-
     const { token } = req.nextauth;
+    console.log("Protected Route Access:", req.nextUrl.pathname);
 
-    // No token means redirect to login
+    // No token means redirect to login for protected routes
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    // Allow access to account page for authenticated users
-    if (req.nextUrl.pathname.startsWith('/account')) {
-      return NextResponse.next();
-    }
-
-    // Handle dashboard access
+    // Handle dashboard access (admin/manager only)
     if (req.nextUrl.pathname.startsWith('/dashboard')) {
       if (token.role === "ADMIN" || token.role === "MANAGER") {
         return NextResponse.next();
@@ -31,29 +19,33 @@ export default withAuth(
       return NextResponse.redirect(new URL("/account", req.url));
     }
 
+    // Allow access to account page for all authenticated users
+    if (req.nextUrl.pathname.startsWith('/account')) {
+      return NextResponse.next();
+    }
+
     return NextResponse.next();
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Always allow auth-related paths
-        if (req.nextUrl.pathname.startsWith('/api/auth/') ||
-            req.nextUrl.pathname.startsWith('/login') ||
-            req.nextUrl.pathname.startsWith('/register') ||
-            req.nextUrl.pathname.includes('callback')) {
-          return true;
+        // Only check token for protected routes
+        if (req.nextUrl.pathname.startsWith('/dashboard') ||
+            req.nextUrl.pathname.startsWith('/account')) {
+          return !!token;
         }
-        return !!token;
+        // Allow access to all other routes
+        return true;
       },
     },
   }
 );
 
+// Update matcher to only include protected routes
 export const config = {
   matcher: [
     '/dashboard/:path*',
     '/account/:path*',
-    '/api/((?!auth/).)*',
-    '/((?!api/auth/callback|api/auth/signin|api/auth/session|api/auth/csrf|login|register|_next|favicon|assets|images).*)',
+    '/api/protected/:path*', // For protected API routes
   ]
 };

@@ -6,24 +6,42 @@ import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import prisma from "@/libs/prisma";
 
+// Add this before authOptions to verify Prisma connection
+const verifyPrismaConnection = async () => {
+  try {
+    await prisma.$connect();
+    console.log("Prisma connected successfully");
+  } catch (error) {
+    console.error("Prisma connection error:", error);
+  }
+};
+
+verifyPrismaConnection();
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not defined');
+}
+
+console.log("Database URL:", process.env.DATABASE_URL);
+
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
-  debug: true,
-  
+  debug: process.env.NODE_ENV === 'development',
+
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
+     httpOptions: {
+        timeout: 10000 // 10 seconds
+      }
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          prompt: "select_account",
-          access_type: "offline",
-          response_type: "code"
-        }
+      allowDangerousEmailAccountLinking: true,
+      httpOptions: {
+        timeout: 10000 // 10 seconds
       }
     }),
     CredentialsProvider({
@@ -35,7 +53,7 @@ export const authOptions = {
 
         try {
           console.log("Authorizing credentials for:", email);
-          
+
           const user = await prisma.user.findUnique({
             where: { email }
           });
@@ -77,51 +95,38 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
+  httpOptions: {
+    timeout: 10000
+  },
+
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log("\n==================== AUTH DATA ====================");
-      console.log("\n1. Raw User Data:", JSON.stringify(user, null, 2));
-      console.log("\n2. Raw Account Data:", JSON.stringify(account, null, 2));
-      console.log("\n3. Raw Profile Data:", JSON.stringify(profile, null, 2));
-      
       try {
         if (account?.provider === "github" || account?.provider === "google") {
+          // First check if user exists with this email
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email },
             include: { accounts: true }
           });
 
           if (!existingUser) {
-            await prisma.user.create({
-              data: {
-                email: user.email,
-                name: user.name,
-                avatar: account.provider === "github" ? profile.avatar_url : profile.picture,
-                userRole: "FREE",
-                isEmailVerified: true,
-                password: await bcrypt.hash(Math.random().toString(36), 10),
-                accounts: {
-                  create: {
-                    type: account.type,
-                    provider: account.provider,
-                    providerAccountId: account.providerAccountId,
-                    access_token: account.access_token,
-                    token_type: account.token_type,
-                    scope: account.scope,
-                  }
+            // Create new user with account
+            try {
+              const newUser = await prisma.user.create({
+                data: {
+                  email: user.email,
+                  name: user.name || profile.name || profile.login,
+                  avatar: account.provider === "github" ? profile.avatar_url : profile.picture,
+                  userRole: "FREE",
+                  isEmailVerified: true,
+                  password: await bcrypt.hash(Math.random().toString(36), 10)
                 }
-              }
-            });
-            console.log(`New ${account.provider} user created:`, user.email);
-          } else {
-            const existingAccount = existingUser.accounts.find(
-              (acc) => acc.provider === account.provider
-            );
+              });
 
-            if (!existingAccount) {
+              // Create account for new user
               await prisma.account.create({
                 data: {
-                  userId: existingUser.id,
+                  userId: newUser.id,
                   type: account.type,
                   provider: account.provider,
                   providerAccountId: account.providerAccountId,
@@ -130,19 +135,44 @@ export const authOptions = {
                   scope: account.scope,
                 }
               });
-              console.log(`Linked ${account.provider} to existing user:`, user.email);
+
+              return true;
+            } catch (error) {
+              console.error("Error creating new user:", error);
+              return false;
             }
+          } else {
+            // User exists, allow sign in with same email
+            if (existingUser.accounts.length === 0) {
+              // No accounts linked yet, create one
+              try {
+                await prisma.account.create({
+                  data: {
+                    userId: existingUser.id,
+                    type: account.type,
+                    provider: account.provider,
+                    providerAccountId: account.providerAccountId,
+                    access_token: account.access_token,
+                    token_type: account.token_type,
+                    scope: account.scope,
+                  }
+                });
+              } catch (error) {
+                console.error("Error linking account:", error);
+              }
+            }
+            return true; // Allow sign in with existing account
           }
-          return true;
         }
-        return true;
+        return true; // Allow other sign in methods
       } catch (error) {
-        console.error("\nError in signIn callback:", error);
+        console.error("Error in signIn callback:", error);
         return false;
       }
     },
 
     async jwt({ token, user, account }) {
+      console.log("\n==================== JWT CALLBACK ====================");
       if (user) {
         token.id = user.id;
         token.role = user.userRole || "FREE";
@@ -153,6 +183,7 @@ export const authOptions = {
     },
 
     async session({ session, token }) {
+      console.log("\n==================== SESSION CALLBACK ====================");
       if (token) {
         session.user = {
           ...session.user,
@@ -166,10 +197,9 @@ export const authOptions = {
 
     async redirect({ url, baseUrl }) {
       console.log("\n==================== REDIRECT CALLBACK ====================");
-      console.log("URL:", url);
-      console.log("Base URL:", baseUrl);
+      console.log("Redirect:", { url, baseUrl });
 
-      // Handle callback URLs
+      // Handle OAuth callbacks
       if (url.includes('/api/auth/callback') || url.includes('state=')) {
         return `${baseUrl}/account`;
       }
@@ -183,6 +213,10 @@ export const authOptions = {
     async signIn(message) {
       console.log("\n==================== SIGN IN EVENT ====================");
       console.log("Sign In Event:", JSON.stringify(message, null, 2));
+    },
+    async error(message) {
+      console.error("\n==================== AUTH ERROR ====================");
+      console.error("Auth Error:", message);
     }
   },
 
