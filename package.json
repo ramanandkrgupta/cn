@@ -58,6 +58,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@types/react": "19.0.1",
     "daisyui": "^3.5.1",
     "prisma": "^5.6.0"
   }

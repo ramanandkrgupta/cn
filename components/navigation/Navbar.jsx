@@ -12,8 +12,9 @@ import { navlinks } from "@/constants";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
 import { newlogo } from "@/public/icons";
-import { Sun, Moon, Menu, X, LogOut, LogIn, User2 } from "lucide-react";
+import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from 'lucide-react'
 import Image from "next/image";
+
 
 const NavBar = ({ showSearch = true }) => {
   const { data: session } = useSession();
@@ -51,7 +52,7 @@ const NavBar = ({ showSearch = true }) => {
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("theme", newTheme);
-    
+
     // Reset animation after it's done
     setTimeout(() => {
       setIsAnimating(false);
@@ -104,10 +105,8 @@ const NavBar = ({ showSearch = true }) => {
         </div>
         <button
           onClick={handleCloseSidebar}
-          className="p-2 hover:bg-base-300 rounded-lg transition-colors"
-          aria-label="Close Menu"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          {/* <X className="w-5 h-5 text-gray-500" /> */}
         </button>
       </div>
 
@@ -137,7 +136,7 @@ const NavBar = ({ showSearch = true }) => {
               </p>
             </div>
           </div>
-          
+
           {/* Quick Stats/Actions */}
           <div className="grid grid-cols-2 gap-2 mb-2">
             <div className="bg-base-300 p-2 rounded-lg text-center">
@@ -157,18 +156,18 @@ const NavBar = ({ showSearch = true }) => {
         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
           Navigation
         </div>
-        
+
         {navlinks.map((menu) => {
           const isActive = isLinkActive(menu.link);
           const IconComponent = menu.icon;
-          
+
           return (
             <Link
               key={menu.name}
               href={menu.link}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
-                isActive 
-                  ? "bg-primary/10 text-primary font-medium" 
+                isActive
+                  ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-500 hover:bg-base-300 hover:text-gray-700"
               }`}
               onClick={() => {
@@ -207,8 +206,8 @@ const NavBar = ({ showSearch = true }) => {
         {/* Auth Button */}
         <button
           className={`flex items-center w-full gap-3 p-4 rounded-xl transition-all duration-200 transform hover:scale-[0.98] active:scale-[0.95] ${
-            session 
-              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" 
+            session
+              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
               : "bg-primary/10 text-primary hover:bg-primary/20"
           }`}
           onClick={() => {
@@ -252,8 +251,8 @@ const NavBar = ({ showSearch = true }) => {
       >
         <div
           className={`absolute inset-0 transition-colors duration-300
-            ${theme === 'mydark' 
-              ? 'bg-base-100' 
+            ${theme === 'mydark'
+              ? 'bg-base-100'
               : 'bg-base-300'
             }`}
           style={{
@@ -323,8 +322,12 @@ const NavBar = ({ showSearch = true }) => {
             <span className="badge">.in</span>
           </p>
 
-          <div className="flex items-center justify-center">
-            <ThemeToggleButton mobile />
+          <div className="flex items-center justify-center ">
+            {/* <ThemeToggleButton mobile />
+             */}
+            <Link href="/account/notifications">
+              <Bell/>
+            </Link>
           </div>
 
           <button
@@ -333,12 +336,12 @@ const NavBar = ({ showSearch = true }) => {
             ref={menuButtonRef}
             aria-label="Toggle Menu"
           >
-            <Menu 
+            <Menu
               className={`w-6 h-6 text-gray-500 absolute transition-opacity duration-200 ${
                 toggleDrawer ? 'opacity-0' : 'opacity-100'
               }`}
             />
-            <X 
+            <X
               className={`w-6 h-6 text-gray-500 transition-opacity duration-200 ${
                 toggleDrawer ? 'opacity-100' : 'opacity-0'
               }`}
@@ -350,7 +353,7 @@ const NavBar = ({ showSearch = true }) => {
             aria-hidden={!toggleDrawer}
           >
             {/* Backdrop */}
-            <div 
+            <div
               className={`absolute inset-0 bg-black transition-opacity duration-300 ${
                 toggleDrawer ? 'opacity-50 pointer-events-auto' : 'opacity-0'
               }`}
