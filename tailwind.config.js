@@ -59,7 +59,7 @@ module.exports = {
     themes: [
       {
         mydark: {
-          primary: '#f97316',
+          primary: '#0EA5E9',
           'base-300': '#1c1c24',
 
           secondary: '#f5f5f4',
@@ -81,7 +81,7 @@ module.exports = {
       },
       {
         mylight: {
-          primary: '#f97316',
+          primary: '#0EA5E9',
           'base-300': '#eaeaea',
           secondary: '#1c1917',
           accent: '#4ade80',
