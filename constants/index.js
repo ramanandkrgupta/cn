@@ -1,9 +1,9 @@
-import { Home, Upload, Info, MessageCircle, Sun, Moon, Menu, X, LogOut, LogIn } from "lucide-react";
+import { Home, Upload, Info, MessageCircle, Sun, Moon, Menu, X, LogOut, LogIn,Search ,Brain } from "lucide-react";
 import { about, addUser, dashboard, upload , whatsapp, wa, click } from "@/public/assets";
 import {
   Psychology,
   bba,
-  
+
   bsw,
   ca,
   coop,
@@ -53,10 +53,21 @@ export const navlinks = [
     link: "/about",
   },
   {
-    name: "Join WA group",
+    name: "Join Us",
     icon: MessageCircle,
     link: "https://chat.whatsapp.com/JotgzAmp62YLOwQScP29iD"
   },
+  {
+    name: "Search",
+    icon: Search,
+    link: "/search"
+  },
+  {
+    name: "Quiz",
+    icon: Brain,
+    link: "/quiz"
+  },
+
 ];
 
 //category-items
@@ -149,7 +160,7 @@ export const courses = [
     description:
       "Mechanical Engineering (ME) is an academic program that provides in-depth knowledge of mechanical engineering.",
   },
-  
+
 ];
 
 export const semester = [
