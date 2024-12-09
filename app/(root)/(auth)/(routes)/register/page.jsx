@@ -12,7 +12,7 @@ import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc"; // Add this import
-import { FaGithub } from "react-icons/fa"; // Add this import
+// import { FaGithub } from "react-icons/fa"; // Add this import
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -23,7 +23,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Add new state
-  const [isGithubLoading, setIsGithubLoading] = useState(false); // Add new state
+  // const [isGithubLoading, setIsGithubLoading] = useState(false); // Add new state
 
   const router = useRouter(); // Ensure useRouter is defined
 
@@ -85,23 +85,23 @@ const RegisterPage = () => {
     }
   };
 
-  const handleGithubLogin = async () => {
-    try {
-      setIsGithubLoading(true);
-      console.log("Starting GitHub signup...");
+  // const handleGithubLogin = async () => {
+  //   try {
+  //     setIsGithubLoading(true);
+  //     console.log("Starting GitHub signup...");
 
-      await signIn("github", {
-        callbackUrl: "/account",
-        redirect: true
-      });
+  //     await signIn("github", {
+  //       callbackUrl: "/account",
+  //       redirect: true
+  //     });
       
-      // Note: The code below won't execute due to redirect: true
-    } catch (error) {
-      console.error("GitHub signup error:", error);
-      toast.error("An error occurred during GitHub sign up");
-      setIsGithubLoading(false);
-    }
-  };
+  //     // Note: The code below won't execute due to redirect: true
+  //   } catch (error) {
+  //     console.error("GitHub signup error:", error);
+  //     toast.error("An error occurred during GitHub sign up");
+  //     setIsGithubLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -207,7 +207,7 @@ const RegisterPage = () => {
                   </span>
                 </button>
 
-                <button
+                {/* <button
                   onClick={handleGithubLogin}
                   disabled={isGithubLoading}
                   className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
@@ -220,7 +220,7 @@ const RegisterPage = () => {
                   <span>
                     {isGithubLoading ? "Signing up..." : "Continue with GitHub"}
                   </span>
-                </button>
+                </button> */}
               </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">

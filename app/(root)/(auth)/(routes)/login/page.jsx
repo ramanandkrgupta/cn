@@ -8,7 +8,7 @@ import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
+// import { FaGithub } from "react-icons/fa";
 
 
 const LoginPage = () => {
@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGithubLoading, setIsGithubLoading] = useState(false);
+  // const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,21 +76,21 @@ const LoginPage = () => {
     }
   };
 
-  const handleGithubLogin = async () => {
-    try {
-      setIsGithubLoading(true);
-      console.log("Starting GitHub login...");
+  // const handleGithubLogin = async () => {
+  //   try {
+  //     setIsGithubLoading(true);
+  //     console.log("Starting GitHub login...");
 
-      await signIn("github", {
-        callbackUrl: "/account",
-        redirect: true
-      });
-    } catch (error) {
-      console.error("GitHub login error:", error);
-      toast.error("An error occurred during GitHub login");
-      setIsGithubLoading(false);
-    }
-  };
+  //     await signIn("github", {
+  //       callbackUrl: "/account",
+  //       redirect: true
+  //     });
+  //   } catch (error) {
+  //     console.error("GitHub login error:", error);
+  //     toast.error("An error occurred during GitHub login");
+  //     setIsGithubLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -180,7 +180,7 @@ const LoginPage = () => {
                   </span>
                 </button>
 
-                <button
+                {/* <button
                   onClick={handleGithubLogin}
                   disabled={isGithubLoading}
                   className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
@@ -193,7 +193,7 @@ const LoginPage = () => {
                   <span>
                     {isGithubLoading ? "Signing in..." : "Continue with GitHub"}
                   </span>
-                </button>
+                </button> */}
               </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
