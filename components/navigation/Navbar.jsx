@@ -103,13 +103,7 @@ const NavBar = ({ showSearch = true }) => {
           />
           <span className="font-bold text-lg">Notes Mates</span>
         </div>
-        <button
-          onClick={handleCloseSidebar}
-          className="p-2 hover:bg-base-300 rounded-lg transition-colors"
-          aria-label="Close Menu"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
+        <button className=""></button>
       </div>
 
       {/* User Profile Section - Show only if logged in */}
