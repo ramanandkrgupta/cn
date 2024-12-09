@@ -150,20 +150,20 @@ const ViewDoc = () => {
   }, [course, semester, category, subId]);
 
   return (
-    // <div className="container ">
-    //   {/* Header Section */}
-    //   <div className=" mb-6">
-        <div className="flex items-center " onClick={() => router.back()}>
+    <div className="container">
+      {/* Header Section */}
+      <div className=" mb-6">
+        <div className="flex items-center gap-2" onClick={() => router.back()} >
           <button
             aria-label="Go Back"
-            className="hover:bg-base-300 p-2 rounded-full transition-colors"
+            className="hover:bg-base-300  rounded-full transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-xl font-bold">{category}</h1>
-        
+          <h1 className="select_header">{category}</h1>
+        </div>
 
-        <small className="text-gray-400 text-sm">
+        <small className="text-gray-400">
           Path: rgpv/
           <Link
             href={`/rgpv/${course}`}
@@ -187,7 +187,7 @@ const ViewDoc = () => {
           </Link>
           /{category}
         </small>
-      
+      </div>
 
       {/* Controls and Stats Section */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
