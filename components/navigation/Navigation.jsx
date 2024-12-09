@@ -2,20 +2,20 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookMarked, Upload, Wallet, User, Bell, Brain } from "lucide-react"; // import icons
+import { Home, BookMarked, Upload, Wallet, User, Bell, Brain ,Search} from "lucide-react"; // import icons
 
 const Navigation = () => {
   const Menus = [
     { name: "Home", icon: Home, path: "/" },
     { name: "Quiz", icon: Brain, path: "/quiz" },
     { name: "Upload", icon: Upload, path: "/upload" },
-    { name: "Notifications", icon: Bell, path: "/account/notifications" },
+    { name: "Search", icon: Search, path: "/search" },
     { name: "Profile", icon: User, path: "/account" },
   ];
 
-  
+
   const currentPath = usePathname();
-  
+
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-base-100 shadow-lg py-3 px-6 rounded-t-xl flex justify-between items-center">
