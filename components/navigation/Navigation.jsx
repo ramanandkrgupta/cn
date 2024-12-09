@@ -25,14 +25,14 @@ const Navigation = () => {
           <Link href={menu.path} key={i} className="flex flex-col items-center">
             <button
               className={`text-2xl ${
-                isActive ? "text-teal-500" : "text-gray-500"
+                isActive ? "text-primary/80" : "text-seconadry/80"
               }`}
             >
               <menu.icon className="w-6 h-6" /> {/* Icon component */}
             </button>
             <span
               className={`text-xs ${
-                isActive ? "text-teal-500" : "text-gray-500"
+                isActive ? "text-primary/80" : "text-seconadry/80"
               } mt-1`}
             >
               {menu.name}

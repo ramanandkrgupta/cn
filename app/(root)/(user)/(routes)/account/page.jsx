@@ -14,12 +14,11 @@ import {
   ChevronRight,
   LayoutDashboard,
 } from "lucide-react";
+import AppVersion from '@/app/(root)/(home)/(routes)/about/components/AppVersion';
 
 // Dynamically import AppVersion with no SSR
-const AppVersion = dynamic(
-  () => import("@/app/(root)/(home)/(routes)/about/components/AppVersion"),
-  { ssr: false }
-);
+// const AppVersion =  import("@/app/(root)/(home)/(routes)/about/components/AppVersion");
+  
 
 // Memoized menu items to prevent unnecessary re-renders
 const getMenuItems = (router, userRole) => {
@@ -126,7 +125,7 @@ export default function Profile() {
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full overflow-hidden bg-base-200">
               <Image
-                src={session?.user?.image || '/icons/icon.png'}
+                src={session?.user?.avatar || '/icons/icon.png'}
                 alt="profile"
                 width={64}
                 height={64}

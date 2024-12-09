@@ -11,7 +11,9 @@ const nextConfig = {
       'avatars.githubusercontent.com', // For GitHub profile photos (if you're using GitHub auth)
       'github.com',
       'www.notesmates.in',
-      'notesmates.in'
+      'notesmates.in',
+      'picsum.photos',
+      'files.edgestore.dev',
     ],
   },
   // async redirects() {
@@ -44,6 +46,9 @@ const nextConfig = {
       },
     ];
   },
+  experimental: {
+    serverActions: true,
+  }
 };
 
 // Configuration object tells the next-pwa plugin

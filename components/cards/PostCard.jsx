@@ -2,108 +2,235 @@ import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
-
-import { doc, fire, newt, premiumIcon } from "@/public/icons";
+import { 
+  Download, 
+  Heart, 
+  Share2, 
+  Eye, 
+  Crown, 
+  Flame,
+  Clock
+} from "lucide-react";
+import { toast } from "sonner";
 
 import PostViewDialogBox from "../models/PostViewDialogBox";
 
-const PostCard = ({ data }) => {
-  const { data: session } = useSession(); // Get session data
-  const description = data.description.slice(0, 120);
-  const shouldShowDots = data.description.length > 120;
-
+const PostCard = ({ data, onUpdate }) => {
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDownload = () => {
-    // Logic to handle file download
+  // Function to determine placeholder image based on file type
+  const getPlaceholderImage = () => {
+    if (!data.file_name) return '/images/placeholders/default-placeholder.png';
+    const extension = data.file_name.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return '/images/placeholders/pdf-placeholder.png';
+      case 'doc':
+      case 'docx':
+        return '/images/placeholders/doc-placeholder.png';
+      default:
+        return '/images/placeholders/default-placeholder.png';
+    }
+  };
+
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    if (!session) {
+      signIn();
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/post/${data.id}/like`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) throw new Error('Failed to like post');
+      
+      const updatedPost = await response.json();
+      onUpdate(updatedPost);
+    } catch (error) {
+      toast.error('Failed to like post');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.share({
+        title: data.title,
+        text: data.description,
+        url: window.location.href
+      });
+      
+      // Update share count
+      const response = await fetch(`/api/post/${data.id}/share`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) throw new Error('Failed to update share count');
+      
+      const updatedPost = await response.json();
+      onUpdate(updatedPost);
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        toast.error('Failed to share');
+      }
+    }
+  };
+
+  const handleDownload = async (e) => {
+    e.stopPropagation();
+    if (!session) {
+      signIn();
+      return;
+    }
+
+    if (data.premium && session.user.role !== "PRO") {
+      toast.error('This is a premium document. Please upgrade to PRO to download.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/post/${data.id}/download`);
+      if (!response.ok) throw new Error('Failed to download');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.file_name;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      // Get updated post data
+      const updateResponse = await fetch(`/api/post/${data.id}`);
+      if (!updateResponse.ok) throw new Error('Failed to update download count');
+      
+      const updatedPost = await updateResponse.json();
+      onUpdate(updatedPost);
+    } catch (error) {
+      toast.error('Failed to download file');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div
-      className="card rounded-lg cursor-pointer bg-neutral hover:bg-[#2c2f32] p-2"
-      title={data.description}
+      className="relative group bg-base-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={() => setIsOpen(true)}
     >
-      <div className="absolute top-0 right-0 w-10 h-10">
-        <Image src={newt} alt="New Tag Icon" className="w-20" />
-        {/* You can add CSS classes like animate-pulse for a pulsing effect */}
-      </div>
-      <div className="flex flex-row items-center relative">
-        {/* Added relative positioning here */}
-        <div className="">
-          <figure className="w-[70px] h-[70px] md:w-20 md:h-20 bg-gray-300 rounded-full overflow-hidden relative">
-            <Image src={doc} alt={data.description} />
-          </figure>
-          <div className="absolute top-0 left-0 w-10 h-10">
-            <Image
-              src={fire}
-              alt="Fire Icon"
-              className="animate-pulse w-25 h-25"
-            />
-            {/* You can add CSS classes like animate-pulse for a pulsing effect */}
+      {/* Thumbnail Section */}
+      <div className="aspect-[3/4] relative overflow-hidden bg-neutral">
+        {/* PDF Thumbnail */}
+        <div className="w-full h-full relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
+          <Image
+            src={getPlaceholderImage()}
+            alt={data.title}
+            width={400}
+            height={600}
+            className="transition-transform duration-300 group-hover:scale-105 object-cover"
+            priority
+          />
+        </div>
+
+        {/* Overlay Icons */}
+        <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <Eye className="w-8 h-8 text-white" />
           </div>
         </div>
-        <div className="text-start ml-5">
-          <p className="text-base font-semibold font-sans md:font-mono mt-2 text-white">
-            {data.title}
-          </p>
-          <p className="text-sm font-medium md:font-semibold font-sans md:font-mono tracking-tighter md:tracking-normal text-[#808191] normal-case break-all">
-            {shouldShowDots ? `${description}...` : description}
-          </p>
-        </div>
-      </div>
-      {/* Premium Tag */}
-      {data.premium && (
-        <div className="absolute top-0 left-0 w-10 h-10">
-          <Image src={premiumIcon} alt="Premium Tag Icon" className="w-20" />
-        </div>
-      )}
-      {isOpen && (
-        <PostViewDialogBox isOpen={isOpen} setIsOpen={setIsOpen} data={data} />
-      )}
 
-      {/* Download Button */}
-      <div className="mt-2">
-        {data.premium ? (
-          session && session.user ? (
-            session.user.userRole === "PRO" ? (
-              <button
-                onClick={handleDownload}
-                className="bg-accent text-white px-4 py-2 rounded"
-              >
-                Download
-              </button>
-            ) : (
-              <p className="text-red-500">
-                Upgrade to PRO to download this file.
-              </p>
-            )
-          ) : (
-            <p
-              className="text-blue-500 cursor-pointer"
-              onClick={() => signIn()}
-            >
-              Login to download
-            </p>
-          )
-        ) : (
-          <button
-            onClick={handleDownload}
-            className="bg-accent text-white px-4 py-2 rounded"
+        {/* Tags */}
+        <div className="absolute top-2 left-2 flex gap-2">
+          {data.premium && (
+            <span className="bg-primary/90 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+              <Crown className="w-3 h-3" />
+              PRO
+            </span>
+          )}
+          {Date.now() - new Date(data.createdAt) < 7 * 24 * 60 * 60 * 1000 && (
+            <span className="bg-accent/90 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              New
+            </span>
+          )}
+        </div>
+
+        {/* Title and Category */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+          <h3 className="font-semibold text-sm line-clamp-2">{data.title}</h3>
+          <p className="text-xs opacity-75 mt-1">{data.category}</p>
+        </div>
+      </div>
+
+      {/* Updated Action Bar */}
+      <div className="p-2 flex items-center justify-between bg-base-200">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={handleLike}
+            disabled={isLoading}
+            className="btn btn-ghost btn-xs gap-1 hover:text-primary"
           >
-            Download
+            <Heart className={`w-4 h-4 ${data.isLiked ? 'fill-primary text-primary' : ''}`} />
+            <span className="text-xs">{data.likes}</span>
           </button>
-        )}
-      </div>
-      <div className="flex justify-between text-sm text-gray-500 mt-2">
-        <span>{data.downloads} 📥</span>
-        <span>{data.likes} ❤️</span>
-        <span>{data.shares} 📢</span>
+          <button 
+            onClick={handleShare}
+            disabled={isLoading}
+            className="btn btn-ghost btn-xs gap-1 hover:text-accent"
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="text-xs">{data.shares}</span>
+          </button>
+          <div className="hidden sm:flex items-center gap-1 text-xs">
+            <Download className="w-4 h-4" />
+            {data.downloads}
+          </div>
+        </div>
         
+        <button
+          onClick={handleDownload}
+          disabled={isLoading || (data.premium && (!session?.user || session.user.role !== "PRO"))}
+          className={`btn btn-xs ${
+            isLoading ? 'loading' : 
+            data.premium && (!session?.user || session.user.role !== "PRO") 
+              ? 'btn-disabled' 
+              : 'btn-primary'
+          }`}
+          title={
+            data.premium && (!session?.user || session.user.role !== "PRO") 
+              ? 'PRO members only' 
+              : `Download (${data.downloads})`
+          }
+        >
+          {!isLoading && <Download className="w-4 h-4" />}
+        </button>
       </div>
+
+      {/* View Dialog */}
+      {isOpen && (
+        <PostViewDialogBox 
+          isOpen={isOpen} 
+          setIsOpen={setIsOpen} 
+          data={data} 
+        />
+      )}
     </div>
-        
-      );
+  );
 };
 
 export default PostCard;

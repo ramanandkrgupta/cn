@@ -13,23 +13,50 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const course = searchParams.get('course') || 'all';
+    const sortBy = searchParams.get('sortBy') || 'name-asc';
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 10;
     const skip = (page - 1) * limit;
 
-    // Build where clause
+    // Build where clause - only add conditions if there's a search term
     const where = {
       AND: [
-        {
+        search ? {
           OR: [
             { subject_name: { contains: search, mode: 'insensitive' } },
             { subject_code: { contains: search, mode: 'insensitive' } },
             { course_name: { contains: search, mode: 'insensitive' } }
           ]
-        },
+        } : {},
         course !== 'all' ? { course_name: course } : {}
       ]
     };
+
+    // Determine sort order
+    let orderBy;
+    switch (sortBy) {
+      case 'name-desc':
+        orderBy = { subject_name: 'desc' };
+        break;
+      case 'newest':
+        orderBy = { id: 'desc' }; // MongoDB ObjectId contains timestamp
+        break;
+      case 'oldest':
+        orderBy = { id: 'asc' };
+        break;
+      case 'most-content':
+        orderBy = {
+          videos: { _count: 'desc' }
+        };
+        break;
+      case 'least-content':
+        orderBy = {
+          videos: { _count: 'asc' }
+        };
+        break;
+      default:
+        orderBy = { subject_name: 'asc' };
+    }
 
     // Get subjects with pagination and related counts
     const [subjects, total] = await Promise.all([
@@ -41,24 +68,20 @@ export async function GET(req) {
           subject_code: true,
           course_name: true,
           semester_code: true,
-          videos: {
-            select: {
-              id: true
-            }
-          },
-          Post: {
-            select: {
-              id: true
-            }
-          },
           User: {
             select: {
               name: true,
               email: true
             }
+          },
+          _count: {
+            select: {
+              videos: true,
+              posts: true
+            }
           }
         },
-        orderBy: { subject_name: 'asc' },
+        orderBy,
         skip,
         take: limit
       }),
@@ -80,12 +103,12 @@ export async function GET(req) {
       }
     });
 
-    // Transform the response to include video counts
+    // Simplified transformation - just pass through the counts
     const transformedSubjects = subjects.map(subject => ({
       ...subject,
       _count: {
-        videos: subject.videos.length,
-        posts: subject.Post?.length || 0
+        videos: subject._count.videos,
+        posts: subject._count.posts
       }
     }));
 

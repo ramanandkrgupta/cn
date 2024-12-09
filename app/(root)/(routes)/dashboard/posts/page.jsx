@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import debounce from "lodash/debounce";
 import {
   FileText,
   Search,
@@ -16,8 +17,91 @@ import {
   Heart,
   Share2,
   Crown,
+  Clock,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
+
+// First, create a separate PostsGrid component
+const PostsGrid = memo(({ posts, onDelete, onTogglePremium, onView }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map((post) => (
+        <div
+          key={post.id}
+          className="bg-base-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <h3 className="font-bold line-clamp-2">{post.title}</h3>
+                <p className="text-sm text-gray-500">{post.subject_name}</p>
+              </div>
+              <div className="dropdown dropdown-end">
+                <label tabIndex={0} className="btn btn-ghost btn-sm btn-square">
+                  <MoreVertical className="w-4 h-4" />
+                </label>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                >
+                  <li>
+                    <a onClick={() => onView(post.id)}>
+                      <Eye className="w-4 h-4" />
+                      View Details
+                    </a>
+                  </li>
+                  <li>
+                    <a onClick={() => onTogglePremium(post.id)}>
+                      <Crown className="w-4 h-4" />
+                      Toggle Premium
+                    </a>
+                  </li>
+                  <li>
+                    <a className="text-error" onClick={() => onDelete(post.id)}>
+                      <Trash className="w-4 h-4" />
+                      Delete
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4">
+              <div className="badge badge-outline">{post.category}</div>
+              {post.premium && (
+                <div className="badge badge-primary">Premium</div>
+              )}
+            </div>
+
+            <div className="text-sm text-gray-500 mb-4">
+              <p>Course: {post.course_name}</p>
+              <p>Semester: {post.semester_code}</p>
+              <p>Uploaded by: {post.user.name || post.user.email}</p>
+            </div>
+
+            <div className="flex justify-between text-sm text-gray-500">
+              <span className="flex items-center gap-1">
+                <Download className="w-4 h-4" />
+                {post._count.userDownloads}
+              </span>
+              <span className="flex items-center gap-1">
+                <Heart className="w-4 h-4" />
+                {post._count.userLikes}
+              </span>
+              <span className="flex items-center gap-1">
+                <Share2 className="w-4 h-4" />
+                {post.shares}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+PostsGrid.displayName = "PostsGrid";
 
 export default function PostsPage() {
   const { data: session } = useSession();
@@ -37,6 +121,17 @@ export default function PostsPage() {
     page: 1,
     limit: 10,
   });
+  const [tableLoading, setTableLoading] = useState(false);
+  const [sortBy, setSortBy] = useState("newest");
+
+  // Sort options
+  const sortOptions = [
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "most-downloads", label: "Most Downloads" },
+    { value: "most-likes", label: "Most Likes" },
+    { value: "most-shares", label: "Most Shares" },
+  ];
 
   useEffect(() => {
     if (session?.user?.role !== "ADMIN") {
@@ -44,27 +139,44 @@ export default function PostsPage() {
       return;
     }
     fetchPosts();
-  }, [session, router, filterCategory, pagination.page]);
+  }, [session, router, filterCategory, pagination.page, sortBy]);
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== "") {
-        fetchPosts();
-      }
-    }, 500);
+  // Improved debounced search with longer delay
+  const debouncedFetch = useCallback(
+    debounce((searchValue) => {
+      fetchPosts(searchValue);
+    }, 800),
+    [filterCategory, pagination.page, sortBy]
+  );
 
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  // Update search handling
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setTableLoading(true);
+    if (value === "") {
+      fetchPosts("");
+    } else {
+      debouncedFetch(value);
+    }
+  };
 
-  const fetchPosts = async () => {
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    fetchPosts("");
+  };
+
+  // Define fetchPosts first
+  const fetchPosts = async (search = searchTerm) => {
     try {
-      setLoading(true);
+      setTableLoading(true);
       const params = new URLSearchParams({
-        search: searchTerm,
+        search,
         category: filterCategory,
         page: pagination.page,
         limit: pagination.limit,
+        sortBy,
       });
 
       const response = await fetch(`/api/admin/posts?${params}`);
@@ -75,11 +187,19 @@ export default function PostsPage() {
       const data = await response.json();
       setPosts(data.posts);
       setStats(data.stats);
-      setPagination(data.pagination);
+
+      // Update pagination with new values
+      setPagination((prev) => ({
+        ...prev,
+        total: data.pagination.total,
+        pages: data.pagination.pages,
+        page: data.pagination.page, // Use the adjusted page from backend
+      }));
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error("Failed to load posts");
     } finally {
+      setTableLoading(false);
       setLoading(false);
     }
   };
@@ -126,6 +246,12 @@ export default function PostsPage() {
       console.error("Error updating post:", error);
       toast.error("Failed to update post");
     }
+  };
+
+  // Add reset pagination when changing filters
+  const handleCategoryChange = (e) => {
+    setFilterCategory(e.target.value);
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
   };
 
   if (loading) {
@@ -187,119 +313,64 @@ export default function PostsPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {/* Enhanced Filters and Search */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search documents..."
-            className="input input-bordered w-full pl-10"
+            placeholder="Search posts..."
+            className="input input-bordered w-full pl-10 pr-10"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
+          {searchTerm && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          )}
         </div>
         <div className="flex gap-2">
           <select
             className="select select-bordered"
             value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            onChange={handleCategoryChange}
           >
             <option value="all">All Categories</option>
             <option value="Study Materials">Study Material</option>
             <option value="Question Papers">Question Papers</option>
             <option value="solutions">Solutions</option>
           </select>
-          <button className="btn btn-square btn-ghost">
-            <Filter className="w-5 h-5" />
-          </button>
+          <select
+            className="select select-bordered"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-base-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <div className="p-4">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <h3 className="font-bold line-clamp-2">{post.title}</h3>
-                  <p className="text-sm text-gray-500">{post.subject_name}</p>
-                </div>
-                <div className="dropdown dropdown-end">
-                  <label
-                    tabIndex={0}
-                    className="btn btn-ghost btn-sm btn-square"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </label>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                  >
-                    <li>
-                      <a
-                        onClick={() =>
-                          router.push(`/dashboard/posts/${post.id}`)
-                        }
-                      >
-                        <Eye className="w-4 h-4" />
-                        View Details
-                      </a>
-                    </li>
-                    <li>
-                      <a onClick={() => togglePremium(post.id)}>
-                        <Crown className="w-4 h-4" />
-                        Toggle Premium
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="text-error"
-                        onClick={() => handleDeletePost(post.id)}
-                      >
-                        <Trash className="w-4 h-4" />
-                        Delete
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 mb-4">
-                <div className="badge badge-outline">{post.category}</div>
-                {post.premium && (
-                  <div className="badge badge-primary">Premium</div>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-500 mb-4">
-                <p>Course: {post.course_name}</p>
-                <p>Semester: {post.semester_code}</p>
-                <p>Uploaded by: {post.user.name || post.user.email}</p>
-              </div>
-
-              <div className="flex justify-between text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <Download className="w-4 h-4" />
-                  {post._count.userDownloads}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Heart className="w-4 h-4" />
-                  {post._count.userLikes}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Share2 className="w-4 h-4" />
-                  {post.shares}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Posts Grid with loading state */}
+      {tableLoading ? (
+        <div className="w-full flex justify-center items-center py-8">
+          <div className="loading loading-spinner loading-lg"></div>
+        </div>
+      ) : (
+        <PostsGrid
+          posts={posts}
+          onDelete={handleDeletePost}
+          onTogglePremium={togglePremium}
+          onView={(id) => router.push(`/dashboard/posts/${id}`)}
+        />
+      )}
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-6 p-4 bg-base-200 rounded-lg">

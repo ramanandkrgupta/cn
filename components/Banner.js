@@ -93,8 +93,8 @@ export default function Banner() {
   {/* Tag */}
   <span 
     className={`w-fit px-3 py-1 mb-2 text-xs font-medium rounded-full 
-      bg-primary/30 text-primary
-      dark:bg-primary/30 dark:text-primary-content
+      bg-primary/30 text-white
+      dark:bg-primary/30 dark:text-white
     `}
   >
     {item.tag}

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -14,10 +14,108 @@ import {
   Video,
   School,
   GraduationCap,
+  Clock,
+  TrendingUp,
+  Calendar,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import SubjectModal from "./components/SubjectModal";
 import { courses } from "@/constants";
+import debounce from "lodash/debounce";
+
+// First, create a separate SubjectsTable component
+const SubjectsTable = ({ subjects, onEdit, onDelete }) => {
+  return (
+    <div className="bg-base-200 rounded-lg overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Course</th>
+              <th>Semester</th>
+              <th>Content</th>
+              <th>Added By</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subjects.map((subject) => (
+              <tr key={subject.id}>
+                <td>
+                  <div>
+                    <div className="font-bold">{subject.subject_name}</div>
+                    <div className="text-sm opacity-50">
+                      Code: {subject.subject_code}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4" />
+                    {subject.course_name}
+                  </div>
+                </td>
+                <td>{subject.semester_code}</td>
+                <td>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <FileText className="w-4 h-4" />
+                      <span className="font-medium">
+                        {subject._count.posts}
+                      </span>
+                      <span className="text-xs text-gray-500">posts</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Video className="w-4 h-4" />
+                      <span className="font-medium">
+                        {subject._count.videos}
+                      </span>
+                      <span className="text-xs text-gray-500">videos</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="text-sm">
+                    {subject.User?.name || subject.User?.email || "N/A"}
+                  </div>
+                </td>
+                <td>
+                  <div className="dropdown dropdown-end">
+                    <label tabIndex={0} className="btn btn-ghost btn-sm">
+                      <MoreVertical className="w-4 h-4" />
+                    </label>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                    >
+                      <li>
+                        <a onClick={() => onEdit(subject)}>
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="text-error"
+                          onClick={() => onDelete(subject.id)}
+                        >
+                          <Trash className="w-4 h-4" />
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 export default function SubjectsPage() {
   const { data: session } = useSession();
@@ -25,6 +123,7 @@ export default function SubjectsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCourse, setFilterCourse] = useState("all");
+  const [sortBy, setSortBy] = useState("name-asc");
   const [subjects, setSubjects] = useState([]);
   const [stats, setStats] = useState({
     totalSubjects: 0,
@@ -40,34 +139,28 @@ export default function SubjectsPage() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
+  const [tableLoading, setTableLoading] = useState(false);
 
-  useEffect(() => {
-    if (session?.user?.role !== "ADMIN") {
-      router.push("/");
-      return;
-    }
-    fetchSubjects();
-  }, [session, router, filterCourse, pagination.page]);
+  // Sort options
+  const sortOptions = [
+    { value: "name-asc", label: "Name (A-Z)", icon: ArrowUpDown },
+    { value: "name-desc", label: "Name (Z-A)", icon: ArrowUpDown },
+    { value: "newest", label: "Recently Added", icon: Clock },
+    { value: "oldest", label: "Oldest First", icon: Calendar },
+    { value: "most-content", label: "Most Content", icon: TrendingUp },
+    { value: "least-content", label: "Least Content", icon: TrendingUp },
+  ];
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== "") {
-        fetchSubjects();
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const fetchSubjects = async () => {
+  // Define fetchSubjects first
+  const fetchSubjects = async (search = searchTerm) => {
     try {
-      setLoading(true);
+      setTableLoading(true);
       const params = new URLSearchParams({
-        search: searchTerm,
+        search,
         course: filterCourse,
         page: pagination.page,
         limit: pagination.limit,
+        sortBy,
       });
 
       const response = await fetch(`/api/admin/subjects?${params}`);
@@ -77,15 +170,48 @@ export default function SubjectsPage() {
 
       const data = await response.json();
       setSubjects(data.subjects);
-      setStats(data.stats);
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching subjects:", error);
       toast.error("Failed to load subjects");
     } finally {
-      setLoading(false);
+      setTableLoading(false);
     }
   };
+
+  // Improved debounced search with longer delay
+  const debouncedFetch = useCallback(
+    debounce((searchValue) => {
+      fetchSubjects(searchValue);
+    }, 800), // Increased delay to 800ms
+    [filterCourse, pagination.page, sortBy]
+  );
+
+  // Update search handling
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setTableLoading(true); // Show loading immediately
+    if (value === "") {
+      fetchSubjects("");
+    } else {
+      debouncedFetch(value);
+    }
+  };
+
+  // Clear search and reset
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    fetchSubjects("");
+  };
+
+  useEffect(() => {
+    if (session?.user?.role !== "ADMIN") {
+      router.push("/");
+      return;
+    }
+    fetchSubjects();
+  }, [session, router, filterCourse, pagination.page, sortBy]);
 
   const handleDeleteSubject = async (subjectId) => {
     if (!confirm("Are you sure you want to delete this subject?")) {
@@ -210,17 +336,25 @@ export default function SubjectsPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {/* Enhanced Filters and Search */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search subjects..."
-            className="input input-bordered w-full pl-10"
+            className="input input-bordered w-full pl-10 pr-10"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
+          {searchTerm && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          )}
         </div>
         <div className="flex gap-2">
           <select
@@ -235,139 +369,75 @@ export default function SubjectsPage() {
               </option>
             ))}
           </select>
-          <button className="btn btn-square btn-ghost">
-            <Filter className="w-5 h-5" />
-          </button>
+          <select
+            className="select select-bordered"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Subjects Table */}
-      <div className="bg-base-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Course</th>
-                <th>Semester</th>
-                <th>Content</th>
-                <th>Added By</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map((subject) => (
-                <tr key={subject.id}>
-                  <td>
-                    <div>
-                      <div className="font-bold">{subject.subject_name}</div>
-                      <div className="text-sm opacity-50">
-                        Code: {subject.subject_code}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4" />
-                      {subject.course_name}
-                    </div>
-                  </td>
-                  <td>{subject.semester_code}</td>
-                  <td>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <FileText className="w-4 h-4" />
-                        <span>{subject._count?.posts || 0}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Video className="w-4 h-4" />
-                        <span>{subject._count?.videos || 0}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="text-sm">
-                      {subject.User?.name || subject.User?.email || "N/A"}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="dropdown dropdown-end">
-                      <label tabIndex={0} className="btn btn-ghost btn-sm">
-                        <MoreVertical className="w-4 h-4" />
-                      </label>
-                      <ul
-                        tabIndex={0}
-                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                      >
-                        <li>
-                          <a
-                            onClick={() => {
-                              setEditingSubject(subject);
-                              setIsModalOpen(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                            Edit
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            className="text-error"
-                            onClick={() => handleDeleteSubject(subject.id)}
-                          >
-                            <Trash className="w-4 h-4" />
-                            Delete
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Table with loading state */}
+      {tableLoading ? (
+        <div className="w-full flex justify-center items-center py-8">
+          <div className="loading loading-spinner loading-lg"></div>
         </div>
+      ) : (
+        <SubjectsTable
+          subjects={subjects}
+          onEdit={(subject) => {
+            setEditingSubject(subject);
+            setIsModalOpen(true);
+          }}
+          onDelete={handleDeleteSubject}
+        />
+      )}
 
-        {/* Pagination */}
-        <div className="flex justify-between items-center p-4">
-          <div className="text-sm text-gray-500">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-            {pagination.total} entries
-          </div>
-          <div className="join">
+      {/* Pagination */}
+      <div className="flex justify-between items-center p-4">
+        <div className="text-sm text-gray-500">
+          Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+          {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+          {pagination.total} entries
+        </div>
+        <div className="join">
+          <button
+            className="join-item btn btn-sm"
+            disabled={pagination.page === 1}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+            }
+          >
+            Previous
+          </button>
+          {[...Array(pagination.pages)].map((_, i) => (
             <button
-              className="join-item btn btn-sm"
-              disabled={pagination.page === 1}
+              key={i + 1}
+              className={`join-item btn btn-sm ${
+                pagination.page === i + 1 ? "btn-active" : ""
+              }`}
               onClick={() =>
-                setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+                setPagination((prev) => ({ ...prev, page: i + 1 }))
               }
             >
-              Previous
+              {i + 1}
             </button>
-            {[...Array(pagination.pages)].map((_, i) => (
-              <button
-                key={i + 1}
-                className={`join-item btn btn-sm ${
-                  pagination.page === i + 1 ? "btn-active" : ""
-                }`}
-                onClick={() =>
-                  setPagination((prev) => ({ ...prev, page: i + 1 }))
-                }
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              className="join-item btn btn-sm"
-              disabled={pagination.page === pagination.pages}
-              onClick={() =>
-                setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-              }
-            >
-              Next
-            </button>
-          </div>
+          ))}
+          <button
+            className="join-item btn btn-sm"
+            disabled={pagination.page === pagination.pages}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+            }
+          >
+            Next
+          </button>
         </div>
       </div>
 

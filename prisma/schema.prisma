@@ -57,6 +57,9 @@ model subject{
   subject_code  String
   subject_name  String
   videos        video[] // Corrected to match model name
+  posts         post[]     // Add this line to create relation with posts
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   // MockTest      MockTest?
 }
 
@@ -76,22 +79,24 @@ model post {
   file_name     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  downloads     Int @default(0)
-  likes         Int @default(0)
-  shares        Int @default(0)
+  downloads     Int      @default(0)
+  likes         Int      @default(0)
+  shares        Int      @default(0)
   userLikes     UserLike[]
   userDownloads UserDownload[]
-  fileHash      String?   // To prevent duplicates
-  status        String    @default("pending") // pending, approved, rejected
+  fileHash      String?   
+  status        String    @default("pending")
   moderatedBy   String?   @db.ObjectId
   moderator     User?     @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
   moderatedAt   DateTime?
   moderationNote String?
   qualityScore  Float     @default(0.0)
   reports       Report[]
-  version       Int       @default(1)  // For version control
-  previousVersion String?   @db.ObjectId  // Reference to previous version
-  isLatestVersion Boolean   @default(true)
+  version       Int       @default(1)
+  previousVersion String?  @db.ObjectId
+  isLatestVersion Boolean @default(true)
+  subject       subject   @relation(fields: [subjectId], references: [id])
+  subjectId     String    @db.ObjectId
 }
 
 model video {

@@ -16,6 +16,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const role = searchParams.get('role') || 'all';
+    const sortBy = searchParams.get('sortBy') || 'newest';
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 10;
     const skip = (page - 1) * limit;
@@ -23,15 +24,34 @@ export async function GET(req) {
     // Build where clause
     const where = {
       AND: [
-        {
+        search ? {
           OR: [
             { name: { contains: search, mode: 'insensitive' } },
             { email: { contains: search, mode: 'insensitive' } }
           ]
-        },
+        } : {},
         role !== 'all' ? { userRole: role } : {}
       ]
     };
+
+    // Determine sort order
+    let orderBy;
+    switch (sortBy) {
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
+        break;
+      case 'most-posts':
+        orderBy = { posts: { _count: 'desc' } };
+        break;
+      case 'most-downloads':
+        orderBy = { downloads: { _count: 'desc' } };
+        break;
+      case 'reputation':
+        orderBy = { reputationScore: 'desc' };
+        break;
+      default: // 'newest'
+        orderBy = { createdAt: 'desc' };
+    }
 
     // Get users with pagination
     const [users, total] = await Promise.all([
@@ -50,7 +70,7 @@ export async function GET(req) {
             }
           }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: orderBy,
         skip,
         take: limit
       }),

@@ -29,13 +29,13 @@ export const authOptions = {
   debug: process.env.NODE_ENV === 'development',
 
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
-     httpOptions: {
-        timeout: 10000 // 10 seconds
-      }
-    }),
+    // GithubProvider({
+    //   clientId: process.env.GITHUB_ID,
+    //   clientSecret: process.env.GITHUB_SECRET,
+    //  httpOptions: {
+    //     timeout: 10000 // 10 seconds
+    //   }
+    // }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -102,7 +102,7 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
-        if (account?.provider === "github" || account?.provider === "google") {
+        if (account?.provider === "google") {
           // First check if user exists with this email
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email },
@@ -116,7 +116,7 @@ export const authOptions = {
                 data: {
                   email: user.email,
                   name: user.name || profile.name || profile.login,
-                  avatar: account.provider === "github" ? profile.avatar_url : profile.picture,
+                  avatar: profile.picture || user.image,
                   userRole: "FREE",
                   isEmailVerified: true,
                   password: await bcrypt.hash(Math.random().toString(36), 10)
@@ -142,6 +142,16 @@ export const authOptions = {
               return false;
             }
           } else {
+            // Update existing user's avatar if it's missing
+            if (!existingUser.avatar && (profile.picture || user.image)) {
+              await prisma.user.update({
+                where: { id: existingUser.id },
+                data: {
+                  avatar: profile.picture || user.image
+                }
+              });
+            }
+
             // User exists, allow sign in with same email
             if (existingUser.accounts.length === 0) {
               // No accounts linked yet, create one
@@ -177,6 +187,9 @@ export const authOptions = {
         token.id = user.id;
         token.role = user.userRole || "FREE";
         token.email = user.email;
+        token.name = user.name;
+        token.avatar = user.avatar || user.image;
+        token.phoneNumber = user.phoneNumber || null;
         token.provider = account?.provider;
       }
       return token;
@@ -189,7 +202,10 @@ export const authOptions = {
           ...session.user,
           id: token.id,
           role: token.role,
-          provider: token.provider
+          provider: token.provider,
+          avatar: token.avatar || session.user.image,
+          name: token.name || session.user.name,
+          phoneNumber: token.phoneNumber
         };
       }
       return session;

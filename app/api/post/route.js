@@ -69,6 +69,21 @@ export async function POST(req) {
     // Create posts
     const posts = await Promise.all(
       fileDetails.map(async (detail, index) => {
+        // First find the subject
+        const subject = await prisma.subject.findFirst({
+          where: {
+            AND: [
+              { subject_code: detail.subject_code },
+              { course_name: detail.course_name },
+              { semester_code: detail.semester_code }
+            ]
+          }
+        });
+
+        if (!subject) {
+          throw new Error(`Subject not found for subject code: ${detail.subject_code}`);
+        }
+
         const post = await prisma.post.create({
           data: {
             title: detail.title,
@@ -81,11 +96,20 @@ export async function POST(req) {
             file_url: uploadRes[index].url,
             file_name: detail.file_name,
             fileHash: uploadRes[index].hash,
-            userId: user.id,
             status: initialStatus,
             qualityScore: 0,
             version: 1,
-            isLatestVersion: true
+            isLatestVersion: true,
+            user: {
+              connect: {
+                id: user.id
+              }
+            },
+            subject: {
+              connect: {
+                id: subject.id
+              }
+            }
           }
         });
 

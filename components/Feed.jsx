@@ -16,7 +16,7 @@ const Feed = ({ label, styleHead, style }) => {
               altMsg={item.description}
               style="mt-2 md:mt-0"
               styleContent="flex flex-col"
-              syleName="text-[#808191] tracking-tighter"
+              syleName="text-secondary/80 dark:text-secondary/70 tracking-tighter" //[#808191]
             />
           );
         })}

@@ -5,78 +5,116 @@ import { authOptions } from "@/app/api/auth/send-code/route";
 
 export async function GET(req) {
   try {
-    // Check for admin role
     const session = await getServerSession(authOptions);
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get URL parameters
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || 'all';
-    const page = parseInt(searchParams.get('page')) || 1;
+    const sortBy = searchParams.get('sortBy') || 'newest';
+    let page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 10;
-    const skip = (page - 1) * limit;
 
     // Build where clause
     const where = {
       AND: [
-        {
+        search ? {
           OR: [
             { title: { contains: search, mode: 'insensitive' } },
-            { subject_name: { contains: search, mode: 'insensitive' } }
+            { description: { contains: search, mode: 'insensitive' } },
+            { subject_name: { contains: search, mode: 'insensitive' } },
+            { course_name: { contains: search, mode: 'insensitive' } }
           ]
-        },
-        category !== 'all' ? { category: category } : {}
-      ]
+        } : {},
+        category && category !== 'all' ? { category } : {}
+      ].filter(Boolean) // Remove empty conditions
     };
 
+    // Get total count first
+    const total = await prisma.post.count({ where });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(total / limit);
+
+    // Adjust page number if it exceeds total pages
+    page = Math.min(page, totalPages || 1);
+
+    // Calculate skip
+    const skip = (page - 1) * limit;
+
+    // Determine sort order
+    let orderBy;
+    switch (sortBy) {
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
+        break;
+      case 'most-downloads':
+        orderBy = { downloads: 'desc' };
+        break;
+      case 'most-likes':
+        orderBy = { likes: 'desc' };
+        break;
+      case 'most-shares':
+        orderBy = { shares: 'desc' };
+        break;
+      default: // 'newest'
+        orderBy = { createdAt: 'desc' };
+    }
+
     // Get posts with pagination
-    const [posts, total] = await Promise.all([
-      prisma.post.findMany({
-        where,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          category: true,
-          course_name: true,
-          subject_name: true,
-          semester_code: true,
-          premium: true,
-          downloads: true,
-          likes: true,
-          shares: true,
-          createdAt: true,
-          user: {
-            select: {
-              name: true,
-              email: true
-            }
-          },
-          _count: {
-            select: {
-              userDownloads: true,
-              userLikes: true
-            }
+    const posts = await prisma.post.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        course_name: true,
+        subject_name: true,
+        semester_code: true,
+        premium: true,
+        downloads: true,
+        likes: true,
+        shares: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true
           }
         },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit
-      }),
-      prisma.post.count({ where })
-    ]);
+        _count: {
+          select: {
+            userDownloads: true,
+            userLikes: true
+          }
+        }
+      },
+      orderBy,
+      skip,
+      take: limit
+    });
 
-    // Get stats
+    // Get stats for all posts (not affected by filtering)
     const stats = await prisma.post.aggregate({
       _sum: {
         downloads: true,
         likes: true,
         shares: true
+      }
+    });
+
+    // Get category distribution
+    const categoryStats = await prisma.post.groupBy({
+      by: ['category'],
+      _count: {
+        _all: true
       },
-      where: {}
+      where: {
+        category: { not: null }
+      }
     });
 
     return NextResponse.json({
@@ -84,11 +122,12 @@ export async function GET(req) {
       stats: {
         totalDownloads: stats._sum.downloads || 0,
         totalLikes: stats._sum.likes || 0,
-        totalShares: stats._sum.shares || 0
+        totalShares: stats._sum.shares || 0,
+        categoryDistribution: categoryStats
       },
       pagination: {
         total,
-        pages: Math.ceil(total / limit),
+        pages: totalPages,
         page,
         limit
       }
