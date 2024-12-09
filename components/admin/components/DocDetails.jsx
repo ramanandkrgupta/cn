@@ -79,6 +79,8 @@ const DocDetails = ({ files, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("Files received in DocDetails:", files); // Debug log
+
     // Validate all required fields
     const isValid = fileDetails.every((detail) => {
       if (
@@ -101,22 +103,43 @@ const DocDetails = ({ files, onSubmit }) => {
 
     try {
       // Format the data for submission
-      const formattedDetails = fileDetails.map((detail, index) => ({
-        title: detail.title,
-        description: detail.description,
-        category: detail.category,
-        course_name: detail.course,
-        semester_code: detail.semester,
-        subject_name: detail.subject.subject_name,
-        subject_code: detail.subject.subject_code,
-        file_name: files[index].file.name,
-      }));
+      const formattedDetails = fileDetails.map((detail, index) => {
+        console.log(`Processing file ${index}:`, {
+          detail,
+          fileData: files[index]
+        }); // Debug log
+
+        const fileData = files[index];
+        if (!fileData?.file) {
+          console.error(`File data missing for index ${index}:`, fileData); // Debug log
+          throw new Error(`Missing file data for ${detail.title}`);
+        }
+
+        const formattedDetail = {
+          ...detail,
+          file: fileData.file,
+          file_name: fileData.file.name,
+          course_name: detail.course,
+          semester_code: detail.semester,
+          subject_name: detail.subject.subject_name,
+          subject_code: detail.subject.subject_code,
+        };
+
+        console.log(`Formatted detail for file ${index}:`, formattedDetail); // Debug log
+        return formattedDetail;
+      });
+
+      console.log("Final formatted details:", formattedDetails); // Debug log
 
       // Call the onSubmit prop function with formatted details
       await onSubmit(formattedDetails);
     } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Failed to submit document details");
+      console.error("Submission error details:", {
+        error,
+        fileDetails,
+        files
+      }); // Debug log
+      toast.error(error.message || "Failed to submit document details");
     }
   };
 

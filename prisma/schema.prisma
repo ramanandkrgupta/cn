@@ -76,6 +76,7 @@ model post {
   category      String?
   premium       Boolean  @default(false)
   file_url      String?
+  thumbnail_url String?
   file_name     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

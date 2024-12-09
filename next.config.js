@@ -14,6 +14,7 @@ const nextConfig = {
       'notesmates.in',
       'picsum.photos',
       'files.edgestore.dev',
+      'res.cloudinary.com',
     ],
   },
   // async redirects() {
@@ -48,7 +49,24 @@ const nextConfig = {
   },
   experimental: {
     serverActions: true,
-  }
+  },
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+    responseLimit: '10mb',
+  },
+  // Increase header size limit
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        stream: false,
+        crypto: false,
+      }
+    }
+    return config
+  },
 };
 
 // Configuration object tells the next-pwa plugin

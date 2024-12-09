@@ -144,6 +144,8 @@ const UploadDoc = ({
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
+      console.log("Dropped files:", acceptedFiles); // Debug log
+
       if (files.length + acceptedFiles.length > 3) {
         toast.error("You can only upload up to three files.");
         return [];
@@ -151,6 +153,7 @@ const UploadDoc = ({
 
       const processedFiles = await Promise.all(
         acceptedFiles.map(async (file) => {
+          console.log("Processing dropped file:", file); // Debug log
           try {
             if (files.some((existingFile) => existingFile.name === file.name)) {
               toast.error(`File '${file.name}' is already selected.`);
@@ -164,20 +167,23 @@ const UploadDoc = ({
 
             // Add watermark to PDF
             const watermarkedFile = await addWatermarkToPdf(file);
-            return {
+            const addedFile = {
               file: watermarkedFile,
               hash: validation.hash,
             };
+            console.log("Processed file:", addedFile); // Debug log
+            return addedFile;
           } catch (error) {
-            toast.error(
-              error.message || `Error processing file '${file.name}'`
-            );
+            console.error("File processing error:", error); // Debug log
+            toast.error(error.message || `Error processing file '${file.name}'`);
             return null;
           }
         })
       );
 
       const validFiles = processedFiles.filter(Boolean);
+      console.log("Valid processed files:", validFiles); // Debug log
+      
       if (validFiles.length > 0) {
         setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       }

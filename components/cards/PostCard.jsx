@@ -2,14 +2,14 @@ import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
-import { 
-  Download, 
-  Heart, 
-  Share2, 
-  Eye, 
-  Crown, 
+import {
+  Download,
+  Heart,
+  Share2,
+  Eye,
+  Crown,
   Flame,
-  Clock
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,16 +23,16 @@ const PostCard = ({ data, onUpdate }) => {
 
   // Function to determine placeholder image based on file type
   const getPlaceholderImage = () => {
-    if (!data.file_name) return '/images/placeholders/default-placeholder.png';
-    const extension = data.file_name.split('.').pop().toLowerCase();
+    if (!data.file_name) return "/images/placeholders/default-placeholder.png";
+    const extension = data.file_name.split(".").pop().toLowerCase();
     switch (extension) {
-      case 'pdf':
-        return '/images/placeholders/pdf-placeholder.png';
-      case 'doc':
-      case 'docx':
-        return '/images/placeholders/doc-placeholder.png';
+      case "pdf":
+        return "/images/placeholders/pdf-placeholder.png";
+      case "doc":
+      case "docx":
+        return "/images/placeholders/doc-placeholder.png";
       default:
-        return '/images/placeholders/default-placeholder.png';
+        return "/images/placeholders/default-placeholder.png";
     }
   };
 
@@ -42,19 +42,19 @@ const PostCard = ({ data, onUpdate }) => {
       signIn();
       return;
     }
-    
+
     try {
       setIsLoading(true);
       const response = await fetch(`/api/post/${data.id}/like`, {
-        method: 'POST'
+        method: "POST",
       });
-      
-      if (!response.ok) throw new Error('Failed to like post');
-      
+
+      if (!response.ok) throw new Error("Failed to like post");
+
       const updatedPost = await response.json();
       onUpdate(updatedPost);
     } catch (error) {
-      toast.error('Failed to like post');
+      toast.error("Failed to like post");
     } finally {
       setIsLoading(false);
     }
@@ -66,21 +66,21 @@ const PostCard = ({ data, onUpdate }) => {
       await navigator.share({
         title: data.title,
         text: data.description,
-        url: window.location.href
+        url: window.location.href,
       });
-      
+
       // Update share count
       const response = await fetch(`/api/post/${data.id}/share`, {
-        method: 'POST'
+        method: "POST",
       });
-      
-      if (!response.ok) throw new Error('Failed to update share count');
-      
+
+      if (!response.ok) throw new Error("Failed to update share count");
+
       const updatedPost = await response.json();
       onUpdate(updatedPost);
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        toast.error('Failed to share');
+      if (error.name !== "AbortError") {
+        toast.error("Failed to share");
       }
     }
   };
@@ -93,18 +93,20 @@ const PostCard = ({ data, onUpdate }) => {
     }
 
     if (data.premium && session.user.role !== "PRO") {
-      toast.error('This is a premium document. Please upgrade to PRO to download.');
+      toast.error(
+        "This is a premium document. Please upgrade to PRO to download."
+      );
       return;
     }
 
     try {
       setIsLoading(true);
       const response = await fetch(`/api/post/${data.id}/download`);
-      if (!response.ok) throw new Error('Failed to download');
-      
+      if (!response.ok) throw new Error("Failed to download");
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = data.file_name;
       document.body.appendChild(a);
@@ -114,12 +116,13 @@ const PostCard = ({ data, onUpdate }) => {
 
       // Get updated post data
       const updateResponse = await fetch(`/api/post/${data.id}`);
-      if (!updateResponse.ok) throw new Error('Failed to update download count');
-      
+      if (!updateResponse.ok)
+        throw new Error("Failed to update download count");
+
       const updatedPost = await updateResponse.json();
       onUpdate(updatedPost);
     } catch (error) {
-      toast.error('Failed to download file');
+      toast.error("Failed to download file");
     } finally {
       setIsLoading(false);
     }
@@ -134,21 +137,24 @@ const PostCard = ({ data, onUpdate }) => {
     >
       {/* Thumbnail Section */}
       <div className="aspect-[3/4] relative overflow-hidden bg-neutral">
-        {/* PDF Thumbnail */}
         <div className="w-full h-full relative">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
           <Image
-            src={getPlaceholderImage()}
+            src={data.thumbnail_url || getPlaceholderImage()}
             alt={data.title}
-            width={400}
-            height={600}
+            width={300}
+            height={400}
             className="transition-transform duration-300 group-hover:scale-105 object-cover"
             priority
           />
         </div>
 
         {/* Overlay Icons */}
-        <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div
+          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <Eye className="w-8 h-8 text-white" />
           </div>
@@ -180,15 +186,19 @@ const PostCard = ({ data, onUpdate }) => {
       {/* Updated Action Bar */}
       <div className="p-2 flex items-center justify-between bg-base-200">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={handleLike}
             disabled={isLoading}
             className="btn btn-ghost btn-xs gap-1 hover:text-primary"
           >
-            <Heart className={`w-4 h-4 ${data.isLiked ? 'fill-primary text-primary' : ''}`} />
+            <Heart
+              className={`w-4 h-4 ${
+                data.isLiked ? "fill-primary text-primary" : ""
+              }`}
+            />
             <span className="text-xs">{data.likes}</span>
           </button>
-          <button 
+          <button
             onClick={handleShare}
             disabled={isLoading}
             className="btn btn-ghost btn-xs gap-1 hover:text-accent"
@@ -201,19 +211,23 @@ const PostCard = ({ data, onUpdate }) => {
             {data.downloads}
           </div>
         </div>
-        
+
         <button
           onClick={handleDownload}
-          disabled={isLoading || (data.premium && (!session?.user || session.user.role !== "PRO"))}
+          disabled={
+            isLoading ||
+            (data.premium && (!session?.user || session.user.role !== "PRO"))
+          }
           className={`btn btn-xs ${
-            isLoading ? 'loading' : 
-            data.premium && (!session?.user || session.user.role !== "PRO") 
-              ? 'btn-disabled' 
-              : 'btn-primary'
+            isLoading
+              ? "loading"
+              : data.premium && (!session?.user || session.user.role !== "PRO")
+              ? "btn-disabled"
+              : "btn-primary"
           }`}
           title={
-            data.premium && (!session?.user || session.user.role !== "PRO") 
-              ? 'PRO members only' 
+            data.premium && (!session?.user || session.user.role !== "PRO")
+              ? "PRO members only"
               : `Download (${data.downloads})`
           }
         >
@@ -223,11 +237,7 @@ const PostCard = ({ data, onUpdate }) => {
 
       {/* View Dialog */}
       {isOpen && (
-        <PostViewDialogBox 
-          isOpen={isOpen} 
-          setIsOpen={setIsOpen} 
-          data={data} 
-        />
+        <PostViewDialogBox isOpen={isOpen} setIsOpen={setIsOpen} data={data} />
       )}
     </div>
   );

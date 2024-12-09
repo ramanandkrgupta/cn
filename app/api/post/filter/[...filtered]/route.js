@@ -31,6 +31,7 @@ export async function GET(req, { params }) {
         subject_name: true,
         premium: true,
         file_name: true,
+        thumbnail_url: true,
         createdAt: true,
         user: {
           select: {

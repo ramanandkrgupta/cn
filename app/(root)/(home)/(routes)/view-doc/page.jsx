@@ -1,3 +1,5 @@
+// app/(root)/(home)/(routes)/view-doc/page.jsx
+
 "use client";
 import { toast } from "sonner";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -9,23 +11,23 @@ import Link from "next/link";
 
 // Format subject code (BT101 -> BT-101)
 const formatSubjectCode = (code) => {
-  if (!code) return '';
+  if (!code) return "";
   const match = code.match(/([A-Za-z]+)(\d+)/);
   return match ? `${match[1]}-${match[2]}` : code;
 };
 
 // Format semester (one -> First)
 const formatSemester = (sem) => {
-  if (!sem) return '';
+  if (!sem) return "";
   const semesterMap = {
-    one: 'First',
-    two: 'Second',
-    three: 'Third',
-    four: 'Fourth',
-    five: 'Fifth',
-    six: 'Sixth',
-    seven: 'Seventh',
-    eight: 'Eighth'
+    one: "First",
+    two: "Second",
+    three: "Third",
+    four: "Fourth",
+    five: "Fifth",
+    six: "Sixth",
+    seven: "Seventh",
+    eight: "Eighth",
   };
   return semesterMap[sem.toLowerCase()] || sem;
 };
@@ -56,8 +58,8 @@ const ViewDoc = () => {
 
   // Update the filter state and options
   const [filters, setFilters] = useState({
-    sort: 'newest',
-    type: 'all'
+    sort: "newest",
+    type: "all",
   });
 
   // Modified fetch function
@@ -67,24 +69,28 @@ const ViewDoc = () => {
         setLoading(true);
         const params = new URLSearchParams({
           sort: filters.sort,
-          type: filters.type
+          type: filters.type,
         });
-        
+
         const response = await fetch(
-          `/api/post/filter/${encodeURIComponent(course)}/${encodeURIComponent(semester)}/${encodeURIComponent(category)}/${encodeURIComponent(subId)}?${params}`
+          `/api/post/filter/${encodeURIComponent(course)}/${encodeURIComponent(
+            semester
+          )}/${encodeURIComponent(category)}/${encodeURIComponent(
+            subId
+          )}?${params}`
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch posts');
+          throw new Error(data.error || "Failed to fetch posts");
         }
 
         // Filter posts based on type
-        const filteredPosts = data.posts.filter(post => {
+        const filteredPosts = data.posts.filter((post) => {
           switch (filters.type) {
-            case 'free':
+            case "free":
               return !post.premium;
-            case 'premium':
+            case "premium":
               return post.premium;
             default:
               return true;
@@ -94,7 +100,7 @@ const ViewDoc = () => {
         setPosts(filteredPosts);
         setMetadata({
           ...data.meta,
-          total: filteredPosts.length
+          total: filteredPosts.length,
         });
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -112,54 +118,76 @@ const ViewDoc = () => {
 
   // Update document title and meta tags
   useEffect(() => {
-    const title = `${category} - ${formatSubjectCode(subId)} - ${course?.toUpperCase()} - ${formatSemester(semester)} Semester | RGPV Notes`;
-    const description = `Access free ${category?.toLowerCase()} for ${formatSubjectCode(subId)} (${course?.toUpperCase()}) ${formatSemester(semester)} Semester at RGPV University. Download lecture notes, previous year question papers, syllabus, and video lectures.`;
-    
+    const title = `${category} - ${formatSubjectCode(
+      subId
+    )} - ${course?.toUpperCase()} - ${formatSemester(
+      semester
+    )} Semester | RGPV Notes`;
+    const description = `Access free ${category?.toLowerCase()} for ${formatSubjectCode(
+      subId
+    )} (${course?.toUpperCase()}) ${formatSemester(
+      semester
+    )} Semester at RGPV University. Download lecture notes, previous year question papers, syllabus, and video lectures.`;
+
     document.title = title;
-    
+
     // Update meta tags
     const updateMetaTag = (name, content) => {
       let tag = document.querySelector(`meta[name="${name}"]`);
       if (!tag) {
-        tag = document.createElement('meta');
+        tag = document.createElement("meta");
         tag.name = name;
         document.head.appendChild(tag);
       }
       tag.content = content;
     };
 
-    updateMetaTag('description', description);
-    updateMetaTag('og:title', title);
-    updateMetaTag('og:description', description);
-    updateMetaTag('og:type', 'website');
-    updateMetaTag('og:site_name', 'RGPV Notes');
+    updateMetaTag("description", description);
+    updateMetaTag("og:title", title);
+    updateMetaTag("og:description", description);
+    updateMetaTag("og:type", "website");
+    updateMetaTag("og:site_name", "RGPV Notes");
   }, [course, semester, category, subId]);
 
   return (
-    <div className="container mx-auto px-4">
-      {/* Header Section */}
-      <div className="space-y-2 mb-6">
-        <div className="flex items-center gap-2" onClick={() => router.back()}>
-          <button aria-label="Go Back" className="hover:bg-base-300 p-2 rounded-full transition-colors">
+    // <div className="container ">
+    //   {/* Header Section */}
+    //   <div className=" mb-6">
+        <div className="flex items-center " onClick={() => router.back()}>
+          <button
+            aria-label="Go Back"
+            className="hover:bg-base-300 p-2 rounded-full transition-colors"
+          >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold">{category}</h1>
-        </div>
+        
 
         <small className="text-gray-400 text-sm">
           Path: rgpv/
-          <Link href={`/rgpv/${course}`} className="text-blue-500 hover:underline">
+          <Link
+            href={`/rgpv/${course}`}
+            className="text-blue-500 hover:underline"
+          >
             {course}
-          </Link>/
-          <Link href={`/rgpv/${course}/${semester}`} className="text-blue-500 hover:underline">
+          </Link>
+          /
+          <Link
+            href={`/rgpv/${course}/${semester}`}
+            className="text-blue-500 hover:underline"
+          >
             {semester}
-          </Link>/
-          <Link href={`/rgpv/${course}/${semester}/${subId}`} className="text-blue-500 hover:underline">
+          </Link>
+          /
+          <Link
+            href={`/rgpv/${course}/${semester}/${subId}`}
+            className="text-blue-500 hover:underline"
+          >
             {subId}
-          </Link>/
-          {category}
+          </Link>
+          /{category}
         </small>
-      </div>
+      
 
       {/* Controls and Stats Section */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
@@ -168,7 +196,9 @@ const ViewDoc = () => {
           <select
             className="select select-bordered select-sm"
             value={filters.sort}
-            onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value }))}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, sort: e.target.value }))
+            }
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
@@ -178,7 +208,9 @@ const ViewDoc = () => {
           <select
             className="select select-bordered select-sm"
             value={filters.type}
-            onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, type: e.target.value }))
+            }
           >
             <option value="all">All Content</option>
             <option value="free">Free Only</option>
@@ -195,7 +227,9 @@ const ViewDoc = () => {
             </div>
             <div className="stat py-2">
               <div className="stat-title text-xs">Downloads</div>
-              <div className="stat-value text-base">{metadata.stats.downloads}</div>
+              <div className="stat-value text-base">
+                {metadata.stats.downloads}
+              </div>
             </div>
             <div className="stat py-2">
               <div className="stat-title text-xs">Likes</div>
@@ -216,12 +250,12 @@ const ViewDoc = () => {
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             {posts.map((post) => (
-              <PostCard 
-                key={post.id} 
+              <PostCard
+                key={post.id}
                 data={post}
                 onUpdate={(updatedPost) => {
-                  setPosts(currentPosts => 
-                    currentPosts.map(p => 
+                  setPosts((currentPosts) =>
+                    currentPosts.map((p) =>
                       p.id === updatedPost.id ? updatedPost : p
                     )
                   );

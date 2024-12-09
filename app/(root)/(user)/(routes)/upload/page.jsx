@@ -18,6 +18,7 @@ export default function UploadPage() {
   const [showDetails, setShowDetails] = useState(false);
 
   const handleFileSelect = async (selectedFiles) => {
+    console.log("Selected files:", selectedFiles); // Debug log
     if (selectedFiles && selectedFiles.length > 0) {
       setFiles(selectedFiles);
       setShowDetails(true);
@@ -31,57 +32,80 @@ export default function UploadPage() {
         return;
       }
 
+      console.log("Starting file upload with details:", fileDetails); // Debug log
+
       toast.loading("Uploading files...");
 
       // Upload files to EdgeStore and calculate hashes
-      const uploadPromises = files.map(async (file) => {
+      const uploadPromises = fileDetails.map(async (detail, index) => {
+        console.log(`Processing upload for file ${index}:`, detail); // Debug log
+
         try {
           // Calculate file hash
-          const hash = await calculateFileHash(file.file);
+          const hash = await calculateFileHash(detail.file);
+          console.log(`File hash calculated for ${detail.file_name}:`, hash); // Debug log
 
           // Check for duplicates
           const dupCheck = await fetch(
             `/api/posts/check-duplicate?hash=${hash}`
           );
           const dupData = await dupCheck.json();
+          console.log("Duplicate check result:", dupData); // Debug log
 
           if (dupData.isDuplicate) {
             throw new Error(
-              `File '${file.file.name}' has already been uploaded`
+              `File '${detail.file_name}' has already been uploaded`
             );
           }
 
           // Upload to EdgeStore
+          console.log(`Starting EdgeStore upload for ${detail.file_name}`); // Debug log
           const res = await edgestore.publicFiles.upload({
-            file: file.file,
+            file: detail.file,
             options: {
               temporary: false,
             },
             onProgressChange: (progress) => {
-              console.log("Upload progress:", progress);
+              console.log(`Upload progress for ${detail.file_name}:`, progress);
             },
           });
 
-          return {
+          console.log("EdgeStore upload response:", res); // Debug log
+
+          const uploadResult = {
             ...res,
             hash,
-            filename: file.file.name,
+            filename: detail.file_name,
+            url: res.url || res.accessUrl,
+            accessUrl: res.accessUrl,
+            file: detail.file,
           };
+
+          console.log("EdgeStore raw response:", res);
+          console.log("Formatted upload result:", uploadResult);
+
+          return uploadResult;
         } catch (error) {
-          console.error("File upload error:", error);
+          console.error(`Upload error for ${detail.file_name}:`, error); // Debug log
           throw new Error(
-            `Failed to upload ${file.file.name}: ${error.message}`
+            `Failed to upload ${detail.file_name}: ${error.message}`
           );
         }
       });
 
       const uploadRes = await Promise.all(uploadPromises);
+      console.log("All upload results:", uploadRes); // Debug log
 
       // Create post entries
       const formData = new FormData();
       formData.append("fileDetails", JSON.stringify(fileDetails));
       formData.append("userEmail", session.user.email);
       formData.append("uploadRes", JSON.stringify(uploadRes));
+
+      console.log("Sending to API:", {
+        fileDetails,
+        uploadRes,
+      }); // Debug log
 
       const response = await fetch("/api/post", {
         method: "POST",
@@ -90,10 +114,12 @@ export default function UploadPage() {
 
       if (!response.ok) {
         const error = await response.json();
+        console.error("API error response:", error); // Debug log
         throw new Error(error.message || "Upload failed");
       }
 
       const data = await response.json();
+      console.log("API success response:", data); // Debug log
 
       if (data.success) {
         toast.dismiss();
@@ -104,7 +130,7 @@ export default function UploadPage() {
       }
     } catch (error) {
       toast.dismiss();
-      console.error("Upload error:", error);
+      console.error("Upload error details:", error); // Debug log
       toast.error(error.message || "Failed to upload files");
     }
   };

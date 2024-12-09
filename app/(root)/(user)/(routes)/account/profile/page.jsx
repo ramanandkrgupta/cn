@@ -85,29 +85,29 @@ export default function EditProfile() {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size should be less than 5MB");
         return;
       }
 
       try {
-        // Convert to base64 for now (you might want to use a proper image upload service)
-        const base64 = await convertToBase64(file);
-        setUserData(prev => ({ ...prev, avatar: base64 }));
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/users/avatar', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error('Failed to upload avatar');
+        
+        const data = await response.json();
+        setUserData(prev => ({ ...prev, avatar: data.avatarUrl }));
       } catch (error) {
         console.error("Error handling avatar:", error);
         toast.error("Failed to process image");
       }
     }
-  };
-
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
   };
 
   const handleSubmit = async (e) => {
