@@ -1,30 +1,65 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Send, Bot, Loader } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Send, Bot, Loader, History } from "lucide-react";
 import { toast } from "sonner";
-import ClientWrapper from "@/components/providers/ClientWrapper";
 
-function AIAssistantContent() {
+export default function AIAssistantContent() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const [loading, setLoading] = useState(false);
   const [conversation, setConversation] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Auto-scroll to bottom
+  useEffect(() => {
+    if (!session) return;
+    
+    if (session?.user?.role !== 'PRO') {
+      router.push('/account/plans');
+      toast.error('AI Assistant is a PRO feature');
+      return;
+    }
+
+    fetchHistory();
+
+    const initialQuery = searchParams.get("q");
+    if (initialQuery) {
+      handleSubmit(null, initialQuery);
+    }
+  }, [session, router]);
+
+  const fetchHistory = async () => {
+    try {
+      const response = await fetch("/api/v1/members/ai-assistant");
+      if (!response.ok) throw new Error("Failed to fetch history");
+      const data = await response.json();
+      
+      const conversationHistory = data.flatMap(item => [
+        { role: "user", content: item.query },
+        { role: "assistant", content: item.response }
+      ]);
+      
+      setConversation(conversationHistory);
+    } catch (error) {
+      toast.error("Failed to load conversation history");
+    }
+  };
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const handleSubmit = async (e, initialQuery = null) => {
+    if (e) e.preventDefault();
+    const messageToSend = initialQuery || query;
+    if (!messageToSend.trim()) return;
 
     setLoading(true);
-    const userMessage = { role: "user", content: query };
+    const userMessage = { role: "user", content: messageToSend };
     setConversation(prev => [...prev, userMessage]);
     setQuery("");
 
@@ -32,7 +67,7 @@ function AIAssistantContent() {
       const response = await fetch("/api/v1/members/ai-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query }),
+        body: JSON.stringify({ message: messageToSend }),
       });
 
       if (!response.ok) {
@@ -45,6 +80,10 @@ function AIAssistantContent() {
         role: "assistant",
         content: data.response
       }]);
+
+      const recentQueries = JSON.parse(localStorage.getItem('aiRecentQueries') || '[]');
+      const updatedQueries = [messageToSend, ...recentQueries.slice(0, 4)];
+      localStorage.setItem('aiRecentQueries', JSON.stringify(updatedQueries));
 
     } catch (error) {
       toast.error(error.message || "Failed to get AI response");
@@ -59,12 +98,21 @@ function AIAssistantContent() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Bot size={32} className="text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold">AI Study Assistant</h1>
-          <p className="text-gray-500">Your personal study companion</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Bot size={32} className="text-primary" />
+          <div>
+            <h1 className="text-2xl font-bold">AI Study Assistant</h1>
+            <p className="text-gray-500">Your personal study companion</p>
+          </div>
         </div>
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="btn btn-ghost btn-sm gap-2"
+        >
+          <History size={16} />
+          History
+        </button>
       </div>
 
       {/* Chat Interface */}
@@ -109,13 +157,5 @@ function AIAssistantContent() {
         </button>
       </form>
     </div>
-  );
-}
-
-export default function AIAssistant() {
-  return (
-    <ClientWrapper requirePro>
-      <AIAssistantContent />
-    </ClientWrapper>
   );
 }

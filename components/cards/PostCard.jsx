@@ -10,16 +10,21 @@ import {
   Crown,
   Flame,
   Clock,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import PostViewDialogBox from "../models/PostViewDialogBox";
+import AddToCollection from "../collections/AddToCollection";
 
 const PostCard = ({ data, onUpdate }) => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Add state for collection modal
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
 
   // Function to determine placeholder image based on file type
   const getPlaceholderImage = () => {
@@ -187,6 +192,16 @@ const PostCard = ({ data, onUpdate }) => {
       <div className="p-2 flex items-center justify-between bg-base-200">
         <div className="flex items-center gap-4">
           <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowCollectionModal(true);
+            }}
+            className="btn btn-ghost btn-xs"
+            title="Add to Collection"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
             onClick={handleLike}
             disabled={isLoading}
             className="btn btn-ghost btn-xs gap-1 hover:text-primary"
@@ -234,6 +249,14 @@ const PostCard = ({ data, onUpdate }) => {
           {!isLoading && <Download className="w-4 h-4" />}
         </button>
       </div>
+
+      {/* Add Collection Modal */}
+{showCollectionModal && (
+  <AddToCollection
+    postId={data.id}
+    onClose={() => setShowCollectionModal(false)}
+  />
+)}
 
       {/* View Dialog */}
       {isOpen && (

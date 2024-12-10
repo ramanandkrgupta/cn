@@ -46,6 +46,8 @@ model User {
   quizAttempts        QuizAttempt[]
   accounts            Account[]
   sessions            Session[]
+  collections         Collection[]
+  aiConversations     AIConversation[]
 }
 
 model subject{
@@ -98,6 +100,7 @@ model post {
   isLatestVersion Boolean @default(true)
   subject       subject?   @relation(fields: [subjectId], references: [id])
   subjectId     String?    @db.ObjectId
+  collections   PostsInCollections[]
 }
 
 model video {
@@ -385,4 +388,36 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Collection {
+  id          String               @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  userId      String              @db.ObjectId
+  user        User                @relation(fields: [userId], references: [id])
+  posts       PostsInCollections[]
+  isPublic    Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model PostsInCollections {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  post         post       @relation(fields: [postId], references: [id])
+  postId       String     @db.ObjectId
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @db.ObjectId
+  addedAt      DateTime   @default(now())
+
+  @@unique([postId, collectionId])
+}
+
+model AIConversation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  query     String
+  response  String
+  timestamp DateTime @default(now())
 }
