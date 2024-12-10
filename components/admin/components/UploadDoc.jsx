@@ -34,7 +34,9 @@ const UploadDoc = ({
   // Check for duplicate files
   const checkDuplicate = async (hash) => {
     try {
-      const response = await fetch(`/api/posts/check-duplicate?hash=${hash}`);
+      const response = await fetch(
+        `/api/v1/members/posts/check-duplicate?hash=${hash}`
+      );
       const data = await response.json();
       return data.isDuplicate;
     } catch (error) {
@@ -175,7 +177,9 @@ const UploadDoc = ({
             return addedFile;
           } catch (error) {
             console.error("File processing error:", error); // Debug log
-            toast.error(error.message || `Error processing file '${file.name}'`);
+            toast.error(
+              error.message || `Error processing file '${file.name}'`
+            );
             return null;
           }
         })
@@ -183,7 +187,7 @@ const UploadDoc = ({
 
       const validFiles = processedFiles.filter(Boolean);
       console.log("Valid processed files:", validFiles); // Debug log
-      
+
       if (validFiles.length > 0) {
         setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       }

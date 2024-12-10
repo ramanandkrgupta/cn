@@ -73,11 +73,11 @@ const ViewDoc = () => {
         });
 
         const response = await fetch(
-          `/api/post/filter/${encodeURIComponent(course)}/${encodeURIComponent(
-            semester
-          )}/${encodeURIComponent(category)}/${encodeURIComponent(
-            subId
-          )}?${params}`
+          `/api/v1/public/posts/filter/${encodeURIComponent(
+            course
+          )}/${encodeURIComponent(semester)}/${encodeURIComponent(
+            category
+          )}/${encodeURIComponent(subId)}?${params}`
         );
         const data = await response.json();
 
@@ -154,7 +154,7 @@ const ViewDoc = () => {
       {/* Header Section */}
       {/* nn */}
       <div className=" mb-6">
-        <div className="flex items-center gap-2" onClick={() => router.back()} >
+        <div className="flex items-center gap-2" onClick={() => router.back()}>
           <button
             aria-label="Go Back"
             className="hover:bg-base-300  rounded-full transition-colors"

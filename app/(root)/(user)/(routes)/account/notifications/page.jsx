@@ -2,7 +2,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Bell, Download, ThumbsUp, Share2, Check, CheckCheck, ArrowLeft } from "lucide-react";
+import {
+  Bell,
+  Download,
+  ThumbsUp,
+  Share2,
+  Check,
+  CheckCheck,
+  ArrowLeft,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 // Skeleton loading component
@@ -46,7 +54,7 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch("/api/users/notifications");
+      const response = await fetch("/api/v1/members/users/notifications");
       if (!response.ok) {
         throw new Error("Failed to fetch notifications");
       }
@@ -62,7 +70,7 @@ export default function Notifications() {
 
   const markAsRead = async (id) => {
     try {
-      const response = await fetch("/api/users/notifications", {
+      const response = await fetch("/api/v1/members/users/notifications", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +80,9 @@ export default function Notifications() {
 
       if (response.ok) {
         setNotifications((prev) =>
-          prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif))
+          prev.map((notif) =>
+            notif.id === id ? { ...notif, read: true } : notif
+          )
         );
         toast.success("Marked as read");
       } else {
@@ -89,7 +99,7 @@ export default function Notifications() {
       const unreadNotifications = notifications.filter((n) => !n.read);
       await Promise.all(
         unreadNotifications.map((notification) =>
-          fetch("/api/users/notifications", {
+          fetch("/api/v1/members/users/notifications", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -99,7 +109,9 @@ export default function Notifications() {
         )
       );
 
-      setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
+      setNotifications((prev) =>
+        prev.map((notif) => ({ ...notif, read: true }))
+      );
       toast.success("All notifications marked as read");
     } catch (error) {
       console.error("Error marking all as read:", error);
@@ -161,15 +173,21 @@ export default function Notifications() {
             <div
               key={notification.id}
               className={`p-4 md:p-5 rounded-lg shadow-md border ${
-                notification.read ? "bg-base-300 border-gray-200" : "bg-base-200 border-gray-300"
+                notification.read
+                  ? "bg-base-300 border-gray-200"
+                  : "bg-base-200 border-gray-300"
               }`}
             >
               <div className="flex items-center gap-3">
                 <div>{getNotificationIcon(notification.type)}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium line-clamp-2">{notification.message}</p>
+                  <p className="text-sm font-medium line-clamp-2">
+                    {notification.message}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
                 {!notification.read && (

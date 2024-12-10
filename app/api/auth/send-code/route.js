@@ -1,3 +1,5 @@
+// /app/api/auth/[...nextauth]/auth.config.js
+
 import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -60,7 +62,7 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       console.log("SignIn Callback:", { user, account: account?.provider });
-      
+
       if (account?.provider === "google") {
         try {
           const existingUser = await prisma.user.findUnique({
@@ -91,7 +93,7 @@ export const authOptions = {
 
     async jwt({ token, user, account }) {
       console.log("JWT Callback:", { tokenEmail: token.email, userId: user?.id });
-      
+
       if (user) {
         token.role = user.userRole;
         token.id = user.id;
@@ -100,11 +102,11 @@ export const authOptions = {
     },
 
     async session({ session, token }) {
-      console.log("Session Callback:", { 
+      console.log("Session Callback:", {
         sessionEmail: session?.user?.email,
-        tokenId: token.id 
+        tokenId: token.id
       });
-      
+
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
@@ -114,7 +116,7 @@ export const authOptions = {
 
     async redirect({ url, baseUrl }) {
       console.log("Redirect Callback:", { url, baseUrl });
-      
+
       // If it's a callback URL with auth parameters
       if (url.includes('/api/auth/callback') || url.includes('state=')) {
         console.log("Processing callback, redirecting to account");

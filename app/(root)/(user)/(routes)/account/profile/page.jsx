@@ -4,7 +4,20 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { ArrowLeft, Camera } from "lucide-react";
+import { ArrowLeft, Camera, Crown } from "lucide-react";
+
+// Helper function to generate random hex color
+const getRandomColor = () => {
+  const colors = [
+    "0088CC", // Blue
+    "00A36C", // Green
+    "CD5C5C", // Red
+    "FFB347", // Orange
+    "9370DB", // Purple
+    "40E0D0", // Turquoise
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
 
 // Skeleton loading component
 const SkeletonLoading = () => (
@@ -41,6 +54,30 @@ const SkeletonLoading = () => (
   </div>
 );
 
+// Avatar categories
+const avatarSets = {
+  free: [
+    '/avatars/free/avatar-1.png',
+    '/avatars/free/avatar-2.png',
+    '/avatars/free/avatar-3.png',
+    '/avatars/free/avatar-4.png',
+  ],
+  pro: [
+    '/avatars/premium/3d/3d-1.png',
+    '/avatars/premium/3d/3d-2.png',
+    '/avatars/premium/3d/3d-3.png',
+    '/avatars/premium/3d/3d-4.png',
+    '/avatars/premium/anime/anime-1.png',
+    '/avatars/premium/anime/anime-2.png',
+    '/avatars/premium/anime/anime-3.png',
+    '/avatars/premium/anime/anime-4.png',
+    '/avatars/premium/pixel/pixel-1.png',
+    '/avatars/premium/pixel/pixel-2.png',
+    '/avatars/premium/pixel/pixel-3.png',
+    '/avatars/premium/pixel/pixel-4.png',
+  ]
+};
+
 export default function EditProfile() {
   const router = useRouter();
   const { data: session, status, update: updateSession } = useSession();
@@ -61,7 +98,7 @@ export default function EditProfile() {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch('/api/users/profile');
+      const response = await fetch("/api/v1/members/users/profile");
       if (response.ok) {
         const data = await response.json();
         setUserData({
@@ -79,7 +116,7 @@ export default function EditProfile() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarChange = async (e) => {
@@ -92,17 +129,17 @@ export default function EditProfile() {
 
       try {
         const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await fetch('/api/users/avatar', {
-          method: 'POST',
+        formData.append("file", file);
+
+        const response = await fetch("/api/users/avatar", {
+          method: "POST",
           body: formData,
         });
 
-        if (!response.ok) throw new Error('Failed to upload avatar');
-        
+        if (!response.ok) throw new Error("Failed to upload avatar");
+
         const data = await response.json();
-        setUserData(prev => ({ ...prev, avatar: data.avatarUrl }));
+        setUserData((prev) => ({ ...prev, avatar: data.avatarUrl }));
       } catch (error) {
         console.error("Error handling avatar:", error);
         toast.error("Failed to process image");
@@ -115,10 +152,10 @@ export default function EditProfile() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/v1/members/users/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
@@ -148,6 +185,13 @@ export default function EditProfile() {
     }
   };
 
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+
+  const handleAvatarSelect = (avatarUrl) => {
+    setUserData((prev) => ({ ...prev, avatar: avatarUrl }));
+    setShowAvatarSelector(false);
+  };
+
   if (pageLoading) {
     return (
       <div className="bg-base-100 min-h-screen">
@@ -173,34 +217,229 @@ export default function EditProfile() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Section */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg relative group">
-              <Image
-                src={userData.avatar || "/team/member-1.jpeg"}
-                alt="avatar"
-                width={100}
-                height={100}
-                className="object-cover w-full h-full"
-              />
-              <label
-                htmlFor="avatar"
-                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              >
-                <Camera className="w-6 h-6 text-white" />
-              </label>
+            <div className="relative">
+              {/* Main Avatar */}
+              <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg relative group">
+                <Image
+                  src={
+                    userData.avatar ||
+                    session?.user.avatar ||
+                    `https://api.dicebear.com/6.x/initials/png?seed=${encodeURIComponent(
+                      userData.name || "NM"
+                    )}&backgroundColor=${getRandomColor()}`
+                  }
+                  alt={`${userData.name}'s avatar`}
+                  width={100}
+                  height={100}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    const seed = encodeURIComponent(userData.name || "NM");
+                    e.target.src = `https://api.dicebear.com/6.x/initials/png?seed=${seed}&backgroundColor=${getRandomColor()}`;
+                  }}
+                />
+                <label
+                  htmlFor="avatar"
+                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Camera className="w-6 h-6 text-white" />
+                </label>
+              </div>
+
+              {/* Premium Indicator */}
+              {session?.user?.role === "PRO" && (
+                <div className="absolute -top-2 -right-2 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <Crown className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              )}
             </div>
-            <input
-              id="avatar"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-            <p className="text-sm text-gray-500 mt-2">Click to change avatar</p>
+
+            {/* Avatar Selection Options */}
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <input
+                id="avatar"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAvatarSelector(!showAvatarSelector)}
+                  className="btn btn-sm btn-outline"
+                >
+                  Choose Default Avatar
+                </button>
+                <label htmlFor="avatar" className="btn btn-sm btn-primary">
+                  Upload Custom
+                </label>
+              </div>
+            </div>
+
+            {/* Default Avatar Selector Modal */}
+            {showAvatarSelector && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-base-200 p-6 rounded-lg max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Choose an Avatar</h3>
+                    <button
+                      onClick={() => setShowAvatarSelector(false)}
+                      className="btn btn-sm btn-ghost"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Free Avatars Section */}
+                  <div className="mb-8">
+                    <h4 className="text-md font-medium mb-3">Free Avatars</h4>
+                    <div className="grid grid-cols-4 gap-4">
+                      {avatarSets.free.map((avatar, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAvatarSelect(avatar)}
+                          className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all group"
+                        >
+                          <Image
+                            src={avatar}
+                            alt={`Free avatar ${index + 1}`}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Premium Avatars Section */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h4 className="text-md font-medium">Premium Avatars</h4>
+                      {session?.user?.role !== 'PRO' && (
+                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                          PRO Only
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 3D Avatars */}
+                    <div className="mb-6">
+                      <h5 className="text-sm text-gray-500 mb-2">3D Style</h5>
+                      <div className="grid grid-cols-4 gap-4">
+                        {avatarSets.pro.slice(0, 4).map((avatar, index) => (
+                          <button
+                            key={index}
+                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            className={`relative aspect-square rounded-lg overflow-hidden group
+                              ${session?.user?.role === 'PRO' 
+                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
+                                : 'cursor-not-allowed opacity-75'}`}
+                          >
+                            <Image
+                              src={avatar}
+                              alt={`3D avatar ${index + 1}`}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform"
+                            />
+                            {session?.user?.role !== 'PRO' && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <Crown className="w-6 h-6 text-primary" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Anime Avatars */}
+                    <div className="mb-6">
+                      <h5 className="text-sm text-gray-500 mb-2">Anime Style</h5>
+                      <div className="grid grid-cols-4 gap-4">
+                        {avatarSets.pro.slice(4, 8).map((avatar, index) => (
+                          <button
+                            key={index}
+                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            className={`relative aspect-square rounded-lg overflow-hidden group
+                              ${session?.user?.role === 'PRO' 
+                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
+                                : 'cursor-not-allowed opacity-75'}`}
+                          >
+                            <Image
+                              src={avatar}
+                              alt={`Anime avatar ${index + 1}`}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform"
+                            />
+                            {session?.user?.role !== 'PRO' && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <Crown className="w-6 h-6 text-primary" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pixel Art Avatars */}
+                    <div>
+                      <h5 className="text-sm text-gray-500 mb-2">Pixel Art Style</h5>
+                      <div className="grid grid-cols-4 gap-4">
+                        {avatarSets.pro.slice(8).map((avatar, index) => (
+                          <button
+                            key={index}
+                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            className={`relative aspect-square rounded-lg overflow-hidden group
+                              ${session?.user?.role === 'PRO' 
+                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
+                                : 'cursor-not-allowed opacity-75'}`}
+                          >
+                            <Image
+                              src={avatar}
+                              alt={`Pixel art avatar ${index + 1}`}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform"
+                            />
+                            {session?.user?.role !== 'PRO' && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <Crown className="w-6 h-6 text-primary" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {session?.user?.role !== 'PRO' && (
+                      <div className="mt-6 p-4 bg-base-300 rounded-lg text-center">
+                        <p className="text-sm mb-2">Upgrade to PRO to unlock all premium avatars!</p>
+                        <button
+                          onClick={() => router.push('/account/plans')}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Upgrade Now
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <p className="text-sm text-gray-500 mt-2">
+              {session?.user?.role === "PRO"
+                ? "Premium user - All avatar options available"
+                : "Upgrade to PRO for more avatar options"}
+            </p>
           </div>
 
           {/* Name Field */}
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm text-secondary font-medium">
+            <label
+              htmlFor="name"
+              className="text-sm text-secondary font-medium"
+            >
               Name
             </label>
             <input
@@ -217,7 +456,10 @@ export default function EditProfile() {
 
           {/* Email (Non-editable) */}
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm text-secondary font-medium">
+            <label
+              htmlFor="email"
+              className="text-sm text-secondary font-medium"
+            >
               Email
             </label>
             <input
@@ -234,9 +476,13 @@ export default function EditProfile() {
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow 
-              ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-focus'}`}
+              ${
+                isLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-primary-focus"
+              }`}
           >
-            {isLoading ? 'Saving...' : 'Save Changes'}
+            {isLoading ? "Saving..." : "Save Changes"}
           </button>
         </form>
       </div>

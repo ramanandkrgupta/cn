@@ -13,18 +13,20 @@ const ViewSubjects = ({ course, semester }) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/subject/filter/${encodeURIComponent(course)}/${encodeURIComponent(semester)}`
+          `/api/v1/public/subjects/filter/${encodeURIComponent(
+            course
+          )}/${encodeURIComponent(semester)}`
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch subjects');
+          throw new Error(data.error || "Failed to fetch subjects");
         }
 
         // Access the subjects array from the response
         setSubjects(data.subjects || []);
       } catch (error) {
-        console.error('Error fetching subjects:', error);
+        console.error("Error fetching subjects:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -71,7 +73,7 @@ const ViewSubjects = ({ course, semester }) => {
           <div className="card-body">
             <h2 className="card-title text-lg">{subject.subject_name}</h2>
             <p className="text-sm opacity-75">Code: {subject.subject_code}</p>
-            
+
             <div className="flex justify-between items-center mt-4">
               <div className="stats stats-vertical lg:stats-horizontal shadow">
                 <div className="stat place-items-center">
@@ -86,9 +88,7 @@ const ViewSubjects = ({ course, semester }) => {
             </div>
 
             <div className="card-actions justify-end mt-2">
-              <button className="btn btn-primary btn-sm">
-                View Content
-              </button>
+              <button className="btn btn-primary btn-sm">View Content</button>
             </div>
           </div>
         </div>
@@ -97,4 +97,4 @@ const ViewSubjects = ({ course, semester }) => {
   );
 };
 
-export default ViewSubjects; 
+export default ViewSubjects;

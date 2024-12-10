@@ -47,7 +47,7 @@ export default function UploadPage() {
 
           // Check for duplicates
           const dupCheck = await fetch(
-            `/api/posts/check-duplicate?hash=${hash}`
+            `/api/v1/members/posts/check-duplicate?hash=${hash}`
           );
           const dupData = await dupCheck.json();
           console.log("Duplicate check result:", dupData); // Debug log

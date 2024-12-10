@@ -16,7 +16,7 @@ export default function UserUploads() {
 
   const fetchUserUploads = async () => {
     try {
-      const response = await fetch('/api/users/uploads');
+      const response = await fetch("/api/v1/members/users/uploads");
       if (response.ok) {
         const data = await response.json();
         setUploads(data);
@@ -33,12 +33,12 @@ export default function UserUploads() {
 
   const handleDelete = async (postId) => {
     try {
-      const response = await fetch(`/api/posts/${postId}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/v1/members/posts/${postId}`, {
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setUploads(prev => prev.filter(upload => upload.id !== postId));
+        setUploads((prev) => prev.filter((upload) => upload.id !== postId));
         toast.success("Post deleted successfully");
       } else {
         throw new Error("Failed to delete post");
@@ -60,15 +60,15 @@ export default function UserUploads() {
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center gap-2 mb-6">
-      {/* Back Button */}
-      <button onClick={() => router.back()} aria-label="Go Back">
-        <ArrowLeft className="w-6 h-6" />
-      </button>
-        <h1 className="text-2xl font-bold">Your Uploads</h1>
+        <div className="flex items-center gap-2 mb-6">
+          {/* Back Button */}
+          <button onClick={() => router.back()} aria-label="Go Back">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-bold">Your Uploads</h1>
         </div>
         <button
-          onClick={() => router.push('/upload')}
+          onClick={() => router.push("/upload")}
           className="btn btn-primary"
         >
           <Upload className="w-4 h-4 mr-2" />
@@ -106,4 +106,4 @@ export default function UserUploads() {
       )}
     </div>
   );
-} 
+}

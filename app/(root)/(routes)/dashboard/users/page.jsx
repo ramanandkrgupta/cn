@@ -23,31 +23,31 @@ import { toast } from "sonner";
 
 // Add these constants at the top of the file, after the imports
 const ROLES = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'FREE', label: 'Free Users' },
-  { value: 'PRO', label: 'Pro Users' },
-  { value: 'ADMIN', label: 'Admins' }
+  { value: "all", label: "All Roles" },
+  { value: "FREE", label: "Free Users" },
+  { value: "PRO", label: "Pro Users" },
+  { value: "ADMIN", label: "Admins" },
 ];
 
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest Members', icon: Clock },
-  { value: 'oldest', label: 'Oldest Members', icon: Calendar },
-  { value: 'most-posts', label: 'Most Posts', icon: FileText },
-  { value: 'most-downloads', label: 'Most Downloads', icon: Download },
-  { value: 'reputation', label: 'Highest Reputation', icon: Star }
+  { value: "newest", label: "Newest Members", icon: Clock },
+  { value: "oldest", label: "Oldest Members", icon: Calendar },
+  { value: "most-posts", label: "Most Posts", icon: FileText },
+  { value: "most-downloads", label: "Most Downloads", icon: Download },
+  { value: "reputation", label: "Highest Reputation", icon: Star },
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'All Status' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-  { value: 'blocked', label: 'Blocked' }
+  { value: "all", label: "All Status" },
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+  { value: "blocked", label: "Blocked" },
 ];
 
 const VERIFICATION_OPTIONS = [
-  { value: 'all', label: 'All Verification' },
-  { value: 'verified', label: 'Verified' },
-  { value: 'unverified', label: 'Unverified' }
+  { value: "all", label: "All Verification" },
+  { value: "verified", label: "Verified" },
+  { value: "unverified", label: "Unverified" },
 ];
 
 // First, create a separate UsersTable component
@@ -116,18 +116,18 @@ const UsersTable = memo(({ users, onRoleChange, onDelete, onView }) => {
               </td>
               <td>
                 <div className="dropdown dropdown-end">
-                  <label 
-                    tabIndex={0} 
+                  <label
+                    tabIndex={0}
                     className="btn btn-ghost btn-sm btn-square"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </label>
-                  <ul 
-                    tabIndex={0} 
+                  <ul
+                    tabIndex={0}
                     className="dropdown-content menu menu-sm z-[100] p-2 shadow-lg bg-base-100 rounded-box w-48"
                   >
                     <li>
-                      <button 
+                      <button
                         onClick={() => onView(user.id)}
                         className="flex items-center px-4 py-2 hover:bg-base-200 rounded-lg"
                       >
@@ -136,8 +136,13 @@ const UsersTable = memo(({ users, onRoleChange, onDelete, onView }) => {
                       </button>
                     </li>
                     <li>
-                      <button 
-                        onClick={() => onRoleChange(user.id, user.userRole === "PRO" ? "FREE" : "PRO")}
+                      <button
+                        onClick={() =>
+                          onRoleChange(
+                            user.id,
+                            user.userRole === "PRO" ? "FREE" : "PRO"
+                          )
+                        }
                         className="flex items-center px-4 py-2 hover:bg-base-200 rounded-lg"
                       >
                         <Shield className="w-4 h-4 mr-2" />
@@ -145,7 +150,7 @@ const UsersTable = memo(({ users, onRoleChange, onDelete, onView }) => {
                       </button>
                     </li>
                     <li>
-                      <button 
+                      <button
                         onClick={() => onDelete(user.id)}
                         className="flex items-center px-4 py-2 hover:bg-base-200 rounded-lg text-error"
                       >
@@ -230,7 +235,7 @@ export default function UsersPage() {
         sortBy,
       });
 
-      const response = await fetch(`/api/admin/users?${params}`);
+      const response = await fetch(`/api/v1/admin/users?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -249,7 +254,7 @@ export default function UsersPage() {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const response = await fetch("/api/admin/users", {
+      const response = await fetch("/api/v1/admin/users", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -275,7 +280,7 @@ export default function UsersPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/users?userId=${userId}`, {
+      const response = await fetch(`/api/v1/admin/users?userId=${userId}`, {
         method: "DELETE",
       });
 
@@ -294,22 +299,22 @@ export default function UsersPage() {
   // Add these handler functions
   const handleRoleFilter = (e) => {
     setFilterRole(e.target.value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handleStatusFilter = (e) => {
     setStatus(e.target.value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handleVerificationFilter = (e) => {
     setVerificationStatus(e.target.value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handleSort = (e) => {
     setSortBy(e.target.value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   if (loading) {
@@ -363,7 +368,7 @@ export default function UsersPage() {
             value={filterRole}
             onChange={handleRoleFilter}
           >
-            {ROLES.map(role => (
+            {ROLES.map((role) => (
               <option key={role.value} value={role.value}>
                 {role.label}
               </option>
@@ -374,7 +379,7 @@ export default function UsersPage() {
             value={status}
             onChange={handleStatusFilter}
           >
-            {STATUS_OPTIONS.map(status => (
+            {STATUS_OPTIONS.map((status) => (
               <option key={status.value} value={status.value}>
                 {status.label}
               </option>
@@ -385,7 +390,7 @@ export default function UsersPage() {
             value={verificationStatus}
             onChange={handleVerificationFilter}
           >
-            {VERIFICATION_OPTIONS.map(status => (
+            {VERIFICATION_OPTIONS.map((status) => (
               <option key={status.value} value={status.value}>
                 {status.label}
               </option>
@@ -396,7 +401,7 @@ export default function UsersPage() {
             value={sortBy}
             onChange={handleSort}
           >
-            {SORT_OPTIONS.map(option => (
+            {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

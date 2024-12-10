@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  Users, 
-  FileText, 
-  BookOpen, 
+import {
+  Users,
+  FileText,
+  BookOpen,
   Download,
   Upload,
   Settings,
@@ -14,7 +14,7 @@ import {
   TrendingDown,
   Crown,
   Heart,
-  Share2
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -27,7 +27,7 @@ export default function DashboardPage() {
     users: { total: 0, premium: 0, trend: 0 },
     documents: { total: 0, premium: 0, trend: 0 },
     subjects: { total: 0, trend: 0 },
-    engagement: { downloads: 0, likes: 0, shares: 0, trend: 0 }
+    engagement: { downloads: 0, likes: 0, shares: 0, trend: 0 },
   });
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/dashboard/stats');
+      const response = await fetch("/api/v1/admin/dashboard/stats");
       if (!response.ok) {
         throw new Error("Failed to fetch dashboard stats");
       }
@@ -56,14 +56,26 @@ export default function DashboardPage() {
     }
   };
 
-  const StatCard = ({ title, value, trend, icon: Icon, color, subValue, subLabel }) => (
+  const StatCard = ({
+    title,
+    value,
+    trend,
+    icon: Icon,
+    color,
+    subValue,
+    subLabel,
+  }) => (
     <div className="bg-base-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-lg ${color} text-white`}>
           <Icon className="w-6 h-6" />
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+          <div
+            className={`flex items-center ${
+              trend >= 0 ? "text-green-500" : "text-red-500"
+            }`}
+          >
             {trend >= 0 ? (
               <TrendingUp className="w-4 h-4 mr-1" />
             ) : (
@@ -78,8 +90,7 @@ export default function DashboardPage() {
         <p className="text-gray-500">{title}</p>
         {subValue !== undefined && (
           <p className="text-sm mt-2">
-            <span className="font-medium">{subValue.toLocaleString()}</span>
-            {" "}
+            <span className="font-medium">{subValue.toLocaleString()}</span>{" "}
             <span className="text-gray-500">{subLabel}</span>
           </p>
         )}
@@ -154,9 +165,7 @@ export default function DashboardPage() {
             <Users className="w-5 h-5" />
             <h3 className="font-semibold">Manage Users</h3>
           </div>
-          <p className="text-sm text-gray-500">
-            View and manage user accounts
-          </p>
+          <p className="text-sm text-gray-500">View and manage user accounts</p>
         </Link>
 
         <Link
@@ -193,9 +202,7 @@ export default function DashboardPage() {
             <Settings className="w-5 h-5" />
             <h3 className="font-semibold">Settings</h3>
           </div>
-          <p className="text-sm text-gray-500">
-            Configure dashboard settings
-          </p>
+          <p className="text-sm text-gray-500">Configure dashboard settings</p>
         </Link>
       </div>
 
@@ -209,9 +216,7 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold mb-2">
             {stats.engagement.downloads.toLocaleString()}
           </p>
-          <p className="text-sm text-gray-500">
-            Total document downloads
-          </p>
+          <p className="text-sm text-gray-500">Total document downloads</p>
         </div>
 
         <div className="bg-base-200 rounded-lg p-6">
@@ -222,9 +227,7 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold mb-2">
             {stats.engagement.likes.toLocaleString()}
           </p>
-          <p className="text-sm text-gray-500">
-            Total document likes
-          </p>
+          <p className="text-sm text-gray-500">Total document likes</p>
         </div>
 
         <div className="bg-base-200 rounded-lg p-6">
@@ -235,11 +238,9 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold mb-2">
             {stats.engagement.shares.toLocaleString()}
           </p>
-          <p className="text-sm text-gray-500">
-            Total document shares
-          </p>
+          <p className="text-sm text-gray-500">Total document shares</p>
         </div>
       </div>
     </div>
   );
-} 
+}

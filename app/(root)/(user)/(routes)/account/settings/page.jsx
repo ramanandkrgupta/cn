@@ -64,7 +64,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/users/settings')
+      const response = await fetch('/api/v1/members/users/settings')
       if (response.ok) {
         const data = await response.json()
         setSettings(data)

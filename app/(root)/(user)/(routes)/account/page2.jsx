@@ -113,7 +113,10 @@ const ProfilePage = () => {
       return;
     }
     try {
-      await axios.post("/api/user/changepwd", { oldPassword, newPassword });
+      await axios.post("/api/v1/members/users/change-password", {
+        oldPassword,
+        newPassword,
+      });
       toast.alert("Password changed successfully!");
       setOldPassword("");
       setNewPassword("");

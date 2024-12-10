@@ -25,7 +25,7 @@ const useUserPost = ({ userID }) => {
 };
 
 const useFilterPost = ({ course, semester, category, subId }) => {
-  const key = `/api/post/filter/${course}/${semester}/${category}/${subId}`;
+  const key = `/api/v1/public/posts/filter/${course}/${semester}/${category}/${subId}`;
   const { data, error, isLoading, mutate } = useSWR(key, fetcher);
   return {
     data,

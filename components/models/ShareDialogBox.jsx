@@ -22,18 +22,18 @@ const ShareDialogBox = ({ isOpen, setIsOpen, postId }) => {
   const updateShareMetric = async () => {
     if (postId) {
       try {
-        await fetch('/api/posts/metrics', {
-          method: 'POST',
+        await fetch("/api/v1/members/posts/metrics", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             postId,
-            metricType: 'shares'
+            metricType: "shares",
           }),
         });
       } catch (error) {
-        console.error('Error updating shares:', error);
+        console.error("Error updating shares:", error);
       }
     }
   };

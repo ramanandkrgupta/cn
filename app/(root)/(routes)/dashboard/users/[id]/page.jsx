@@ -22,7 +22,7 @@ export default function UserDetailsPage() {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch(`/api/admin/users/${params.id}`);
+      const response = await fetch(`/api/v1/admin/users/${params.id}`);
       if (!response.ok) throw new Error("Failed to fetch user details");
       const data = await response.json();
       setUser(data);
@@ -43,10 +43,7 @@ export default function UserDetailsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <button 
-        onClick={() => router.back()}
-        className="btn btn-ghost mb-6"
-      >
+      <button onClick={() => router.back()} className="btn btn-ghost mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back
       </button>
@@ -67,9 +64,9 @@ export default function UserDetailsPage() {
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
-          
+
           <div className="divider"></div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Role</span>
@@ -92,13 +89,15 @@ export default function UserDetailsPage() {
               </div>
               <p className="text-2xl font-bold">{user?._count?.posts || 0}</p>
             </div>
-            
+
             <div className="bg-base-200 p-6 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Download className="w-5 h-5 text-secondary" />
                 <span className="font-medium">Total Downloads</span>
               </div>
-              <p className="text-2xl font-bold">{user?._count?.downloads || 0}</p>
+              <p className="text-2xl font-bold">
+                {user?._count?.downloads || 0}
+              </p>
             </div>
           </div>
 
@@ -111,4 +110,4 @@ export default function UserDetailsPage() {
       </div>
     </div>
   );
-} 
+}

@@ -58,8 +58,8 @@ model subject{
   subject_name  String
   videos        video[] // Corrected to match model name
   posts         post[]     // Add this line to create relation with posts
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime?   @default(now())
+  updatedAt     DateTime?   @updatedAt
   // MockTest      MockTest?
 }
 
@@ -96,8 +96,8 @@ model post {
   version       Int       @default(1)
   previousVersion String?  @db.ObjectId
   isLatestVersion Boolean @default(true)
-  subject       subject   @relation(fields: [subjectId], references: [id])
-  subjectId     String    @db.ObjectId
+  subject       subject?   @relation(fields: [subjectId], references: [id])
+  subjectId     String?    @db.ObjectId
 }
 
 model video {

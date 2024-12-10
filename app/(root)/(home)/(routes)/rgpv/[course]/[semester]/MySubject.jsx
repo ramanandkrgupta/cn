@@ -23,12 +23,14 @@ const ViewSubjects = ({ course, semester }) => {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `/api/subject/filter/${encodeURIComponent(course)}/${encodeURIComponent(semester)}`
+          `/api/v1/public/subjects/filter/${encodeURIComponent(
+            course
+          )}/${encodeURIComponent(semester)}`
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch subjects');
+          throw new Error(data.error || "Failed to fetch subjects");
         }
 
         // Ensure we're setting an array
@@ -48,7 +50,10 @@ const ViewSubjects = ({ course, semester }) => {
   }, [course, semester]);
 
   // Memoize the data to prevent unnecessary re-renders
-  const data = useMemo(() => Array.isArray(userSelectedData) ? userSelectedData : [], [userSelectedData]);
+  const data = useMemo(
+    () => (Array.isArray(userSelectedData) ? userSelectedData : []),
+    [userSelectedData]
+  );
 
   return (
     <div>
@@ -58,10 +63,13 @@ const ViewSubjects = ({ course, semester }) => {
         </button>
         <h1 className="select_header">Select Subjects</h1>
       </div>
-      
+
       <small className="text-gray-400">
         Path: /rgpv/
-        <Link href={`/rgpv/${course}`} className="text-blue-500 hover:underline">
+        <Link
+          href={`/rgpv/${course}`}
+          className="text-blue-500 hover:underline"
+        >
           {course}
         </Link>
         /{semester}

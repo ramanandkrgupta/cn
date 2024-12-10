@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/send-code/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 import { generateThumbnail } from "@/libs/generateThumbnail";
 
 export async function GET() {
@@ -16,7 +16,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    });                          
   } catch (error) {
     console.error("Error processing the request:", error);
     return new Response("An error occurred", {
@@ -47,18 +47,13 @@ export async function POST(req) {
       fileDetails = JSON.parse(fileDetailsStr);
       uploadRes = JSON.parse(uploadResStr);
     } catch (error) {
-      console.error("Error parsing form data:", error);
       return NextResponse.json(
         { error: "Invalid form data" },
         { status: 400 }
       );
     }
 
-    console.log("Received form data:", {
-      fileDetails: fileDetailsStr,
-      userEmail,
-      uploadRes: uploadResStr
-    });
+
 
     if (!fileDetailsStr || !userEmail || !uploadResStr) {
       return NextResponse.json(
@@ -67,10 +62,7 @@ export async function POST(req) {
       );
     }
 
-    console.log("Parsed data:", {
-      fileDetails,
-      uploadRes
-    });
+   
 
     // Get user
     const user = await prisma.user.findUnique({
@@ -125,21 +117,16 @@ export async function POST(req) {
         }
 
         const uploadResult = uploadRes[index];
-        console.log("Processing upload result:", uploadResult);
+      
 
         // Check for any available URL
         const fileUrl = uploadResult?.url || uploadResult?.accessUrl;
         if (!fileUrl) {
-          console.error("Upload result missing URL:", uploadResult);
+          // console.error("Upload result missing URL:", uploadResult);
           throw new Error(`Missing file URL for ${detail.file_name}`);
         }
 
-        // Before thumbnail generation
-        console.log("About to generate thumbnail for:", {
-          fileUrl,
-          uploadResult,
-          postId: uploadResult.id || `temp-${Date.now()}`
-        });
+        
 
         // Generate thumbnail and store the result
         let thumbnailUrl = '/images/placeholders/pdf-placeholder.png'; // Default value
@@ -147,9 +134,9 @@ export async function POST(req) {
         try {
           // Generate thumbnail after file upload
           thumbnailUrl = await generateThumbnail(fileUrl, uploadResult.id || `temp-${Date.now()}`);
-          console.log("Thumbnail generation result:", thumbnailUrl);
+          
         } catch (error) {
-          console.error("Thumbnail generation error:", error);
+         
           // Keep using the default placeholder
         }
 
@@ -203,7 +190,6 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    console.error("Error:", error);
     return NextResponse.json(
       { error: "Server error", message: error.message },
       { status: 500 }

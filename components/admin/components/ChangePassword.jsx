@@ -34,11 +34,14 @@ const ChangePassword = ({ sessionData }) => {
           toast.error(err.message);
         });
       } else {
-        const response = await axios.patch("/api/user/changepwd", {
-          oldPassword,
-          newPassword,
-          sessionData,
-        });
+        const response = await axios.patch(
+          "/api/v1/members/users/change-password",
+          {
+            oldPassword,
+            newPassword,
+            sessionData,
+          }
+        );
         if (response.statusText === "FAILED") {
           toast.error(response.data);
         } else {

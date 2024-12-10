@@ -9,21 +9,21 @@ export default function AddUserPage() {
     name: "",
     email: "",
     password: "",
-    role: "USER" // Default role
+    role: "USER", // Default role
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/admin/users', {
-        method: 'POST',
+      const response = await fetch("/api/v1/admin/users", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
@@ -33,7 +33,7 @@ export default function AddUserPage() {
       }
 
       toast.success("User added successfully");
-      router.push('/dashboard/users');
+      router.push("/dashboard/users");
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error(error.message || "Failed to add user");
@@ -90,8 +90,10 @@ export default function AddUserPage() {
             <option value="PRO">Pro</option>
           </select>
         </div>
-        <button type="submit" className="btn btn-primary w-full">Add User</button>
+        <button type="submit" className="btn btn-primary w-full">
+          Add User
+        </button>
       </form>
     </div>
   );
-} 
+}

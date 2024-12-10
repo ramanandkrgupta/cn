@@ -163,7 +163,7 @@ export default function SubjectsPage() {
         sortBy,
       });
 
-      const response = await fetch(`/api/admin/subjects?${params}`);
+      const response = await fetch(`/api/v1/admin/subjects?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch subjects");
       }
@@ -220,7 +220,7 @@ export default function SubjectsPage() {
 
     try {
       const response = await fetch(
-        `/api/admin/subjects?subjectId=${subjectId}`,
+        `/api/v1/admin/subjects?subjectId=${subjectId}`,
         {
           method: "DELETE",
         }
@@ -242,8 +242,8 @@ export default function SubjectsPage() {
   const handleSubjectSubmit = async (formData) => {
     try {
       const url = editingSubject
-        ? "/api/admin/subjects"
-        : "/api/admin/subjects";
+        ? "/api/v1/admin/subjects"
+        : "/api/v1/admin/subjects";
 
       const method = editingSubject ? "PUT" : "POST";
       const data = editingSubject

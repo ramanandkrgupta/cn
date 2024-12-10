@@ -7,8 +7,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ShareIcon, XMarkIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useSession, signIn } from "next-auth/react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { Lock } from 'lucide-react';
-import Link from 'next/link';
+import { Lock } from "lucide-react";
+import Link from "next/link";
 
 import { handlesharebtn } from "@/libs/utils";
 
@@ -32,7 +32,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   useEffect(() => {
     const checkUserInteraction = async () => {
       if (session?.user) {
-        const response = await fetch(`/api/posts/metrics?postId=${data.id}`);
+        const response = await fetch(
+          `/api/v1/members/posts/metrics?postId=${data.id}`
+        );
         if (response.ok) {
           const { hasLiked, hasDownloaded } = await response.json();
           setHasLiked(hasLiked);
@@ -83,7 +85,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
         session: session,
       });
 
-      const response = await fetch("/api/posts/metrics", {
+      const response = await fetch("/api/v1/members/posts/metrics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,11 +126,13 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
       // Additional check for premium content
       if (data.premium && session.user.userRole !== "PRO") {
-        toast.error("This is a premium file. You need a premium membership to download it.");
+        toast.error(
+          "This is a premium file. You need a premium membership to download it."
+        );
         return;
       }
 
-      const response = await fetch("/api/posts/secure-file", {
+      const response = await fetch("/api/v1/members/posts/secure-file", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +178,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     }
 
     try {
-      const response = await fetch("/api/posts/metrics", {
+      const response = await fetch("/api/v1/members/posts/metrics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -210,12 +214,12 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const handleShare = async () => {
     try {
       // Check if running in browser and if navigator.share is available
-      if (typeof navigator !== 'undefined' && navigator.share) {
+      if (typeof navigator !== "undefined" && navigator.share) {
         // Mobile share
         await navigator.share({
           title: SharePost.title,
           text: SharePost.content,
-          url: SharePost.url
+          url: SharePost.url,
         });
       } else {
         // Desktop fallback - copy to clipboard
@@ -226,7 +230,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       }
 
       // Update share count without requiring login
-      const response = await fetch("/api/posts/metrics", {
+      const response = await fetch("/api/v1/members/posts/metrics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -246,7 +250,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       }
     } catch (error) {
       console.error("Share error:", error);
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         // User cancelled the share
         return;
       }
@@ -358,11 +362,15 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       }}
                       disabled={hasLiked}
                       className={`mt-4 p-2.5 rounded-full transition-all duration-300 ${
-                        hasLiked 
-                          ? "bg-red-500" 
-                          : "bg-black hover:bg-gray-700"
+                        hasLiked ? "bg-red-500" : "bg-black hover:bg-gray-700"
                       }`}
-                      title={!session?.user ? "Login to Like" : hasLiked ? "Already Liked" : "Like"}
+                      title={
+                        !session?.user
+                          ? "Login to Like"
+                          : hasLiked
+                          ? "Already Liked"
+                          : "Like"
+                      }
                     >
                       <HeartIcon
                         className={`h-6 w-6 ${
@@ -384,7 +392,8 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       <div className="text-center">
                         <h4 className="font-semibold mb-2">Login Required</h4>
                         <p className="text-sm text-gray-500 mb-4">
-                          Please login to download and like documents. It's free and takes less than a minute.
+                          Please login to download and like documents. It's free
+                          and takes less than a minute.
                         </p>
                         <div className="flex gap-2 justify-center">
                           <Link
@@ -408,9 +417,12 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     session.user.userRole !== "PRO" && (
                       <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
                         <div className="text-center">
-                          <h4 className="font-semibold text-amber-900 mb-2">Premium Content</h4>
+                          <h4 className="font-semibold text-amber-900 mb-2">
+                            Premium Content
+                          </h4>
                           <p className="text-sm text-amber-800 mb-4">
-                            This is a premium document. Upgrade to PRO to access premium content.
+                            This is a premium document. Upgrade to PRO to access
+                            premium content.
                           </p>
                           <Link
                             href="/plans"

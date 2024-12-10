@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  Bell, 
-  Search, 
+import {
+  Bell,
+  Search,
   Send,
   Users,
   Image as ImageIcon,
@@ -13,7 +13,7 @@ import {
   AlertCircle,
   Info,
   X,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,7 +27,7 @@ export default function NotificationsPage() {
     total: 0,
     pages: 0,
     page: 1,
-    limit: 10
+    limit: 10,
   });
 
   // Form state
@@ -36,7 +36,7 @@ export default function NotificationsPage() {
     message: "",
     image: "",
     link: "",
-    type: "info" // info, success, warning, error
+    type: "info", // info, success, warning, error
   });
 
   // Users state
@@ -57,7 +57,7 @@ export default function NotificationsPage() {
       setLoading(true);
       const params = new URLSearchParams({
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
       });
 
       const response = await fetch(`/api/admin/notifications?${params}`);
@@ -80,7 +80,7 @@ export default function NotificationsPage() {
   const fetchUsers = async () => {
     try {
       setLoadingUsers(true);
-      const response = await fetch('/api/admin/users');
+      const response = await fetch("/api/v1/admin/users");
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -100,14 +100,14 @@ export default function NotificationsPage() {
     }
 
     try {
-      const response = await fetch('/api/admin/notifications', {
-        method: 'POST',
+      const response = await fetch("/api/admin/notifications", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userIds: selectedUsers,
-          ...notification
+          ...notification,
         }),
       });
 
@@ -132,7 +132,7 @@ export default function NotificationsPage() {
 
     try {
       const response = await fetch(`/api/admin/notifications?id=${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
@@ -175,7 +175,9 @@ export default function NotificationsPage() {
               <label className="label">Message</label>
               <textarea
                 value={notification.message}
-                onChange={(e) => setNotification({ ...notification, message: e.target.value })}
+                onChange={(e) =>
+                  setNotification({ ...notification, message: e.target.value })
+                }
                 className="textarea textarea-bordered w-full h-32"
                 placeholder="Enter notification message..."
                 required
@@ -187,7 +189,9 @@ export default function NotificationsPage() {
               <label className="label">Notification Type</label>
               <select
                 value={notification.type}
-                onChange={(e) => setNotification({ ...notification, type: e.target.value })}
+                onChange={(e) =>
+                  setNotification({ ...notification, type: e.target.value })
+                }
                 className="select select-bordered w-full"
               >
                 <option value="info">Information</option>
@@ -204,14 +208,18 @@ export default function NotificationsPage() {
                 <input
                   type="url"
                   value={notification.image}
-                  onChange={(e) => setNotification({ ...notification, image: e.target.value })}
+                  onChange={(e) =>
+                    setNotification({ ...notification, image: e.target.value })
+                  }
                   className="input input-bordered w-full"
                   placeholder="https://example.com/image.jpg"
                 />
                 <button
                   type="button"
                   className="btn btn-square"
-                  onClick={() => setNotification({ ...notification, image: "" })}
+                  onClick={() =>
+                    setNotification({ ...notification, image: "" })
+                  }
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -225,7 +233,9 @@ export default function NotificationsPage() {
                 <input
                   type="url"
                   value={notification.link}
-                  onChange={(e) => setNotification({ ...notification, link: e.target.value })}
+                  onChange={(e) =>
+                    setNotification({ ...notification, link: e.target.value })
+                  }
                   className="input input-bordered w-full"
                   placeholder="https://example.com"
                 />
@@ -246,7 +256,7 @@ export default function NotificationsPage() {
                 <div className="flex gap-2 mb-2">
                   <button
                     type="button"
-                    onClick={() => setSelectedUsers(users.map(u => u.id))}
+                    onClick={() => setSelectedUsers(users.map((u) => u.id))}
                     className="btn btn-sm"
                   >
                     Select All
@@ -260,7 +270,10 @@ export default function NotificationsPage() {
                   </button>
                 </div>
                 {users.map((user) => (
-                  <label key={user.id} className="flex items-center p-2 hover:bg-base-200 rounded">
+                  <label
+                    key={user.id}
+                    className="flex items-center p-2 hover:bg-base-200 rounded"
+                  >
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user.id)}
@@ -268,13 +281,17 @@ export default function NotificationsPage() {
                         if (e.target.checked) {
                           setSelectedUsers([...selectedUsers, user.id]);
                         } else {
-                          setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                          setSelectedUsers(
+                            selectedUsers.filter((id) => id !== user.id)
+                          );
                         }
                       }}
                       className="checkbox checkbox-sm mr-2"
                     />
                     <span>{user.name || user.email}</span>
-                    <span className="text-sm text-gray-500 ml-2">({user.userRole})</span>
+                    <span className="text-sm text-gray-500 ml-2">
+                      ({user.userRole})
+                    </span>
                   </label>
                 ))}
               </div>
@@ -300,10 +317,18 @@ export default function NotificationsPage() {
               <div key={notif.id} className="bg-base-100 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    {notif.type === 'info' && <Info className="w-5 h-5 text-blue-500" />}
-                    {notif.type === 'success' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                    {notif.type === 'warning' && <AlertCircle className="w-5 h-5 text-yellow-500" />}
-                    {notif.type === 'error' && <AlertCircle className="w-5 h-5 text-red-500" />}
+                    {notif.type === "info" && (
+                      <Info className="w-5 h-5 text-blue-500" />
+                    )}
+                    {notif.type === "success" && (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    )}
+                    {notif.type === "warning" && (
+                      <AlertCircle className="w-5 h-5 text-yellow-500" />
+                    )}
+                    {notif.type === "error" && (
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                    )}
                     <div>
                       <p className="font-medium">{notif.message}</p>
                       <p className="text-sm text-gray-500">
@@ -345,29 +370,39 @@ export default function NotificationsPage() {
           {/* Pagination */}
           <div className="flex justify-between items-center mt-6">
             <div className="text-sm text-gray-500">
-              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} notifications
+              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
+              of {pagination.total} notifications
             </div>
             <div className="join">
-              <button 
+              <button
                 className="join-item btn btn-sm"
                 disabled={pagination.page === 1}
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                onClick={() =>
+                  setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+                }
               >
                 Previous
               </button>
               {[...Array(pagination.pages)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`join-item btn btn-sm ${pagination.page === i + 1 ? 'btn-active' : ''}`}
-                  onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+                  className={`join-item btn btn-sm ${
+                    pagination.page === i + 1 ? "btn-active" : ""
+                  }`}
+                  onClick={() =>
+                    setPagination((prev) => ({ ...prev, page: i + 1 }))
+                  }
                 >
                   {i + 1}
                 </button>
               ))}
-              <button 
+              <button
                 className="join-item btn btn-sm"
                 disabled={pagination.page === pagination.pages}
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                onClick={() =>
+                  setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+                }
               >
                 Next
               </button>
@@ -377,4 +412,4 @@ export default function NotificationsPage() {
       </div>
     </div>
   );
-} 
+}

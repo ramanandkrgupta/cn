@@ -1,12 +1,12 @@
 "use client";
-import { useState, useCallback } from 'react';
-import Image from 'next/image'
-import { search } from '@/public/assets'
-import { XMarkIcon } from '@heroicons/react/20/solid'
-import { useDebounce } from '@/libs/hooks/useDebounce'
+import { useState, useCallback } from "react";
+import Image from "next/image";
+import { search } from "@/public/assets";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { useDebounce } from "@/libs/hooks/useDebounce";
 
 const Search = ({ setIsPostOpen, setPost }) => {
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -19,12 +19,14 @@ const Search = ({ setIsPostOpen, setPost }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/posts/search?q=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error('Search failed');
+      const response = await fetch(
+        `/api/v1/members/posts/search?q=${encodeURIComponent(query)}`
+      );
+      if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setResults(data.posts);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);
@@ -38,7 +40,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
   };
 
   const handleClose = () => {
-    setSearchText('');
+    setSearchText("");
     setResults([]);
   };
 
@@ -79,10 +81,10 @@ const Search = ({ setIsPostOpen, setPost }) => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Search
+export default Search;
 
 const SearchDropDown = ({
   loading,
@@ -107,7 +109,7 @@ const SearchDropDown = ({
         />
         <div className="text-white font-semibold text-xs">
           {loading ? (
-            'Searching...'
+            "Searching..."
           ) : (
             <>
               {results.length} <span>results for</span> "{searchText}"
@@ -130,5 +132,5 @@ const SearchDropDown = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
