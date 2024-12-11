@@ -1,7 +1,7 @@
 // app/(root)/(home)/(routes)/view-doc/page.jsx
 
 "use client";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import PostCard from "@/components/cards/PostCard";

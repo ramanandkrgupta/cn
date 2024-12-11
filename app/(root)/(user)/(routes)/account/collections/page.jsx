@@ -1,8 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Plus, Folder, Share2, Edit, Trash, Lock, Globe, ChevronDown, ChevronUp } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Plus,
+  Folder,
+  Share2,
+  Edit,
+  Trash,
+  Lock,
+  Globe,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -19,13 +29,13 @@ export default function Collections() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    isPublic: false
+    isPublic: false,
   });
 
   useEffect(() => {
-    if (session?.user?.role !== 'PRO') {
-      router.push('/account/plans');
-      toast.error('Collections are a PRO feature');
+    if (session?.user?.role !== "PRO") {
+      router.push("/account/plans");
+      toast.error("Collections are a PRO feature");
       return;
     }
     fetchCollections();
@@ -56,7 +66,7 @@ export default function Collections() {
       if (!response.ok) throw new Error("Failed to create collection");
 
       const newCollection = await response.json();
-      setCollections(prev => [newCollection, ...prev]);
+      setCollections((prev) => [newCollection, ...prev]);
       setShowCreateModal(false);
       setFormData({ name: "", description: "", isPublic: false });
       toast.success("Collection created successfully!");
@@ -73,15 +83,15 @@ export default function Collections() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingCollection.id,
-          ...formData
+          ...formData,
         }),
       });
 
       if (!response.ok) throw new Error("Failed to update collection");
 
       const updatedCollection = await response.json();
-      setCollections(prev => 
-        prev.map(c => c.id === editingCollection.id ? updatedCollection : c)
+      setCollections((prev) =>
+        prev.map((c) => (c.id === editingCollection.id ? updatedCollection : c))
       );
       setShowEditModal(false);
       setEditingCollection(null);
@@ -103,7 +113,7 @@ export default function Collections() {
 
       if (!response.ok) throw new Error("Failed to delete collection");
 
-      setCollections(prev => prev.filter(c => c.id !== collectionId));
+      setCollections((prev) => prev.filter((c) => c.id !== collectionId));
       toast.success("Collection deleted successfully!");
     } catch (error) {
       toast.error("Failed to delete collection");
@@ -111,14 +121,14 @@ export default function Collections() {
   };
 
   const handleShare = async (collectionId) => {
-    const collection = collections.find(c => c.id === collectionId);
+    const collection = collections.find((c) => c.id === collectionId);
     if (!collection) return;
 
     try {
       await navigator.share({
         title: collection.name,
         text: collection.description,
-        url: `${window.location.origin}/collections/${collectionId}`
+        url: `${window.location.origin}/collections/${collectionId}`,
       });
 
       toast.success("Collection shared successfully!");
@@ -134,13 +144,15 @@ export default function Collections() {
     setFormData({
       name: collection.name,
       description: collection.description,
-      isPublic: collection.isPublic
+      isPublic: collection.isPublic,
     });
     setShowEditModal(true);
   };
 
   const toggleExpand = (collectionId) => {
-    setExpandedCollection(expandedCollection === collectionId ? null : collectionId);
+    setExpandedCollection(
+      expandedCollection === collectionId ? null : collectionId
+    );
   };
 
   const removeFromCollection = async (collectionId, postId) => {
@@ -154,16 +166,18 @@ export default function Collections() {
       if (!response.ok) throw new Error("Failed to remove from collection");
 
       // Update local state
-      setCollections(prev => prev.map(c => {
-        if (c.id === collectionId) {
-          return {
-            ...c,
-            posts: c.posts.filter(p => p.id !== postId),
-            _count: { ...c._count, posts: c._count.posts - 1 }
-          };
-        }
-        return c;
-      }));
+      setCollections((prev) =>
+        prev.map((c) => {
+          if (c.id === collectionId) {
+            return {
+              ...c,
+              posts: c.posts.filter((p) => p.id !== postId),
+              _count: { ...c._count, posts: c._count.posts - 1 },
+            };
+          }
+          return c;
+        })
+      );
 
       toast.success("Removed from collection");
     } catch (error) {
@@ -218,10 +232,11 @@ export default function Collections() {
                   className="flex items-center gap-2 hover:text-primary transition-colors"
                 >
                   <span>{collection._count.posts} items</span>
-                  {expandedCollection === collection.id ? 
-                    <ChevronUp size={16} /> : 
+                  {expandedCollection === collection.id ? (
+                    <ChevronUp size={16} />
+                  ) : (
                     <ChevronDown size={16} />
-                  }
+                  )}
                 </button>
                 <div className="flex gap-2">
                   <button
@@ -259,7 +274,10 @@ export default function Collections() {
                       <div key={post.id} className="relative group">
                         <div className="aspect-[3/4] rounded-lg overflow-hidden">
                           <Image
-                            src={post.thumbnail_url || "/images/placeholders/pdf-placeholder.png"}
+                            src={
+                              post.thumbnail_url ||
+                              "/images/placeholders/pdf-placeholder.png"
+                            }
                             alt={post.title}
                             width={200}
                             height={267}
@@ -268,7 +286,9 @@ export default function Collections() {
                         </div>
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button
-                            onClick={() => removeFromCollection(collection.id, post.id)}
+                            onClick={() =>
+                              removeFromCollection(collection.id, post.id)
+                            }
                             className="btn btn-sm btn-error"
                           >
                             Remove
@@ -291,14 +311,18 @@ export default function Collections() {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-base-200 p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-lg font-semibold mb-4">Create New Collection</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Create New Collection
+            </h2>
             <form onSubmit={handleCreateCollection} className="space-y-4">
               <div>
                 <label className="label">Name</label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   className="input input-bordered w-full"
                   required
                 />
@@ -307,7 +331,12 @@ export default function Collections() {
                 <label className="label">Description</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   className="textarea textarea-bordered w-full"
                 />
               </div>
@@ -315,7 +344,12 @@ export default function Collections() {
                 <input
                   type="checkbox"
                   checked={formData.isPublic}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isPublic: e.target.checked,
+                    }))
+                  }
                   className="checkbox"
                 />
                 <label>Make this collection public</label>
@@ -348,7 +382,9 @@ export default function Collections() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   className="input input-bordered w-full"
                   required
                 />
@@ -357,7 +393,12 @@ export default function Collections() {
                 <label className="label">Description</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   className="textarea textarea-bordered w-full"
                 />
               </div>
@@ -365,7 +406,12 @@ export default function Collections() {
                 <input
                   type="checkbox"
                   checked={formData.isPublic}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isPublic: e.target.checked,
+                    }))
+                  }
                   className="checkbox"
                 />
                 <label>Make this collection public</label>

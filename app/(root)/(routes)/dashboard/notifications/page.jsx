@@ -15,7 +15,7 @@ import {
   X,
   Trash2,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function NotificationsPage() {
   const { data: session } = useSession();
@@ -60,7 +60,7 @@ export default function NotificationsPage() {
         limit: pagination.limit,
       });
 
-      const response = await fetch(`/api/admin/notifications?${params}`);
+      const response = await fetch(`/api/v1/admin/notifications?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch notifications");
       }
@@ -100,7 +100,7 @@ export default function NotificationsPage() {
     }
 
     try {
-      const response = await fetch("/api/admin/notifications", {
+      const response = await fetch("/api/v1/admin/notifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export default function NotificationsPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/notifications?id=${id}`, {
+      const response = await fetch(`/api/v1/admin/notifications?id=${id}`, {
         method: "DELETE",
       });
 

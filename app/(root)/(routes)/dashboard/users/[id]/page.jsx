@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, User2, FileText, Download } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function UserDetailsPage() {
   const { data: session } = useSession();

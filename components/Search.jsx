@@ -20,7 +20,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/v1/members/posts/search?q=${encodeURIComponent(query)}`
+        `/api/v1/public/search?q=${encodeURIComponent(query)}`
       );
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();

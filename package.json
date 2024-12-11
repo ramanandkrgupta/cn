@@ -51,6 +51,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-easy-crop": "^5.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-icons": "^4.10.1",
     "react-markdown": "^9.0.1",
     "react-phone-input-2": "^2.15.1",

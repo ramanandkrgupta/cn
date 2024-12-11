@@ -10,7 +10,7 @@ import axios from "axios";
 import Input from "@/components/ui/Input";
 import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc"; // Add this import
 // import { FaGithub } from "react-icons/fa"; // Add this import
 
@@ -94,7 +94,7 @@ const RegisterPage = () => {
   //       callbackUrl: "/account",
   //       redirect: true
   //     });
-      
+
   //     // Note: The code below won't execute due to redirect: true
   //   } catch (error) {
   //     console.error("GitHub signup error:", error);

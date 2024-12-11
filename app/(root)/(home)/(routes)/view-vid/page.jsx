@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 

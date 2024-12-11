@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { Upload, Trash2, Edit, ArrowLeft } from "lucide-react";
 import PostCard from "@/components/cards/PostCard";
 

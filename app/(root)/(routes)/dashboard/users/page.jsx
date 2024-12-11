@@ -19,7 +19,7 @@ import {
   Calendar,
   Star,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 // Add these constants at the top of the file, after the imports
 const ROLES = [

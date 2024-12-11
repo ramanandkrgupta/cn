@@ -1,10 +1,10 @@
 import axios from "axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { useEffect, useMemo, useState } from "react";
 
 import Table from "./Table";
-import EditForm from "./EditForm";  // Import the EditForm component
+import EditForm from "./EditForm"; // Import the EditForm component
 import { useEdgeStore } from "@/libs/edgestore";
 import { useUserPost } from "@/libs/hooks/usePost";
 import { useUserSubject } from "@/libs/hooks/useSubject";
@@ -162,11 +162,15 @@ const ShowData = ({ userID }) => {
   const handleSave = (updatedData) => {
     if (isSubjectEditing) {
       setSubjectData((prevData) =>
-        prevData.map((item) => (item.id === updatedData.id ? updatedData : item))
+        prevData.map((item) =>
+          item.id === updatedData.id ? updatedData : item
+        )
       );
     } else {
       setPostData((prevData) =>
-        prevData.map((item) => (item.id === updatedData.id ? updatedData : item))
+        prevData.map((item) =>
+          item.id === updatedData.id ? updatedData : item
+        )
       );
     }
   };

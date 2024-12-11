@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import VideoCard from "@/components/video/VideoCard";
 import SkeletonLoading from "@/components/ui/SkeletonLoading";

@@ -17,7 +17,7 @@ import {
   Share2,
 } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function DashboardPage() {
   const { data: session } = useSession();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import { roles } from "..";
 import ListBox from "../ui/ListBox";

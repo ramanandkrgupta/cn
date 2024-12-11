@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { ArrowLeft, Camera, Crown } from "lucide-react";
 
 // Helper function to generate random hex color
@@ -194,18 +194,18 @@ export default function EditProfile() {
 
   const handleNameUpdate = async (newName) => {
     try {
-      const response = await fetch('/api/v1/members/users/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/v1/members/users/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: newName
-        })
+          name: newName,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to update profile');
-      
+      if (!response.ok) throw new Error("Failed to update profile");
+
       const updatedUser = await response.json();
 
       // Update session
@@ -213,17 +213,17 @@ export default function EditProfile() {
         ...session,
         user: {
           ...session.user,
-          name: updatedUser.name
-        }
+          name: updatedUser.name,
+        },
       });
 
       // Trigger profile update event
-      window.dispatchEvent(new Event('profileUpdate'));
+      window.dispatchEvent(new Event("profileUpdate"));
 
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
     }
   };
 

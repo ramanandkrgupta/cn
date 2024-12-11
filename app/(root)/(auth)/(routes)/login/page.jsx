@@ -6,10 +6,9 @@ import { Mail, Lock, Loader, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 // import { FaGithub } from "react-icons/fa";
-
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -67,7 +66,7 @@ const LoginPage = () => {
 
       await signIn("google", {
         callbackUrl: "/account",
-        redirect: true
+        redirect: true,
       });
     } catch (error) {
       console.error("Google login error:", error);

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { courses, semester, category } from "@/constants";
 import PropTypes from "prop-types";
 
@@ -106,7 +106,7 @@ const DocDetails = ({ files, onSubmit }) => {
       const formattedDetails = fileDetails.map((detail, index) => {
         console.log(`Processing file ${index}:`, {
           detail,
-          fileData: files[index]
+          fileData: files[index],
         }); // Debug log
 
         const fileData = files[index];
@@ -137,7 +137,7 @@ const DocDetails = ({ files, onSubmit }) => {
       console.error("Submission error details:", {
         error,
         fileDetails,
-        files
+        files,
       }); // Debug log
       toast.error(error.message || "Failed to submit document details");
     }

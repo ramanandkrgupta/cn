@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { Fragment, useState, useEffect } from "react";
 import { saveAs } from "file-saver";
 import { Dialog, Transition } from "@headlessui/react";

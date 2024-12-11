@@ -19,7 +19,7 @@ import {
   Calendar,
   ArrowUpDown,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import SubjectModal from "./components/SubjectModal";
 import { courses } from "@/constants";
 import debounce from "lodash/debounce";

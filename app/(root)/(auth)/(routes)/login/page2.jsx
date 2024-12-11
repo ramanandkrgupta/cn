@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import { logo } from "@/public/assets";
 import FormButtons from "@/components/ui/FormButtons";

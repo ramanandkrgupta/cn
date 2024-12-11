@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { toast } from "sonner";
+import toast  from "react-hot-toast";
 import { signOut } from "next-auth/react";
 
 const handleSignOutButton = () => {

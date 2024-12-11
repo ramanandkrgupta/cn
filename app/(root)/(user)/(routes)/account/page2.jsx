@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";

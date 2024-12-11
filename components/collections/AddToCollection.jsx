@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function AddToCollection({ postId, onClose }) {
   const [collections, setCollections] = useState([]);
@@ -56,7 +56,9 @@ export default function AddToCollection({ postId, onClose }) {
             <span className="loading loading-spinner loading-md"></span>
           </div>
         ) : collections.length === 0 ? (
-          <p className="text-center py-4">No collections found. Create one first!</p>
+          <p className="text-center py-4">
+            No collections found. Create one first!
+          </p>
         ) : (
           <div className="space-y-2">
             {collections.map((collection) => (

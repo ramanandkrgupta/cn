@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 // import { zxcvbn } from 'zxcvbn';
 
 import { logo } from "@/public/assets";

@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Download, FileCheck, Loader, Search, Filter } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { useRouter } from "next/navigation";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 
 export default function BatchDownload() {
   const { data: session } = useSession();
@@ -16,16 +16,16 @@ export default function BatchDownload() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     type: "all",
-    subject: "all"
+    subject: "all",
   });
   const router = useRouter();
   const [processingFiles, setProcessingFiles] = useState(new Set());
 
   // Fetch available files
   useEffect(() => {
-    if (session?.user?.role !== 'PRO') {
-      router.push('/account/plans');
-      toast.error('Batch download is a PRO feature');
+    if (session?.user?.role !== "PRO") {
+      router.push("/account/plans");
+      toast.error("Batch download is a PRO feature");
       return;
     }
     fetchFiles();
@@ -45,10 +45,13 @@ export default function BatchDownload() {
   };
 
   // Filter and search files
-  const filteredFiles = files.filter(file => {
-    const matchesSearch = file.title.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredFiles = files.filter((file) => {
+    const matchesSearch = file.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesType = filters.type === "all" || file.type === filters.type;
-    const matchesSubject = filters.subject === "all" || file.subject_code === filters.subject;
+    const matchesSubject =
+      filters.subject === "all" || file.subject_code === filters.subject;
     return matchesSearch && matchesType && matchesSubject;
   });
 
@@ -81,9 +84,9 @@ export default function BatchDownload() {
       }
 
       // Get filename from header
-      const contentDisposition = response.headers.get('content-disposition');
+      const contentDisposition = response.headers.get("content-disposition");
       const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        ? contentDisposition.split("filename=")[1].replace(/"/g, "")
         : `study-materials-${Date.now()}.zip`;
 
       // Download using blob
@@ -96,7 +99,6 @@ export default function BatchDownload() {
       saveAs(blob, filename);
       toast.success("Files downloaded successfully!", { id: toastId });
       setSelectedFiles([]); // Reset selection after download
-
     } catch (error) {
       console.error("Download error:", error);
       toast.error(error.message || "Failed to download files", { id: toastId });
@@ -106,9 +108,9 @@ export default function BatchDownload() {
   };
 
   const toggleFileSelection = (fileId) => {
-    setSelectedFiles(prev => 
-      prev.includes(fileId) 
-        ? prev.filter(id => id !== fileId)
+    setSelectedFiles((prev) =>
+      prev.includes(fileId)
+        ? prev.filter((id) => id !== fileId)
         : [...prev, fileId]
     );
   };
@@ -152,7 +154,9 @@ export default function BatchDownload() {
         </div>
         <select
           value={filters.type}
-          onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, type: e.target.value }))
+          }
           className="select select-bordered"
         >
           <option value="all">All Types</option>
@@ -161,7 +165,9 @@ export default function BatchDownload() {
         </select>
         <select
           value={filters.subject}
-          onChange={(e) => setFilters(prev => ({ ...prev, subject: e.target.value }))}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, subject: e.target.value }))
+          }
           className="select select-bordered"
         >
           <option value="all">All Subjects</option>
@@ -175,10 +181,12 @@ export default function BatchDownload() {
           <div
             key={file.id}
             className={`bg-base-200 p-4 rounded-lg cursor-pointer transition-all
-              ${selectedFiles.includes(file.id) ? 'ring-2 ring-primary' : ''}
-              ${processingFiles.has(file.id) ? 'opacity-50' : ''}
+              ${selectedFiles.includes(file.id) ? "ring-2 ring-primary" : ""}
+              ${processingFiles.has(file.id) ? "opacity-50" : ""}
               hover:bg-base-300`}
-            onClick={() => !processingFiles.has(file.id) && toggleFileSelection(file.id)}
+            onClick={() =>
+              !processingFiles.has(file.id) && toggleFileSelection(file.id)
+            }
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -188,15 +196,15 @@ export default function BatchDownload() {
                   <span className="text-xs bg-base-300 px-2 py-1 rounded">
                     {file.type.toUpperCase()}
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {file.size}
-                  </span>
+                  <span className="text-xs text-gray-500">{file.size}</span>
                 </div>
               </div>
               {processingFiles.has(file.id) ? (
                 <Loader className="animate-spin text-primary" />
-              ) : selectedFiles.includes(file.id) && (
-                <FileCheck className="text-primary" />
+              ) : (
+                selectedFiles.includes(file.id) && (
+                  <FileCheck className="text-primary" />
+                )
               )}
             </div>
           </div>
@@ -211,4 +219,4 @@ export default function BatchDownload() {
       )}
     </div>
   );
-} 
+}

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import {
   Crown,
   Check,
@@ -12,7 +12,7 @@ import {
   Share2,
   Shield,
 } from "lucide-react";
-import useUserStore from '@/store/useUserStore';
+import useUserStore from "@/store/useUserStore";
 
 const plans = [
   {
@@ -58,9 +58,8 @@ export default function PlansPage() {
 
   useEffect(() => {
     if (session?.user) {
-      const isPro = 
-        session.user.role === "PRO" || 
-        session.user.userRole === "PRO";
+      const isPro =
+        session.user.role === "PRO" || session.user.userRole === "PRO";
       setCurrentPlan(isPro ? "pro" : "free");
     }
   }, [session]);
@@ -80,7 +79,7 @@ export default function PlansPage() {
       // Update Zustand store
       updateUser({
         userRole: updatedUser.userRole,
-        role: updatedUser.userRole // Keep both for consistency
+        role: updatedUser.userRole, // Keep both for consistency
       });
 
       // Update NextAuth session
@@ -89,16 +88,16 @@ export default function PlansPage() {
         user: {
           ...session.user,
           role: updatedUser.userRole,
-          userRole: updatedUser.userRole
-        }
+          userRole: updatedUser.userRole,
+        },
       });
 
       toast.success("Successfully upgraded to PRO!");
       router.refresh();
-      router.push('/account');
+      router.push("/account");
     } catch (error) {
-      console.error('Error updating user data:', error);
-      toast.error('Error updating user status');
+      console.error("Error updating user data:", error);
+      toast.error("Error updating user status");
     }
   };
 
@@ -117,10 +116,10 @@ export default function PlansPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: plans.find(p => p.id === planId).price,
+          amount: plans.find((p) => p.id === planId).price,
           currency: "INR",
-          receipt: `plan_${planId}_${Date.now()}`
-        })
+          receipt: `plan_${planId}_${Date.now()}`,
+        }),
       });
 
       if (!orderResponse.ok) {
@@ -148,22 +147,25 @@ export default function PlansPage() {
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
-              })
+                razorpay_signature: response.razorpay_signature,
+              }),
             });
 
             const verifyData = await verifyResponse.json();
-            
+
             if (verifyData.status === "success") {
               // Update user role
-              const updateResponse = await fetch("/api/v1/members/users/upgrade", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: planId })
-              });
+              const updateResponse = await fetch(
+                "/api/v1/members/users/upgrade",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ plan: planId }),
+                }
+              );
 
               if (!updateResponse.ok) {
-                throw new Error('Failed to upgrade plan');
+                throw new Error("Failed to upgrade plan");
               }
 
               const { user } = await updateResponse.json();
@@ -173,12 +175,11 @@ export default function PlansPage() {
             console.error("Error handling payment:", error);
             toast.error("Failed to process upgrade");
           }
-        }
+        },
       };
 
       const razorpay = new window.Razorpay(options);
       razorpay.open();
-
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to process payment");

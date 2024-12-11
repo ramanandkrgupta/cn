@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useState } from "react";
 import { PlusIcon } from "@heroicons/react/20/solid";
 

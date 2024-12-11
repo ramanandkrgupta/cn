@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 const EditForm = ({ data, onClose, onSave, isSubject }) => {
   const [formData, setFormData] = useState(data);
@@ -22,11 +22,16 @@ const EditForm = ({ data, onClose, onSave, isSubject }) => {
     console.log("Submitting data: ", formData);
 
     try {
-      const res = await axios.put(`/api/${isSubject ? "subject" : "post"}`, formData);
+      const res = await axios.put(
+        `/api/${isSubject ? "subject" : "post"}`,
+        formData
+      );
       console.log("Response: ", res);
 
       if (res.status === 200) {
-        toast.success(`${isSubject ? "Subject" : "Post"} updated successfully!`);
+        toast.success(
+          `${isSubject ? "Subject" : "Post"} updated successfully!`
+        );
         onSave(formData);
         onClose();
       } else {
@@ -44,7 +49,9 @@ const EditForm = ({ data, onClose, onSave, isSubject }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-4 rounded shadow-lg w-full max-w-md">
-        <h2 className="text-lg font-bold mb-4">Edit {isSubject ? "Subject" : "Post"}</h2>
+        <h2 className="text-lg font-bold mb-4">
+          Edit {isSubject ? "Subject" : "Post"}
+        </h2>
         <form onSubmit={handleSubmit}>
           {isSubject ? (
             <>

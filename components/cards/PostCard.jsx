@@ -12,7 +12,7 @@ import {
   Clock,
   Plus,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import PostViewDialogBox from "../models/PostViewDialogBox";
 import AddToCollection from "../collections/AddToCollection";
@@ -251,12 +251,12 @@ const PostCard = ({ data, onUpdate }) => {
       </div>
 
       {/* Add Collection Modal */}
-{showCollectionModal && (
-  <AddToCollection
-    postId={data.id}
-    onClose={() => setShowCollectionModal(false)}
-  />
-)}
+      {showCollectionModal && (
+        <AddToCollection
+          postId={data.id}
+          onClose={() => setShowCollectionModal(false)}
+        />
+      )}
 
       {/* View Dialog */}
       {isOpen && (

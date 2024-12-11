@@ -20,7 +20,7 @@ import {
   Clock,
   Calendar,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 // First, create a separate PostsGrid component
 const PostsGrid = memo(({ posts, onDelete, onTogglePremium, onView }) => {
@@ -179,7 +179,7 @@ export default function PostsPage() {
         sortBy,
       });
 
-      const response = await fetch(`/api/admin/posts?${params}`);
+      const response = await fetch(`/api/v1/admin/posts?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch posts");
       }
@@ -210,7 +210,7 @@ export default function PostsPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/posts?postId=${postId}`, {
+      const response = await fetch(`/api/v1/admin/posts?postId=${postId}`, {
         method: "DELETE",
       });
 
@@ -228,7 +228,7 @@ export default function PostsPage() {
 
   const togglePremium = async (postId) => {
     try {
-      const response = await fetch("/api/admin/posts", {
+      const response = await fetch("/api/v1/admin/posts", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

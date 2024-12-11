@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { formatFileSize } from "@edgestore/react/utils";

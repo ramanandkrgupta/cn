@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import {
   User,
   CreditCard,
@@ -26,8 +26,8 @@ import {
   Check,
 } from "lucide-react";
 import AppVersion from "@/app/(root)/(home)/(routes)/about/components/AppVersion";
-import { useEffect, useState } from 'react';
-import useUserStore from '@/store/useUserStore';
+import { useEffect, useState } from "react";
+import useUserStore from "@/store/useUserStore";
 
 // Dynamically import AppVersion with no SSR
 // const AppVersion =  import("@/app/(root)/(home)/(routes)/about/components/AppVersion");
@@ -237,12 +237,8 @@ const MenuItem = ({ item, router }) => (
         {item.icon}
       </div>
       <div>
-        <span className="text-secondary font-medium block">
-          {item.title}
-        </span>
-        <span className="text-xs text-gray-500">
-          {item.description}
-        </span>
+        <span className="text-secondary font-medium block">{item.title}</span>
+        <span className="text-xs text-gray-500">{item.description}</span>
       </div>
     </div>
     <div className="flex items-center gap-3">
@@ -277,9 +273,7 @@ const ProFeaturesSection = ({ items, router }) => (
               <span className="text-secondary font-medium block">
                 {item.title}
               </span>
-              <span className="text-xs text-gray-500">
-                {item.description}
-              </span>
+              <span className="text-xs text-gray-500">{item.description}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -321,17 +315,17 @@ export default function Profile() {
 
   // Get user role from Zustand store or session
   const userRole = userData?.userRole || userData?.role || session?.user?.role;
-  
+
   // Get stats from userData
   const stats = getProfileStats(userData || session);
-  
+
   // Get menu items with updated role
   const menuItems = getMenuItems(router, userRole, {
     ...session,
     user: {
       ...session?.user,
-      role: userRole
-    }
+      role: userRole,
+    },
   });
 
   // Get pro menu items with updated role
@@ -397,9 +391,7 @@ export default function Profile() {
                   {userRole || "FREE"} User
                 </span>
                 {userRole === "PRO" && (
-                  <span className="text-xs text-gray-500">
-                    Lifetime
-                  </span>
+                  <span className="text-xs text-gray-500">Lifetime</span>
                 )}
               </div>
             </div>

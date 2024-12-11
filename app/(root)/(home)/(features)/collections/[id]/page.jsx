@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Folder, Lock, Globe } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
 import Image from "next/image";
 
@@ -35,7 +35,8 @@ export default function CollectionView() {
 
   if (loading) return <LoadingState message="Loading collection..." />;
   if (error) return <div className="text-center p-6 text-error">{error}</div>;
-  if (!collection) return <div className="text-center p-6">Collection not found</div>;
+  if (!collection)
+    return <div className="text-center p-6">Collection not found</div>;
 
   return (
     <div className="container mx-auto p-6">
@@ -50,7 +51,7 @@ export default function CollectionView() {
                 <p className="text-gray-500 mt-1">{collection.description}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm text-gray-500">
-                    Created by {collection.user?.name || 'Anonymous'}
+                    Created by {collection.user?.name || "Anonymous"}
                   </span>
                   {collection.isPublic ? (
                     <Globe size={16} className="text-success" />
@@ -78,7 +79,10 @@ export default function CollectionView() {
                 <div key={post.id} className="group">
                   <div className="aspect-[3/4] rounded-lg overflow-hidden">
                     <Image
-                      src={post.thumbnail_url || "/images/placeholders/pdf-placeholder.png"}
+                      src={
+                        post.thumbnail_url ||
+                        "/images/placeholders/pdf-placeholder.png"
+                      }
                       alt={post.title}
                       width={200}
                       height={267}

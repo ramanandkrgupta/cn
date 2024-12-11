@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEdgeStore } from "@/libs/edgestore";
@@ -30,16 +30,16 @@ export default function UploadPage() {
           const res = await edgestore.publicFiles.upload({
             file: file.file,
             options: {
-              temporary: false
+              temporary: false,
             },
             onProgressChange: (progress) => {
               // You can use this to show upload progress
-              console.log('Upload progress:', progress);
+              console.log("Upload progress:", progress);
             },
           });
           return res;
         } catch (error) {
-          console.error('File upload error:', error);
+          console.error("File upload error:", error);
           throw new Error(`Failed to upload ${file.file.name}`);
         }
       });
@@ -48,39 +48,39 @@ export default function UploadPage() {
 
       // Create FormData for post creation
       const formData = new FormData();
-      formData.append('fileDetails', JSON.stringify(fileDetails));
-      formData.append('userEmail', session.user.email);
-      formData.append('uploadRes', JSON.stringify(uploadRes));
+      formData.append("fileDetails", JSON.stringify(fileDetails));
+      formData.append("userEmail", session.user.email);
+      formData.append("uploadRes", JSON.stringify(uploadRes));
 
-      const response = await fetch('/api/post', {
-        method: 'POST',
+      const response = await fetch("/api/post", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
+        throw new Error(error.message || "Upload failed");
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.dismiss();
-        toast.success('Files uploaded successfully');
-        router.push('/dashboard');
+        toast.success("Files uploaded successfully");
+        router.push("/dashboard");
       } else {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
     } catch (error) {
       toast.dismiss();
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload files');
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload files");
     }
   };
 
   const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (!session) {
@@ -109,11 +109,8 @@ export default function UploadPage() {
 
       {/* Document Details Section */}
       {files.length > 0 && (
-        <DocDetails
-          files={files}
-          onSubmit={handleFileUpload}
-        />
+        <DocDetails files={files} onSubmit={handleFileUpload} />
       )}
     </div>
   );
-} 
+}

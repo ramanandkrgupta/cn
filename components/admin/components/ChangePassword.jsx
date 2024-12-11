@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import FormField from "@/components/ui/FormField";
 import { SmallLoading } from "@/public/assets";

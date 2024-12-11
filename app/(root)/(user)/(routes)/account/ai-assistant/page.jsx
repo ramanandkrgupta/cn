@@ -2,8 +2,23 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Send, Bot, Loader, Book, Calendar, Target, Brain, Sparkles, RefreshCw, Download, Copy, Share2, Eraser, Volume2 } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Send,
+  Bot,
+  Loader,
+  Book,
+  Calendar,
+  Target,
+  Brain,
+  Sparkles,
+  RefreshCw,
+  Download,
+  Copy,
+  Share2,
+  Eraser,
+  Volume2,
+} from "lucide-react";
+import toast from "react-hot-toast";
 import Image from "next/image";
 
 export default function AIAssistant() {
@@ -55,29 +70,29 @@ export default function AIAssistant() {
       label: "General Chat",
       type: "chat",
       color: "text-primary",
-      description: "Ask any study-related question"
+      description: "Ask any study-related question",
     },
     {
       icon: <Book className="w-5 h-5" />,
       label: "Generate Quiz",
       type: "quiz",
       color: "text-success",
-      description: "Create practice questions"
+      description: "Create practice questions",
     },
     {
       icon: <Calendar className="w-5 h-5" />,
       label: "Study Plan",
       type: "study_plan",
       color: "text-info",
-      description: "Get personalized study schedule"
+      description: "Get personalized study schedule",
     },
     {
       icon: <Target className="w-5 h-5" />,
       label: "Deep Explain",
       type: "explain",
       color: "text-warning",
-      description: "Detailed topic explanation"
-    }
+      description: "Detailed topic explanation",
+    },
   ];
 
   const handleSubmit = async (e) => {
@@ -86,16 +101,16 @@ export default function AIAssistant() {
 
     setLoading(true);
     const userMessage = { role: "user", content: query };
-    setConversation(prev => [...prev, userMessage]);
+    setConversation((prev) => [...prev, userMessage]);
     setQuery("");
 
     try {
       const response = await fetch("/api/v1/members/ai-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: query,
-          type: activeType
+          type: activeType,
         }),
       });
 
@@ -105,15 +120,17 @@ export default function AIAssistant() {
       }
 
       const data = await response.json();
-      setConversation(prev => [...prev, {
-        role: "assistant",
-        content: data.response,
-        type: data.type
-      }]);
-
+      setConversation((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.response,
+          type: data.type,
+        },
+      ]);
     } catch (error) {
       toast.error(error.message || "Failed to get AI response");
-      setConversation(prev => prev.slice(0, -1));
+      setConversation((prev) => prev.slice(0, -1));
     } finally {
       setLoading(false);
     }
@@ -148,7 +165,7 @@ export default function AIAssistant() {
 
   // Text-to-speech function
   const speakText = (text) => {
-    if ('speechSynthesis' in window) {
+    if ("speechSynthesis" in window) {
       setIsSpeaking(true);
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.onend = () => setIsSpeaking(false);
@@ -159,17 +176,17 @@ export default function AIAssistant() {
   // Message actions
   const handleMessageAction = (action, content) => {
     switch (action) {
-      case 'copy':
+      case "copy":
         navigator.clipboard.writeText(content);
-        toast.success('Copied to clipboard');
+        toast.success("Copied to clipboard");
         break;
-      case 'speak':
+      case "speak":
         speakText(content);
         break;
-      case 'share':
+      case "share":
         // Implement share functionality
         break;
-      case 'download':
+      case "download":
         // Implement download as PDF/MD
         break;
     }
@@ -238,7 +255,9 @@ export default function AIAssistant() {
       {/* Suggestions */}
       {showSuggestions && conversation.length === 0 && (
         <div className="mb-6">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Suggested Questions</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Suggested Questions
+          </h3>
           <div className="flex flex-wrap gap-2">
             {suggestions[activeType].map((suggestion, index) => (
               <button
@@ -259,7 +278,12 @@ export default function AIAssistant() {
       {/* Chat Interface */}
       <div className="bg-base-200 rounded-lg p-4 mb-4 min-h-[60vh] max-h-[60vh] overflow-y-auto">
         {conversation.map((msg, index) => (
-          <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div
+            key={index}
+            className={`mb-4 flex ${
+              msg.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             {/* Avatar for assistant */}
             {msg.role === "assistant" && (
               <div className="flex-shrink-0 mr-3">
@@ -269,14 +293,16 @@ export default function AIAssistant() {
               </div>
             )}
 
-            <div className={`group relative inline-block max-w-[80%] p-3 rounded-lg ${
-              msg.role === "user" ? "bg-primary text-white" : "bg-base-300"
-            }`}>
+            <div
+              className={`group relative inline-block max-w-[80%] p-3 rounded-lg ${
+                msg.role === "user" ? "bg-primary text-white" : "bg-base-300"
+              }`}
+            >
               {/* Message Type Badge */}
               {msg.role === "assistant" && msg.type && (
                 <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
                   <Sparkles size={12} />
-                  {msg.type.replace('_', ' ').toUpperCase()}
+                  {msg.type.replace("_", " ").toUpperCase()}
                 </div>
               )}
 
@@ -290,28 +316,32 @@ export default function AIAssistant() {
                 <div className="absolute -right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex flex-col gap-1 bg-base-100 rounded-lg shadow-lg p-1">
                     <button
-                      onClick={() => handleMessageAction('copy', msg.content)}
+                      onClick={() => handleMessageAction("copy", msg.content)}
                       className="btn btn-ghost btn-xs"
                       title="Copy"
                     >
                       <Copy size={14} />
                     </button>
                     <button
-                      onClick={() => handleMessageAction('speak', msg.content)}
-                      className={`btn btn-ghost btn-xs ${isSpeaking ? 'text-primary' : ''}`}
+                      onClick={() => handleMessageAction("speak", msg.content)}
+                      className={`btn btn-ghost btn-xs ${
+                        isSpeaking ? "text-primary" : ""
+                      }`}
                       title="Read aloud"
                     >
                       <Volume2 size={14} />
                     </button>
                     <button
-                      onClick={() => handleMessageAction('download', msg.content)}
+                      onClick={() =>
+                        handleMessageAction("download", msg.content)
+                      }
                       className="btn btn-ghost btn-xs"
                       title="Download"
                     >
                       <Download size={14} />
                     </button>
                     <button
-                      onClick={() => handleMessageAction('share', msg.content)}
+                      onClick={() => handleMessageAction("share", msg.content)}
                       className="btn btn-ghost btn-xs"
                       title="Share"
                     >
@@ -322,13 +352,24 @@ export default function AIAssistant() {
               )}
 
               {/* Typing Indicator */}
-              {msg.role === "assistant" && loading && index === conversation.length - 1 && (
-                <div className="mt-2 flex gap-1">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
-                </div>
-              )}
+              {msg.role === "assistant" &&
+                loading &&
+                index === conversation.length - 1 && (
+                  <div className="mt-2 flex gap-1">
+                    <span
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0s" }}
+                    />
+                    <span
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    />
+                    <span
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.4s" }}
+                    />
+                  </div>
+                )}
             </div>
 
             {/* Avatar for user */}
@@ -360,7 +401,7 @@ export default function AIAssistant() {
         </button>
         <button
           onClick={() => {
-            if (confirm('Clear chat history?')) {
+            if (confirm("Clear chat history?")) {
               setConversation([]);
               setShowSuggestions(true);
             }
@@ -389,20 +430,16 @@ export default function AIAssistant() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`${loading ? "AI is typing..." : `Ask about ${activeType.replace('_', ' ')}...`}`}
+          placeholder={`${
+            loading
+              ? "AI is typing..."
+              : `Ask about ${activeType.replace("_", " ")}...`
+          }`}
           className="input input-bordered flex-1"
           disabled={loading}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn btn-primary"
-        >
-          {loading ? (
-            <Loader className="animate-spin" />
-          ) : (
-            <Send />
-          )}
+        <button type="submit" disabled={loading} className="btn btn-primary">
+          {loading ? <Loader className="animate-spin" /> : <Send />}
         </button>
       </form>
     </div>

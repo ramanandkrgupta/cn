@@ -2,16 +2,16 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { 
-  FileText, 
-  Download, 
-  Heart, 
+import toast from "react-hot-toast";
+import {
+  FileText,
+  Download,
+  Heart,
   Share2,
   CheckCircle,
   XCircle,
   Eye,
-  Clock
+  Clock,
 } from "lucide-react";
 
 export default function ModerationPage() {
@@ -22,7 +22,7 @@ export default function ModerationPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session?.user || session.user.role !== "ADMIN") {
       router.push("/");
       return;
@@ -34,9 +34,9 @@ export default function ModerationPage() {
   const fetchPendingPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/admin/moderation?status=pending");
+      const response = await fetch("/api/v1/admin/moderation?status=pending");
       if (!response.ok) throw new Error("Failed to fetch posts");
-      
+
       const data = await response.json();
       setPosts(data.posts);
     } catch (error) {
@@ -55,7 +55,7 @@ export default function ModerationPage() {
         if (!note) return; // Cancel if no reason provided
       }
 
-      const response = await fetch("/api/admin/moderation", {
+      const response = await fetch("/api/v1/admin/moderation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, action, note }),
@@ -104,7 +104,7 @@ export default function ModerationPage() {
                 <div>
                   <h3 className="text-lg font-semibold">{post.title}</h3>
                   <p className="text-sm text-gray-500">
-                    By {post.user?.name || post.user?.email} • 
+                    By {post.user?.name || post.user?.email} •
                     {new Date(post.createdAt).toLocaleDateString()}
                   </p>
                 </div>

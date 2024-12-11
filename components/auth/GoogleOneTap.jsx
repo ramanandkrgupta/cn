@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import toast  from "react-hot-toast";
 
 const GoogleOneTap = () => {
   const { data: session, status } = useSession();
@@ -11,7 +11,7 @@ const GoogleOneTap = () => {
   useEffect(() => {
     if (status === "loading") return;
     if (status === "authenticated") {
-      router.push('/dashboard');
+      router.push("/dashboard");
       return;
     }
 
@@ -35,7 +35,7 @@ const GoogleOneTap = () => {
 
               if (result?.ok) {
                 toast.success("Successfully logged in!");
-                router.push('/dashboard');
+                router.push("/dashboard");
                 window.google.accounts.id.cancel();
               }
             } catch (error) {
@@ -49,8 +49,8 @@ const GoogleOneTap = () => {
             "https://www.notesmates.in",
             "https://notesmates.in",
             "https://cn-eta.vercel.app",
-            "http://localhost:3000"
-          ]
+            "http://localhost:3000",
+          ],
         });
 
         window.google.accounts.id.renderButton(
@@ -68,10 +68,13 @@ const GoogleOneTap = () => {
           }
         );
 
-        if (!sessionStorage.getItem('googleOneTapDismissed')) {
+        if (!sessionStorage.getItem("googleOneTapDismissed")) {
           window.google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              sessionStorage.setItem('googleOneTapDismissed', 'true');
+            if (
+              notification.isNotDisplayed() ||
+              notification.isSkippedMoment()
+            ) {
+              sessionStorage.setItem("googleOneTapDismissed", "true");
             }
           });
         }

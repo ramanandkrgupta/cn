@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import { toast } from "sonner";
+import toast  from "react-hot-toast";
 
 export default function FloatingAIButton() {
   const { data: session } = useSession();

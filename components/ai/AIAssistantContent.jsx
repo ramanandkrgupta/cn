@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Send, Bot, Loader, History } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function AIAssistantContent() {
   const { data: session } = useSession();
@@ -17,10 +17,10 @@ export default function AIAssistantContent() {
 
   useEffect(() => {
     if (!session) return;
-    
-    if (session?.user?.role !== 'PRO') {
-      router.push('/account/plans');
-      toast.error('AI Assistant is a PRO feature');
+
+    if (session?.user?.role !== "PRO") {
+      router.push("/account/plans");
+      toast.error("AI Assistant is a PRO feature");
       return;
     }
 
@@ -37,12 +37,12 @@ export default function AIAssistantContent() {
       const response = await fetch("/api/v1/members/ai-assistant");
       if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
-      
-      const conversationHistory = data.flatMap(item => [
+
+      const conversationHistory = data.flatMap((item) => [
         { role: "user", content: item.query },
-        { role: "assistant", content: item.response }
+        { role: "assistant", content: item.response },
       ]);
-      
+
       setConversation(conversationHistory);
     } catch (error) {
       toast.error("Failed to load conversation history");
@@ -60,7 +60,7 @@ export default function AIAssistantContent() {
 
     setLoading(true);
     const userMessage = { role: "user", content: messageToSend };
-    setConversation(prev => [...prev, userMessage]);
+    setConversation((prev) => [...prev, userMessage]);
     setQuery("");
 
     try {
@@ -76,18 +76,22 @@ export default function AIAssistantContent() {
       }
 
       const data = await response.json();
-      setConversation(prev => [...prev, {
-        role: "assistant",
-        content: data.response
-      }]);
+      setConversation((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.response,
+        },
+      ]);
 
-      const recentQueries = JSON.parse(localStorage.getItem('aiRecentQueries') || '[]');
+      const recentQueries = JSON.parse(
+        localStorage.getItem("aiRecentQueries") || "[]"
+      );
       const updatedQueries = [messageToSend, ...recentQueries.slice(0, 4)];
-      localStorage.setItem('aiRecentQueries', JSON.stringify(updatedQueries));
-
+      localStorage.setItem("aiRecentQueries", JSON.stringify(updatedQueries));
     } catch (error) {
       toast.error(error.message || "Failed to get AI response");
-      setConversation(prev => prev.slice(0, -1));
+      setConversation((prev) => prev.slice(0, -1));
     } finally {
       setLoading(false);
     }
@@ -120,7 +124,9 @@ export default function AIAssistantContent() {
         {conversation.map((msg, index) => (
           <div
             key={index}
-            className={`mb-4 ${msg.role === "user" ? "text-right" : "text-left"}`}
+            className={`mb-4 ${
+              msg.role === "user" ? "text-right" : "text-left"
+            }`}
           >
             <div
               className={`inline-block max-w-[80%] p-3 rounded-lg ${
@@ -144,16 +150,8 @@ export default function AIAssistantContent() {
           className="input input-bordered flex-1"
           disabled={loading}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn btn-primary"
-        >
-          {loading ? (
-            <Loader className="animate-spin" />
-          ) : (
-            <Send />
-          )}
+        <button type="submit" disabled={loading} className="btn btn-primary">
+          {loading ? <Loader className="animate-spin" /> : <Send />}
         </button>
       </form>
     </div>
