@@ -57,25 +57,25 @@ const SkeletonLoading = () => (
 // Avatar categories
 const avatarSets = {
   free: [
-    '/avatars/free/avatar-1.png',
-    '/avatars/free/avatar-2.png',
-    '/avatars/free/avatar-3.png',
-    '/avatars/free/avatar-4.png',
+    "/avatars/free/avatar-1.png",
+    "/avatars/free/avatar-2.png",
+    "/avatars/free/avatar-3.png",
+    "/avatars/free/avatar-4.png",
   ],
   pro: [
-    '/avatars/premium/3d/3d-1.png',
-    '/avatars/premium/3d/3d-2.png',
-    '/avatars/premium/3d/3d-3.png',
-    '/avatars/premium/3d/3d-4.png',
-    '/avatars/premium/anime/anime-1.png',
-    '/avatars/premium/anime/anime-2.png',
-    '/avatars/premium/anime/anime-3.png',
-    '/avatars/premium/anime/anime-4.png',
-    '/avatars/premium/pixel/pixel-1.png',
-    '/avatars/premium/pixel/pixel-2.png',
-    '/avatars/premium/pixel/pixel-3.png',
-    '/avatars/premium/pixel/pixel-4.png',
-  ]
+    "/avatars/premium/3d/3d-1.png",
+    "/avatars/premium/3d/3d-2.png",
+    "/avatars/premium/3d/3d-3.png",
+    "/avatars/premium/3d/3d-4.png",
+    "/avatars/premium/anime/anime-1.png",
+    "/avatars/premium/anime/anime-2.png",
+    "/avatars/premium/anime/anime-3.png",
+    "/avatars/premium/anime/anime-4.png",
+    "/avatars/premium/pixel/pixel-1.png",
+    "/avatars/premium/pixel/pixel-2.png",
+    "/avatars/premium/pixel/pixel-3.png",
+    "/avatars/premium/pixel/pixel-4.png",
+  ],
 };
 
 export default function EditProfile() {
@@ -131,7 +131,7 @@ export default function EditProfile() {
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch("/api/users/avatar", {
+        const response = await fetch("/api/v1/members/users/avatar", {
           method: "POST",
           body: formData,
         });
@@ -190,6 +190,41 @@ export default function EditProfile() {
   const handleAvatarSelect = (avatarUrl) => {
     setUserData((prev) => ({ ...prev, avatar: avatarUrl }));
     setShowAvatarSelector(false);
+  };
+
+  const handleNameUpdate = async (newName) => {
+    try {
+      const response = await fetch('/api/v1/members/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newName
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update profile');
+      
+      const updatedUser = await response.json();
+
+      // Update session
+      await updateSession({
+        ...session,
+        user: {
+          ...session.user,
+          name: updatedUser.name
+        }
+      });
+
+      // Trigger profile update event
+      window.dispatchEvent(new Event('profileUpdate'));
+
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile');
+    }
   };
 
   if (pageLoading) {
@@ -317,7 +352,7 @@ export default function EditProfile() {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <h4 className="text-md font-medium">Premium Avatars</h4>
-                      {session?.user?.role !== 'PRO' && (
+                      {session?.user?.role !== "PRO" && (
                         <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                           PRO Only
                         </span>
@@ -331,11 +366,17 @@ export default function EditProfile() {
                         {avatarSets.pro.slice(0, 4).map((avatar, index) => (
                           <button
                             key={index}
-                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            onClick={() =>
+                              session?.user?.role === "PRO"
+                                ? handleAvatarSelect(avatar)
+                                : null
+                            }
                             className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${session?.user?.role === 'PRO' 
-                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
-                                : 'cursor-not-allowed opacity-75'}`}
+                              ${
+                                session?.user?.role === "PRO"
+                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
+                                  : "cursor-not-allowed opacity-75"
+                              }`}
                           >
                             <Image
                               src={avatar}
@@ -343,7 +384,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== 'PRO' && (
+                            {session?.user?.role !== "PRO" && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -355,16 +396,24 @@ export default function EditProfile() {
 
                     {/* Anime Avatars */}
                     <div className="mb-6">
-                      <h5 className="text-sm text-gray-500 mb-2">Anime Style</h5>
+                      <h5 className="text-sm text-gray-500 mb-2">
+                        Anime Style
+                      </h5>
                       <div className="grid grid-cols-4 gap-4">
                         {avatarSets.pro.slice(4, 8).map((avatar, index) => (
                           <button
                             key={index}
-                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            onClick={() =>
+                              session?.user?.role === "PRO"
+                                ? handleAvatarSelect(avatar)
+                                : null
+                            }
                             className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${session?.user?.role === 'PRO' 
-                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
-                                : 'cursor-not-allowed opacity-75'}`}
+                              ${
+                                session?.user?.role === "PRO"
+                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
+                                  : "cursor-not-allowed opacity-75"
+                              }`}
                           >
                             <Image
                               src={avatar}
@@ -372,7 +421,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== 'PRO' && (
+                            {session?.user?.role !== "PRO" && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -384,16 +433,24 @@ export default function EditProfile() {
 
                     {/* Pixel Art Avatars */}
                     <div>
-                      <h5 className="text-sm text-gray-500 mb-2">Pixel Art Style</h5>
+                      <h5 className="text-sm text-gray-500 mb-2">
+                        Pixel Art Style
+                      </h5>
                       <div className="grid grid-cols-4 gap-4">
                         {avatarSets.pro.slice(8).map((avatar, index) => (
                           <button
                             key={index}
-                            onClick={() => session?.user?.role === 'PRO' ? handleAvatarSelect(avatar) : null}
+                            onClick={() =>
+                              session?.user?.role === "PRO"
+                                ? handleAvatarSelect(avatar)
+                                : null
+                            }
                             className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${session?.user?.role === 'PRO' 
-                                ? 'hover:ring-2 hover:ring-primary cursor-pointer' 
-                                : 'cursor-not-allowed opacity-75'}`}
+                              ${
+                                session?.user?.role === "PRO"
+                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
+                                  : "cursor-not-allowed opacity-75"
+                              }`}
                           >
                             <Image
                               src={avatar}
@@ -401,7 +458,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== 'PRO' && (
+                            {session?.user?.role !== "PRO" && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -411,11 +468,13 @@ export default function EditProfile() {
                       </div>
                     </div>
 
-                    {session?.user?.role !== 'PRO' && (
+                    {session?.user?.role !== "PRO" && (
                       <div className="mt-6 p-4 bg-base-300 rounded-lg text-center">
-                        <p className="text-sm mb-2">Upgrade to PRO to unlock all premium avatars!</p>
+                        <p className="text-sm mb-2">
+                          Upgrade to PRO to unlock all premium avatars!
+                        </p>
                         <button
-                          onClick={() => router.push('/account/plans')}
+                          onClick={() => router.push("/account/plans")}
                           className="btn btn-primary btn-sm"
                         >
                           Upgrade Now

@@ -97,19 +97,21 @@ export const authOptions = {
                 return false;
             }
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
-                token.role = user.userRole;
-                token.id = user.id;
-                token.avatar = user.avatar ||
-                    `https://api.dicebear.com/6.x/initials/png?seed=${encodeURIComponent(user.name || 'NM')}&backgroundColor=${getRandomColor()}`;
+                token = { ...token, ...user };
             }
+
+            if (trigger === 'update' && session?.user) {
+                token.avatar = session.user.avatar;
+            }
+
             return token;
         },
-        async session({ session, token }) {
-            if (session?.user) {
-                session.user.role = token.role;
+        async session({ token, session }) {
+            if (token) {
                 session.user.id = token.id;
+                session.user.role = token.userRole;
                 session.user.avatar = token.avatar;
             }
             return session;

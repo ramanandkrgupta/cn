@@ -417,7 +417,18 @@ model AIConversation {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
+  type      String   @default("chat")  // chat, quiz, study_plan, explain
   query     String
-  response  String
+  response  String   @db.String
+  context   String?  @db.String  // JSON string of context
   timestamp DateTime @default(now())
+}
+
+model AITraining {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  prompt       String   @db.String
+  dataSnapshot String   @db.String
+  timestamp    DateTime @default(now())
+  status       String   @default("pending") // pending, completed, failed
+  stats        Json?    // Training statistics
 }

@@ -12,6 +12,7 @@ import {
   Share2,
   Shield,
 } from "lucide-react";
+import useUserStore from '@/store/useUserStore';
 
 const plans = [
   {
@@ -51,6 +52,7 @@ const plans = [
 export default function PlansPage() {
   const router = useRouter();
   const { data: session, update: updateSession } = useSession();
+  const { updateUser } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [currentPlan, setCurrentPlan] = useState("free");
 
@@ -71,6 +73,33 @@ export default function PlansPage() {
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
+  };
+
+  const handleUpgradeSuccess = async (updatedUser) => {
+    try {
+      // Update Zustand store
+      updateUser({
+        userRole: updatedUser.userRole,
+        role: updatedUser.userRole // Keep both for consistency
+      });
+
+      // Update NextAuth session
+      await updateSession({
+        ...session,
+        user: {
+          ...session.user,
+          role: updatedUser.userRole,
+          userRole: updatedUser.userRole
+        }
+      });
+
+      toast.success("Successfully upgraded to PRO!");
+      router.refresh();
+      router.push('/account');
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      toast.error('Error updating user status');
+    }
   };
 
   const handleUpgrade = async (planId) => {
@@ -127,39 +156,22 @@ export default function PlansPage() {
             
             if (verifyData.status === "success") {
               // Update user role
-              const updateResponse = await fetch("/api/users/upgrade", {
+              const updateResponse = await fetch("/api/v1/members/users/upgrade", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ plan: planId })
               });
 
               if (!updateResponse.ok) {
-                const error = await updateResponse.json();
-                throw new Error(error.error || "Failed to upgrade plan");
+                throw new Error('Failed to upgrade plan');
               }
 
-              const updateData = await updateResponse.json();
-
-              if (updateData.success) {
-                // Update session with the new data from API
-                await updateSession(updateData.session);
-                
-                setCurrentPlan("pro");
-                
-                // Force refresh and redirect
-                await router.refresh();
-                router.push('/account');
-                
-                toast.success("Successfully upgraded to PRO!");
-              } else {
-                throw new Error(updateData.error || "Failed to upgrade plan");
-              }
-            } else {
-              throw new Error("Payment verification failed");
+              const { user } = await updateResponse.json();
+              await handleUpgradeSuccess(user);
             }
           } catch (error) {
             console.error("Error handling payment:", error);
-            toast.error(error.message || "Failed to process payment");
+            toast.error("Failed to process upgrade");
           }
         }
       };
@@ -169,7 +181,7 @@ export default function PlansPage() {
 
     } catch (error) {
       console.error("Payment error:", error);
-      toast.error(error.message || "Failed to process payment");
+      toast.error("Failed to process payment");
     } finally {
       setLoading(false);
     }

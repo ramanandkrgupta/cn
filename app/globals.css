@@ -40,9 +40,6 @@ h6 {
   /* Ensures UI elements follow the font size */
 }
 
-
-
-
 :root {
   /* --primary: #13131a;
   --primarySun: #ffffffd0;
@@ -91,7 +88,7 @@ body {
 .loader {
   width: 68px;
   height: 68px;
-  border: 3px solid var(--primary) ;
+  border: 3px solid var(--primary);
   border-radius: 50%;
   display: inline-block;
   position: relative;
@@ -109,7 +106,7 @@ body {
   height: 76px;
   border-radius: 50%;
   border: 3px solid;
-  border-color: var(--primaryh1)  transparent;
+  border-color: var(--primaryh1) transparent;
 }
 
 @keyframes rotation {
@@ -145,7 +142,7 @@ body {
 
 @keyframes search-loading {
   0% {
-    @apply bg-primary ;
+    @apply bg-primary;
   }
   100% {
     @apply bg-orange-600;
@@ -163,8 +160,7 @@ body {
 
 .select_header {
   @apply font-epilogue font-bold sm:font-semibold text-[20px]   text-left;
-  color: var(--primaryh1) ;
-
+  color: var(--primaryh1);
 }
 
 /* admin  button and input*/
@@ -210,10 +206,7 @@ body {
   @apply w-6 md:w-4 hover:text-white;
 }
 
-
-
 /*menu*/
-
 
 .container {
   display: flex;
@@ -263,7 +256,6 @@ body {
   display: block;
 }
 
-
 /*menu*/
 
 /* Theme transition styles */
@@ -280,16 +272,16 @@ body {
 }
 
 /* Smooth transition for all color changes - faster now */
-*, *::before, *::after {
-  transition: background-color 0.3s ease-out, 
-              border-color 0.3s ease-out, 
-              color 0.3s ease-out, 
-              fill 0.3s ease-out, 
-              stroke 0.3s ease-out;
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease-out, border-color 0.3s ease-out,
+    color 0.3s ease-out, fill 0.3s ease-out, stroke 0.3s ease-out;
 }
 
 /* Exception for animations and transforms */
-*[class*="animate-"], *[style*="transform"] {
+*[class*="animate-"],
+*[style*="transform"] {
   transition: transform 0.3s ease-out;
 }
 
@@ -301,4 +293,26 @@ body {
   to {
     opacity: 0;
   }
+}
+
+/* Add these styles */
+.message.assistant .prose {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.message.assistant .prose li {
+  margin-bottom: 0.5rem;
+  list-style-type: none;
+  position: relative;
+}
+
+.message.assistant .prose li:before {
+  content: "•";
+  position: absolute;
+  left: -1rem;
+}
+
+.message.assistant .prose p {
+  margin-bottom: 1rem;
 }

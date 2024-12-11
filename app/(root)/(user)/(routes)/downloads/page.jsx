@@ -56,14 +56,14 @@ export default function Downloads() {
     const fetchDownloads = async () => {
       if (session?.user) {
         try {
-          const response = await fetch('/api/users/downloads');
+          const response = await fetch("/api/v1members/users/downloads");
           if (!response.ok) {
-            throw new Error('Failed to fetch downloads');
+            throw new Error("Failed to fetch downloads");
           }
           const data = await response.json();
           setDownloads(data);
         } catch (error) {
-          console.error('Error fetching downloads:', error);
+          console.error("Error fetching downloads:", error);
         } finally {
           setLoading(false);
         }
@@ -84,8 +84,8 @@ export default function Downloads() {
   return (
     <div className="container mx-auto px-4 md:px-6">
       <div className="flex items-center gap-2 mb-6">
-        <button 
-          onClick={() => router.back()} 
+        <button
+          onClick={() => router.back()}
           className="btn btn-ghost btn-sm p-0"
           aria-label="Go Back"
         >
@@ -102,8 +102,8 @@ export default function Downloads() {
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {downloads.map((download) => (
-            <PostCard 
-              key={download.id} 
+            <PostCard
+              key={download.id}
               data={download.post}
               className="h-full" // Make cards equal height
             />
@@ -112,4 +112,4 @@ export default function Downloads() {
       )}
     </div>
   );
-} 
+}

@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   BookOpen,
   Brain,
@@ -12,17 +12,17 @@ import {
   ChevronRight,
   ArrowLeft,
   CheckCircle,
-  XCircle
-} from 'lucide-react';
+  XCircle,
+} from "lucide-react";
 
-const DIFFICULTY_LEVELS = ['EASY', 'MEDIUM', 'HARD'];
+const DIFFICULTY_LEVELS = ["EASY", "MEDIUM", "HARD"];
 const TOPICS = [
-  'Web Development',
-  'Data Structures',
-  'Algorithms',
-  'Database Management',
-  'Machine Learning',
-  'System Design'
+  "Web Development",
+  "Data Structures",
+  "Algorithms",
+  "Database Management",
+  "Machine Learning",
+  "System Design",
 ];
 
 export default function QuizPage() {
@@ -33,8 +33,8 @@ export default function QuizPage() {
   const [showHistory, setShowHistory] = useState(false);
 
   // Quiz generation states
-  const [topic, setTopic] = useState('');
-  const [difficulty, setDifficulty] = useState('MEDIUM');
+  const [topic, setTopic] = useState("");
+  const [difficulty, setDifficulty] = useState("MEDIUM");
   const [questionCount, setQuestionCount] = useState(5);
 
   // Active quiz states
@@ -54,7 +54,7 @@ export default function QuizPage() {
     if (timeLeft === null || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
@@ -62,40 +62,40 @@ export default function QuizPage() {
 
   const fetchQuizHistory = async () => {
     try {
-      const response = await fetch('/api/quiz/generate');
-      if (!response.ok) throw new Error('Failed to fetch quiz history');
+      const response = await fetch("/api/v1/members/quiz/generate");
+      if (!response.ok) throw new Error("Failed to fetch quiz history");
       const data = await response.json();
       setQuizHistory(data.quizzes || []);
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to load quiz history');
+      console.error("Error:", error);
+      toast.error("Failed to load quiz history");
     }
   };
 
   const handleGenerateQuiz = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/quiz/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/v1/members/quiz/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topic,
           difficulty,
-          count: questionCount
-        })
+          count: questionCount,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate quiz');
-      
+      if (!response.ok) throw new Error("Failed to generate quiz");
+
       const data = await response.json();
       setActiveQuiz(data.quiz);
       setTimeLeft(questionCount * 60); // 1 minute per question
-      setUserAnswers(new Array(data.quiz.questions.length).fill(''));
+      setUserAnswers(new Array(data.quiz.questions.length).fill(""));
       setCurrentQuestion(0);
       setQuizCompleted(false);
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to generate quiz');
+      console.error("Error:", error);
+      toast.error("Failed to generate quiz");
     } finally {
       setLoading(false);
     }
@@ -108,39 +108,41 @@ export default function QuizPage() {
 
     // Auto-advance to next question
     if (currentQuestion < activeQuiz.questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
+      setCurrentQuestion((prev) => prev + 1);
     }
   };
 
   const handleSubmitQuiz = async () => {
     try {
-      const response = await fetch('/api/quiz/attempt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/v1/members/quiz/attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           quizId: activeQuiz.id,
-          answers: userAnswers
-        })
+          answers: userAnswers,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit quiz');
-      
+      if (!response.ok) throw new Error("Failed to submit quiz");
+
       const data = await response.json();
       setQuizCompleted(true);
       await fetchQuizHistory(); // Refresh history
-      toast.success('Quiz completed successfully!');
+      toast.success("Quiz completed successfully!");
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to submit quiz');
+      console.error("Error:", error);
+      toast.error("Failed to submit quiz");
     }
   };
 
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <h2 className="text-2xl font-bold mb-4">Please login to take quizzes</h2>
-        <button 
-          onClick={() => router.push('/login')}
+        <h2 className="text-2xl font-bold mb-4">
+          Please login to take quizzes
+        </h2>
+        <button
+          onClick={() => router.push("/login")}
           className="btn btn-primary"
         >
           Login
@@ -188,10 +190,7 @@ export default function QuizPage() {
           ) : (
             <div className="space-y-4">
               {quizHistory.map((quiz) => (
-                <div
-                  key={quiz.id}
-                  className="bg-base-200 p-4 rounded-lg"
-                >
+                <div key={quiz.id} className="bg-base-200 p-4 rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold">{quiz.title}</h3>
@@ -202,10 +201,13 @@ export default function QuizPage() {
                     {quiz.attempts?.[0] && (
                       <div className="text-right">
                         <div className="font-semibold">
-                          Score: {quiz.attempts[0].score}/{quiz.questions.length}
+                          Score: {quiz.attempts[0].score}/
+                          {quiz.questions.length}
                         </div>
                         <p className="text-sm text-base-content/70">
-                          {new Date(quiz.attempts[0].completedAt).toLocaleDateString()}
+                          {new Date(
+                            quiz.attempts[0].completedAt
+                          ).toLocaleDateString()}
                         </p>
                       </div>
                     )}
@@ -225,15 +227,15 @@ export default function QuizPage() {
                 <Trophy className="w-6 h-6 text-yellow-500" />
                 Quiz Completed!
               </h2>
-              
+
               <div className="grid gap-4">
                 {activeQuiz.questions.map((question, index) => (
                   <div
                     key={index}
                     className={`p-4 rounded-lg ${
                       userAnswers[index] === question.correctAnswer
-                        ? 'bg-green-100 dark:bg-green-900/20'
-                        : 'bg-red-100 dark:bg-red-900/20'
+                        ? "bg-green-100 dark:bg-green-900/20"
+                        : "bg-red-100 dark:bg-red-900/20"
                     }`}
                   >
                     <div className="flex items-start gap-2">
@@ -277,11 +279,13 @@ export default function QuizPage() {
               {/* Progress and Timer */}
               <div className="flex justify-between items-center mb-4">
                 <div className="text-sm">
-                  Question {currentQuestion + 1} of {activeQuiz.questions.length}
+                  Question {currentQuestion + 1} of{" "}
+                  {activeQuiz.questions.length}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4" />
-                  {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                  {Math.floor(timeLeft / 60)}:
+                  {(timeLeft % 60).toString().padStart(2, "0")}
                 </div>
               </div>
 
@@ -291,26 +295,30 @@ export default function QuizPage() {
                   {activeQuiz.questions[currentQuestion].question}
                 </h3>
                 <div className="grid gap-3">
-                  {activeQuiz.questions[currentQuestion].options.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswer(option)}
-                      className={`p-3 rounded-lg text-left transition-colors ${
-                        userAnswers[currentQuestion] === option
-                          ? 'bg-primary text-primary-content'
-                          : 'bg-base-300 hover:bg-base-300/80'
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
+                  {activeQuiz.questions[currentQuestion].options.map(
+                    (option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswer(option)}
+                        className={`p-3 rounded-lg text-left transition-colors ${
+                          userAnswers[currentQuestion] === option
+                            ? "bg-primary text-primary-content"
+                            : "bg-base-300 hover:bg-base-300/80"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
 
               {/* Navigation */}
               <div className="flex justify-between">
                 <button
-                  onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+                  onClick={() =>
+                    setCurrentQuestion((prev) => Math.max(0, prev - 1))
+                  }
                   disabled={currentQuestion === 0}
                   className="btn btn-ghost"
                 >
@@ -319,14 +327,14 @@ export default function QuizPage() {
                 {currentQuestion === activeQuiz.questions.length - 1 ? (
                   <button
                     onClick={handleSubmitQuiz}
-                    disabled={userAnswers.some(answer => !answer)}
+                    disabled={userAnswers.some((answer) => !answer)}
                     className="btn btn-primary"
                   >
                     Submit Quiz
                   </button>
                 ) : (
                   <button
-                    onClick={() => setCurrentQuestion(prev => prev + 1)}
+                    onClick={() => setCurrentQuestion((prev) => prev + 1)}
                     disabled={!userAnswers[currentQuestion]}
                     className="btn btn-ghost"
                   >
@@ -352,7 +360,9 @@ export default function QuizPage() {
               >
                 <option value="">Select a topic</option>
                 {TOPICS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
                 ))}
               </select>
             </div>
@@ -367,7 +377,9 @@ export default function QuizPage() {
                 required
               >
                 {DIFFICULTY_LEVELS.map((level) => (
-                  <option key={level} value={level}>{level}</option>
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
                 ))}
               </select>
             </div>
@@ -402,7 +414,7 @@ export default function QuizPage() {
             {loading ? (
               <span className="loading loading-spinner"></span>
             ) : (
-              'Start Quiz'
+              "Start Quiz"
             )}
           </button>
         </div>

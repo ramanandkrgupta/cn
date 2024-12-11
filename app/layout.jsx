@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import SessionWrapper from "@/components/providers/SessionWrapper";
+import { AuthProvider, UserProvider } from "@/components/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +15,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="light">
       <body className={inter.className}>
-        <SessionWrapper>{children}</SessionWrapper>
+        <AuthProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </AuthProvider>
       </body>
     </html>
   );

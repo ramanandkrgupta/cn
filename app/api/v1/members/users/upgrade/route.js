@@ -15,60 +15,32 @@ export async function POST(req) {
       return NextResponse.json({ error: "Plan is required" }, { status: 400 });
     }
 
-    // First check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: session.user.id }
+    // Update user with new role
+    const updatedUser = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        userRole: plan.toUpperCase()
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        userRole: true,
+        avatar: true,
+        // Add any other fields you need
+      }
     });
 
-    if (!existingUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // Format response with role mapping
+    const formattedUser = {
+      ...updatedUser,
+      role: updatedUser.userRole // Add role field for consistency
+    };
 
-    try {
-      // Update user with new role
-      const updatedUser = await prisma.user.update({
-        where: {
-          id: session.user.id
-        },
-        data: {
-          userRole: plan.toUpperCase()
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          userRole: true,
-          avatar: true
-        }
-      });
-
-      // Format the response to match session structure
-      const sessionUser = {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.userRole, // Keep role for backward compatibility
-        userRole: updatedUser.userRole,
-        avatar: updatedUser.avatar
-      };
-
-      // Return formatted response
-      return NextResponse.json({
-        success: true,
-        user: sessionUser,
-        session: {
-          user: sessionUser,
-          expires: session.expires // Keep existing expiry
-        }
-      });
-
-    } catch (updateError) {
-      console.error("Error updating user:", updateError);
-      return NextResponse.json({
-        error: "Failed to update user role",
-        details: updateError.message
-      }, { status: 500 });
-    }
+    return NextResponse.json({
+      success: true,
+      user: formattedUser
+    });
 
   } catch (error) {
     console.error("Error in upgrade process:", error);

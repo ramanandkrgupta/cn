@@ -23,38 +23,35 @@ export async function PUT(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, avatar } = await req.json();
-    const userId = session.user.id;
+    const data = await req.json();
+    
+    // Only allow updating specific fields
+    const allowedUpdates = {
+      name: data.name,
+      phoneNumber: data.phoneNumber
+    };
 
-    // Validate avatar selection for non-PRO users
-    if (!avatar.startsWith('/avatars/') && session.user.role !== 'PRO') {
-      return NextResponse.json({
-        error: "Premium avatars are only available for PRO users"
-      }, { status: 403 });
-    }
-
+    // Update user in database
     const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        name,
-        avatar
-      },
+      where: { id: session.user.id },
+      data: allowedUpdates,
       select: {
         id: true,
         name: true,
         email: true,
+        userRole: true,
         avatar: true,
-        userRole: true
+        phoneNumber: true
       }
     });
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("Error updating profile:", error);
-    return NextResponse.json({
-      error: "Error updating profile",
-      details: error.message
-    }, { status: 500 });
+    console.error('Profile update error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update profile' },
+      { status: 500 }
+    );
   }
 }
 
@@ -73,19 +70,16 @@ export async function GET(req) {
         email: true,
         userRole: true,
         avatar: true,
-        phoneNumber: true,
-      },
+        phoneNumber: true
+      }
     });
-
-    // Generate avatar URL if none exists
-    if (!user.avatar) {
-      const seed = encodeURIComponent(user.name || user.email.split('@')[0]);
-      user.avatar = `https://api.dicebear.com/6.x/initials/png?seed=${seed}&backgroundColor=${getRandomColor()}`;
-    }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Error fetching profile:", error);
-    return NextResponse.json({ error: "Error fetching profile" }, { status: 500 });
+    console.error('Profile fetch error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch profile' },
+      { status: 500 }
+    );
   }
 }
