@@ -16,10 +16,7 @@ export default function AccountLayout({ children }) {
   //   return () => clearTimeout(timer);
   // }, []);
 
-  
-
   return (
-    
     <ProtectedLayout>
       <section>
         <div className="relative sm:p-4 p-2 flex flex-row">
@@ -29,7 +26,6 @@ export default function AccountLayout({ children }) {
           <div className="flex-1 max-sm:w-full max-w-[1280px] mx-auto sm:pr-2">
             <Navbar showSearch={false} />
             {children}
-            
           </div>
         </div>
       </section>
