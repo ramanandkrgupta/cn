@@ -75,6 +75,10 @@ const nextConfig = {
         crypto: false,
       }
     }
+    config.module.rules.push({
+      test: /\.(pdf)$/i,
+      type: 'asset/resource'
+    });
     return config
   },
 };

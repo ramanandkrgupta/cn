@@ -4,9 +4,10 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEdgeStore } from "@/libs/edgestore";
-import { calculateFileHash } from "@/libs/file-utils";
 import UploadDoc from "@/components/admin/components/UploadDoc";
 import DocDetails from "@/components/admin/components/DocDetails";
+import { processPDF } from "@/libs/pdf-processor";
+import logoImg from "@/public/icons/icon.png";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function UploadPage() {
   const [showDetails, setShowDetails] = useState(false);
 
   const handleFileSelect = async (selectedFiles) => {
-    console.log("Selected files:", selectedFiles); // Debug log
+    console.log("Selected files:", selectedFiles);
     if (selectedFiles && selectedFiles.length > 0) {
       setFiles(selectedFiles);
       setShowDetails(true);
@@ -32,80 +33,82 @@ export default function UploadPage() {
         return;
       }
 
-      console.log("Starting file upload with details:", fileDetails); // Debug log
+      console.log("Starting file upload with details:", fileDetails);
+      toast.loading('Starting upload process...', { id: 'upload-process' });
 
-      toast.loading("Uploading files...");
-
-      // Upload files to EdgeStore and calculate hashes
       const uploadPromises = fileDetails.map(async (detail, index) => {
-        console.log(`Processing upload for file ${index}:`, detail); // Debug log
+        const totalFiles = fileDetails.length;
+        toast.loading(`Processing file ${index + 1} of ${totalFiles}: ${detail.file.name}...`, 
+          { id: `upload-${detail.id}` });
 
         try {
-          // Calculate file hash
-          const hash = await calculateFileHash(detail.file);
-          console.log(`File hash calculated for ${detail.file_name}:`, hash); // Debug log
+          let fileToUpload = detail.file;
 
-          // Check for duplicates
-          const dupCheck = await fetch(
-            `/api/v1/members/posts/check-duplicate?hash=${hash}`
-          );
-          const dupData = await dupCheck.json();
-          console.log("Duplicate check result:", dupData); // Debug log
+          // Process PDF with metadata
+          if (detail.file.type === 'application/pdf') {
+            const logoResponse = await fetch(logoImg.src);
+            if (!logoResponse.ok) throw new Error('Failed to fetch logo');
+            
+            const logoData = await logoResponse.arrayBuffer();
+            
+            toast.loading(`Adding metadata and template to ${detail.file.name}...`, { id: `process-${detail.id}` });
+            
+            const processedPDF = await processPDF(detail.file, {
+              logoData,
+              title: detail.title,
+              course: detail.course_name,
+              semester: detail.semester_code,
+              subject: detail.subject_name,
+              category: detail.category
+            });
 
-          if (dupData.isDuplicate) {
-            throw new Error(
-              `File '${detail.file_name}' has already been uploaded`
-            );
+            fileToUpload = new File([processedPDF], detail.file.name, { type: 'application/pdf' });
+            toast.success(`PDF processed successfully`, { id: `process-${detail.id}` });
           }
 
-          // Upload to EdgeStore
-          console.log(`Starting EdgeStore upload for ${detail.file_name}`); // Debug log
+          // Upload the processed file
+          toast.loading(`Uploading ${detail.file.name}...`, { id: `upload-${detail.id}` });
           const res = await edgestore.publicFiles.upload({
-            file: detail.file,
+            file: fileToUpload,
             options: {
               temporary: false,
             },
             onProgressChange: (progress) => {
-              console.log(`Upload progress for ${detail.file_name}:`, progress);
+              toast.loading(
+                `Uploading ${detail.file.name}: ${Math.round(progress)}%`,
+                { id: `upload-${detail.id}` }
+              );
             },
           });
 
-          console.log("EdgeStore upload response:", res); // Debug log
-
-          const uploadResult = {
-            ...res,
-            hash,
-            filename: detail.file_name,
-            url: res.url || res.accessUrl,
-            accessUrl: res.accessUrl,
-            file: detail.file,
-          };
-
-          console.log("EdgeStore raw response:", res);
-          console.log("Formatted upload result:", uploadResult);
-
-          return uploadResult;
+          toast.success(`${detail.file.name} uploaded successfully`, { id: `upload-${detail.id}` });
+          return { ...res, hash: detail.hash };
         } catch (error) {
-          console.error(`Upload error for ${detail.file_name}:`, error); // Debug log
-          throw new Error(
-            `Failed to upload ${detail.file_name}: ${error.message}`
-          );
+          toast.error(`Failed to process/upload ${detail.file.name}`, { id: `upload-${detail.id}` });
+          throw error;
         }
       });
 
       const uploadRes = await Promise.all(uploadPromises);
-      console.log("All upload results:", uploadRes); // Debug log
+      toast.success('All files uploaded successfully', { id: 'upload-process' });
 
       // Create post entries
       const formData = new FormData();
-      formData.append("fileDetails", JSON.stringify(fileDetails));
+      
+      const detailsForAPI = fileDetails.map((detail, index) => ({
+        ...detail,
+        course_name: detail.course,
+        semester_code: detail.semester,
+        subject_name: detail.subject.subject_name,
+        subject_code: detail.subject.subject_code,
+        file_name: detail.file.name,
+        fileHash: detail.hash,
+        file_url: uploadRes[index].url
+      }));
+
+      formData.append("fileDetails", JSON.stringify(detailsForAPI));
       formData.append("userEmail", session.user.email);
       formData.append("uploadRes", JSON.stringify(uploadRes));
-
-      console.log("Sending to API:", {
-        fileDetails,
-        uploadRes,
-      }); // Debug log
 
       const response = await fetch("/api/post", {
         method: "POST",
@@ -114,13 +117,11 @@ export default function UploadPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("API error response:", error); // Debug log
         throw new Error(error.message || "Upload failed");
       }
 
       const data = await response.json();
-      console.log("API success response:", data); // Debug log
-
+      
       if (data.success) {
         toast.dismiss();
         toast.success("Files uploaded successfully and pending moderation");
@@ -130,7 +131,7 @@ export default function UploadPage() {
       }
     } catch (error) {
       toast.dismiss();
-      console.error("Upload error details:", error); // Debug log
+      console.error("Upload error:", error);
       toast.error(error.message || "Failed to upload files");
     }
   };

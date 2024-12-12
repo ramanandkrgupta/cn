@@ -5,16 +5,41 @@ import { courses, semester, category } from "@/constants";
 import PropTypes from "prop-types";
 
 const DocDetails = ({ files, onSubmit }) => {
-  const [fileDetails, setFileDetails] = useState(
-    files?.map((file) => ({
-      title: file?.file?.name?.split(".")[0] || "",
-      description: "",
-      category: category[0]?.name || "",
-      course: courses[0]?.link || "",
-      semester: semester[0]?.link || "",
-      subject: null,
-    })) || []
+  const [fileDetails, setFileDetails] = useState([]);
+  const [batchMode, setBatchMode] = useState(false);
+  const [batchSettings, setBatchSettings] = useState({
+    category: '',
+    course: '',
+    semester: '',
+    subject: null
+  });
+
+  // Add batch mode toggle
+  const BatchModeToggle = () => (
+    <div className="flex items-center gap-2 mb-4 p-4 bg-base-200 rounded-lg">
+      <input
+        type="checkbox"
+        checked={batchMode}
+        onChange={(e) => setBatchMode(e.target.checked)}
+        className="checkbox"
+      />
+      <span>Apply same settings to all files</span>
+    </div>
   );
+
+  // Apply batch settings to all files
+  const applyBatchSettings = () => {
+    setFileDetails(prev => prev.map(detail => ({
+      ...detail,
+      ...batchSettings
+    })));
+  };
+
+  useEffect(() => {
+    if (batchMode) {
+      applyBatchSettings();
+    }
+  }, [batchMode, batchSettings]);
 
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -76,24 +101,38 @@ const DocDetails = ({ files, onSubmit }) => {
     );
   };
 
+  useEffect(() => {
+    console.log("Files received in DocDetails:", files);
+    if (files && files.length > 0) {
+      const initialDetails = files.map(fileObj => ({
+        id: fileObj.id,
+        file: fileObj.file,
+        hash: fileObj.hash,
+        title: fileObj.originalName || '',
+        description: '',
+        category: '',
+        course: '',
+        semester: '',
+        subject: null,
+      }));
+      setFileDetails(initialDetails);
+    }
+  }, [files]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Files received in DocDetails:", files); // Debug log
+    if (loading) return;
 
     // Validate all required fields
     const isValid = fileDetails.every((detail) => {
-      if (
-        !detail.title ||
-        !detail.description ||
-        !detail.category ||
-        !detail.course ||
-        !detail.semester ||
-        !detail.subject
-      ) {
-        return false;
-      }
-      return true;
+      return (
+        detail.title &&
+        detail.description &&
+        detail.category &&
+        detail.course &&
+        detail.semester &&
+        detail.subject // Check if subject is selected
+      );
     });
 
     if (!isValid) {
@@ -101,45 +140,23 @@ const DocDetails = ({ files, onSubmit }) => {
       return;
     }
 
+    setLoading(true);
     try {
-      // Format the data for submission
-      const formattedDetails = fileDetails.map((detail, index) => {
-        console.log(`Processing file ${index}:`, {
-          detail,
-          fileData: files[index],
-        }); // Debug log
+      // Format the details before submission
+      const formattedDetails = fileDetails.map(detail => ({
+        ...detail,
+        course_name: detail.course,
+        semester_code: detail.semester,
+        subject_name: detail.subject?.subject_name || '',
+        subject_code: detail.subject?.subject_code || '',
+      }));
 
-        const fileData = files[index];
-        if (!fileData?.file) {
-          console.error(`File data missing for index ${index}:`, fileData); // Debug log
-          throw new Error(`Missing file data for ${detail.title}`);
-        }
-
-        const formattedDetail = {
-          ...detail,
-          file: fileData.file,
-          file_name: fileData.file.name,
-          course_name: detail.course,
-          semester_code: detail.semester,
-          subject_name: detail.subject.subject_name,
-          subject_code: detail.subject.subject_code,
-        };
-
-        console.log(`Formatted detail for file ${index}:`, formattedDetail); // Debug log
-        return formattedDetail;
-      });
-
-      console.log("Final formatted details:", formattedDetails); // Debug log
-
-      // Call the onSubmit prop function with formatted details
       await onSubmit(formattedDetails);
     } catch (error) {
-      console.error("Submission error details:", {
-        error,
-        fileDetails,
-        files,
-      }); // Debug log
-      toast.error(error.message || "Failed to submit document details");
+      console.error('Error submitting files:', error);
+      toast.error('Failed to submit files');
+    } finally {
+      setLoading(false);
     }
   };
 

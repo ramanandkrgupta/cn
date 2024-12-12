@@ -34,6 +34,7 @@
     "file-saver": "^2.0.5",
     "firebase": "^10.13.1",
     "framer-motion": "^11.11.10",
+    "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "ionicons": "^7.4.0",
     "jsonwebtoken": "^9.0.2",
@@ -62,7 +63,7 @@
     "swr": "^2.2.4",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "3.3.2",
-    "uuid": "^11.0.2",
+    "uuid": "^11.0.3",
     "zod": "^3.22.4",
     "zustand": "^4.5.5",
     "zxcvbn": "^4.4.2"

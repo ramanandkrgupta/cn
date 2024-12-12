@@ -56,8 +56,24 @@ export async function getFileWithWatermark(fileId, user, isPremium) {
 }
 
 export const calculateFileHash = async (file) => {
-  const buffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  try {
+    // For PDF files, use a different approach
+    if (file.type === 'application/pdf') {
+      const arrayBuffer = await file.arrayBuffer();
+      // Just hash the first chunk of the PDF instead of trying to extract text
+      const chunk = arrayBuffer.slice(0, 1024 * 1024); // First 1MB
+      const hashBuffer = await crypto.subtle.digest('SHA-256', chunk);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // For non-PDF files
+    const chunk = await file.slice(0, 1024 * 1024).arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', chunk);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (error) {
+    console.error('Error calculating file hash:', error);
+    throw error;
+  }
 };

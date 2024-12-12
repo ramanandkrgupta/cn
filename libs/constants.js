@@ -1,0 +1,1 @@
+export const PDF_TEMPLATE_URL = '/assets/pdf-template.pdf'; 

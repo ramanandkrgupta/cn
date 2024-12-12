@@ -1,21 +1,25 @@
 {
   "name": "Notes Mates",
   "short_name": "Notes Mates",
+  "description": "Notes, Papers, Videos, Groups",
+  "start_url": "/",
   "icons": [
     {
       "src": "/favicon/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "/favicon/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     }
   ],
-  "theme_color": "#f5f5f4",
-  "background_color": "#f5f5f4",
-  "display": "standalone"
+  "theme_color": "#13131b",
+  "background_color": "#13131b",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/"
 }

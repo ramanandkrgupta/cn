@@ -1,15 +1,8 @@
 import toast from "react-hot-toast";
-import { useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { formatFileSize } from "@edgestore/react/utils";
-import { createHash } from "crypto";
-import {
-  DocumentCheckIcon,
-  DocumentTextIcon,
-  ExclamationCircleIcon,
-  TrashIcon,
-} from "@heroicons/react/20/solid";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { v4 as uuidv4 } from 'uuid';
 import { Cloud } from "@/public/assets";
 
 const UploadDoc = ({
@@ -20,96 +13,7 @@ const UploadDoc = ({
   onChange,
   onFilesAdded,
 }) => {
-  // Calculate file hash for duplicate detection
-  const calculateFileHash = async (file) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    return hashHex;
-  };
-
-  // Check for duplicate files
-  const checkDuplicate = async (hash) => {
-    try {
-      const response = await fetch(
-        `/api/v1/members/posts/check-duplicate?hash=${hash}`
-      );
-      const data = await response.json();
-      return data.isDuplicate;
-    } catch (error) {
-      console.error("Error checking duplicate:", error);
-      return false;
-    }
-  };
-
-  // Add watermark to PDF
-  const addWatermarkToPdf = async (file) => {
-    try {
-      const existingPdfBytes = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(existingPdfBytes, {
-        ignoreEncryption: true,
-      });
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const pages = pdfDoc.getPages();
-
-      pages.forEach((page) => {
-        const { width, height } = page.getSize();
-        const watermarkText = "https://notesmates.in";
-        const fontSize = 12;
-        const textWidth = helveticaFont.widthOfTextAtSize(
-          watermarkText,
-          fontSize
-        );
-
-        // Add watermark in multiple positions without rotation
-        const positions = [
-          // Top-left
-          { x: 10, y: height - fontSize - 10 },
-          // Top-right
-          { x: width - textWidth - 10, y: height - fontSize - 10 },
-          // Bottom-left
-          { x: 10, y: 10 },
-          // Bottom-right
-          { x: width - textWidth - 10, y: 10 },
-          // Center
-          { x: (width - textWidth) / 2, y: height / 2 },
-        ];
-
-        // Add diagonal watermarks
-        for (let i = 0; i < height; i += 150) {
-          page.drawText(watermarkText, {
-            x: 20,
-            y: i,
-            size: fontSize,
-            font: helveticaFont,
-            color: rgb(0.75, 0.75, 0.75),
-            opacity: 0.3,
-          });
-        }
-
-        // Add standard positions watermarks
-        positions.forEach((pos) => {
-          page.drawText(watermarkText, {
-            x: pos.x,
-            y: pos.y,
-            size: fontSize,
-            font: helveticaFont,
-            color: rgb(0.75, 0.75, 0.75),
-            opacity: 0.3,
-          });
-        });
-      });
-
-      const pdfBytes = await pdfDoc.save();
-      return new File([pdfBytes], file.name, { type: file.type });
-    } catch (error) {
-      console.error("Error adding watermark:", error);
-      throw new Error(`Error processing ${file.name}: ${error.message}`);
-    }
-  };
+  const createId = () => uuidv4();
 
   // Validate file
   const validateFile = async (file) => {
@@ -127,16 +31,25 @@ const UploadDoc = ({
 
     try {
       // Calculate file hash
-      const fileHash = await calculateFileHash(file);
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
 
       // Check for duplicates
-      const isDuplicate = await checkDuplicate(fileHash);
-      if (isDuplicate) {
+      const response = await fetch(
+        `/api/v1/members/posts/check-duplicate?hash=${hashHex}`
+      );
+      const data = await response.json();
+      
+      if (data.isDuplicate) {
         toast.error("This file has already been uploaded");
         return false;
       }
 
-      return { isValid: true, hash: fileHash };
+      return { isValid: true, hash: hashHex };
     } catch (error) {
       console.error("Error validating file:", error);
       toast.error("Error processing file");
@@ -144,75 +57,45 @@ const UploadDoc = ({
     }
   };
 
-  const onDrop = useCallback(
-    async (acceptedFiles) => {
-      console.log("Dropped files:", acceptedFiles); // Debug log
+  const onDrop = useCallback(async (acceptedFiles) => {
+    try {
+      toast.loading('Validating files...', { id: 'prepare-files' });
+      
+      const processedFiles = await Promise.all(acceptedFiles.map(async (file) => {
+        const fileId = createId();
 
-      if (files.length + acceptedFiles.length > 3) {
-        toast.error("You can only upload up to three files.");
-        return [];
-      }
+        // Only validate file type, size and check for duplicates
+        const validationResult = await validateFile(file);
+        if (!validationResult) return null;
 
-      const processedFiles = await Promise.all(
-        acceptedFiles.map(async (file) => {
-          console.log("Processing dropped file:", file); // Debug log
-          try {
-            if (files.some((existingFile) => existingFile.name === file.name)) {
-              toast.error(`File '${file.name}' is already selected.`);
-              return null;
-            }
+        return {
+          file,
+          id: fileId,
+          hash: validationResult.hash,
+          originalName: file.name.replace(/\.[^/.]+$/, '')
+        };
+      }));
 
-            const validation = await validateFile(file);
-            if (!validation) {
-              return null;
-            }
-
-            // Add watermark to PDF
-            const watermarkedFile = await addWatermarkToPdf(file);
-            const addedFile = {
-              file: watermarkedFile,
-              hash: validation.hash,
-            };
-            console.log("Processed file:", addedFile); // Debug log
-            return addedFile;
-          } catch (error) {
-            console.error("File processing error:", error); // Debug log
-            toast.error(
-              error.message || `Error processing file '${file.name}'`
-            );
-            return null;
-          }
-        })
-      );
+      toast.dismiss('prepare-files');
 
       const validFiles = processedFiles.filter(Boolean);
-      console.log("Valid processed files:", validFiles); // Debug log
-
       if (validFiles.length > 0) {
-        setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+        setFiles(validFiles);
+        onFilesAdded(validFiles);
+        toast.success(`${validFiles.length} files ready for details`);
       }
-      return validFiles;
-    },
-    [files, setFiles]
-  );
+    } catch (error) {
+      console.error('Error validating files:', error);
+      toast.error('Error validating files');
+    }
+  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop: async (acceptedFiles) => {
-      const validFiles = await onDrop(acceptedFiles);
-      if (validFiles && validFiles.length > 0) {
-        const addedFiles = validFiles.map((file) => ({
-          file: file.file,
-          key: Math.random().toString(36).slice(2),
-          progress: "PENDING",
-          hash: file.hash,
-        }));
-        void onFilesAdded?.(addedFiles);
-        void onChange?.([...(value ?? []), ...addedFiles]);
-      }
-    },
+    onDrop,
     accept: {
       "application/pdf": [".pdf"],
     },
+    maxFiles: 3
   });
 
   return (

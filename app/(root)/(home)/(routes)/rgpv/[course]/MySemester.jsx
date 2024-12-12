@@ -68,7 +68,7 @@ const UserSemester = ({ course }) => {
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h1 className="select_header">Select Category</h1>
+        <h1 className="select_header">Select Semester</h1>
       </div>
 
       <small className="text-gray-400">
