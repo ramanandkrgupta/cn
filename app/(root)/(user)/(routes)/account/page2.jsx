@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { motion } from "framer-motion";
 //import {profile}  from "../../../../../public/img/profile.jpg";
-import { newlogo } from "@/public/icons";
+import { nm } from "@/public/icons";
 import { User, Lock, Download, Heart, LogOut, Menu } from "lucide-react";
 import ChangePassword from "@/components/admin/components/ChangePassword";
 
@@ -333,7 +333,7 @@ const ProfilePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Image src={newlogo} alt="New Tag Icon" className="w-20" />
+              <Image src={nm} alt="New Tag Icon" className="w-20" />
             </div>
           </div>
           <div className="flex items-center lg:hidden">

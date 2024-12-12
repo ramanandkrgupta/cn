@@ -107,13 +107,13 @@ export const processPDF = async (file, options = {}) => {
           opacity: 0.3
         });
 
-        page.drawText('https://notesmates.in', {
+        page.drawText('https://www.notesmates.in', {
           x: 20,
           y: 20,
           size: 10,
           font: helveticaFont,
           color: rgb(0.5, 0.5, 0.5),
-          opacity: 0.5
+          opacity: 1
         });
       }
     }

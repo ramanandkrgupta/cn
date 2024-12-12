@@ -11,10 +11,10 @@ import Search from "../Search";
 import { navlinks } from "@/constants";
 import ShareDialogBox from "../models/ShareDialogBox";
 import PostViewDialogBox from "../models/PostViewDialogBox";
-import { newlogo } from "@/public/icons";
-import { Sun, Moon, Menu, X, LogOut, LogIn, User2,Bell } from "lucide-react";
+import { nm } from "@/public/icons";
+import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from "lucide-react";
 import Image from "next/image";
-import UserProfile from './UserProfile';
+import UserProfile from "./UserProfile";
 
 const NavBar = ({ showSearch = true }) => {
   const { data: session } = useSession();
@@ -36,7 +36,7 @@ const NavBar = ({ showSearch = true }) => {
   // Add this helper function to check if a link is active
   const isLinkActive = (link) => {
     if (!pathname) return false;
-    if (link === '/') {
+    if (link === "/") {
       return pathname === link;
     }
     return pathname.startsWith(link);
@@ -96,11 +96,7 @@ const NavBar = ({ showSearch = true }) => {
       {/* Header with Logo */}
       <div className="flex items-center justify-between p-4 border-b border-base-300">
         <div className="flex items-center gap-2">
-          <Image
-            src={newlogo}
-            alt="Notes Mates Logo"
-            className="w-8 h-8"
-          />
+          <Image src={nm} alt="Notes Mates Logo" className="w-8 h-8" />
           <span className="font-bold text-lg">Notes Mates</span>
         </div>
         <button className=""></button>
@@ -172,7 +168,9 @@ const NavBar = ({ showSearch = true }) => {
                 if (menu.btn) setIsOpen(true);
               }}
             >
-              <IconComponent className={`w-5 h-5 ${isActive ? 'text-primary' : ''}`} />
+              <IconComponent
+                className={`w-5 h-5 ${isActive ? "text-primary" : ""}`}
+              />
               <span>{menu.name}</span>
             </Link>
           );
@@ -212,10 +210,10 @@ const NavBar = ({ showSearch = true }) => {
               handleSignOutButton();
             } else {
               const button = document.activeElement;
-              button.classList.add('animate-press');
+              button.classList.add("animate-press");
               setTimeout(() => {
                 signIn();
-                button.classList.remove('animate-press');
+                button.classList.remove("animate-press");
               }, 200);
             }
           }}
@@ -239,7 +237,7 @@ const NavBar = ({ showSearch = true }) => {
   );
 
   // Add this component inside your NavBar component
-  const ThemeWave = () => (
+  const ThemeWave = () =>
     isAnimating && (
       <div
         className="fixed inset-0 pointer-events-none z-[60]"
@@ -247,18 +245,14 @@ const NavBar = ({ showSearch = true }) => {
       >
         <div
           className={`absolute inset-0 transition-colors duration-300
-            ${theme === 'mydark'
-              ? 'bg-base-100'
-              : 'bg-base-300'
-            }`}
+            ${theme === "mydark" ? "bg-base-100" : "bg-base-300"}`}
           style={{
-            opacity: '0.5',
-            animation: 'fade-theme 300ms ease-out forwards'
+            opacity: "0.5",
+            animation: "fade-theme 300ms ease-out forwards",
           }}
         />
       </div>
-    )
-  );
+    );
 
   // Update the ThemeToggleButton component
   const ThemeToggleButton = ({ mobile = false }) => (
@@ -269,16 +263,28 @@ const NavBar = ({ showSearch = true }) => {
         toggleTheme(e);
       }}
       className={`p-2 hover:bg-base-200 rounded-lg transition-colors relative overflow-hidden
-        ${mobile ? 'flex items-center justify-center' : 'w-full gap-3 p-3 flex items-center'}`}
+        ${
+          mobile
+            ? "flex items-center justify-center"
+            : "w-full gap-3 p-3 flex items-center"
+        }`}
     >
       {theme === "mydark" ? (
         <>
-          <Sun className={`w-${mobile ? '6' : '5'} h-${mobile ? '6' : '5'} text-gray-500`} />
+          <Sun
+            className={`w-${mobile ? "6" : "5"} h-${
+              mobile ? "6" : "5"
+            } text-gray-500`}
+          />
           {!mobile && <span>Light Mode</span>}
         </>
       ) : (
         <>
-          <Moon className={`w-${mobile ? '6' : '5'} h-${mobile ? '6' : '5'} text-gray-500`} />
+          <Moon
+            className={`w-${mobile ? "6" : "5"} h-${
+              mobile ? "6" : "5"
+            } text-gray-500`}
+          />
           {!mobile && <span>Dark Mode</span>}
         </>
       )}
@@ -289,7 +295,7 @@ const NavBar = ({ showSearch = true }) => {
     <>
       <nav className="flex md:flex-row flex-col-reverse justify-between gap-6">
         <p className="text-primary align-middle text-center subpixel-antialiased text-3xl font-bold hidden sm:block">
-          Notes <span className="text-secondary">Mates</span>{' '}
+          Notes <span className="text-secondary">Mates</span>{" "}
           <span className="badge">.in</span>
         </p>
 
@@ -311,12 +317,12 @@ const NavBar = ({ showSearch = true }) => {
           <div
             className="w-[40px] h-[40px] rounded-[10px] bg-neutral flex justify-center items-center cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              router.push('/')
+              e.preventDefault();
+              router.push("/");
             }}
           >
             <Image
-              src={newlogo}
+              src={nm}
               alt="user icon"
               className="w-[95%] h-[95%]"
               priority
@@ -343,12 +349,12 @@ const NavBar = ({ showSearch = true }) => {
           >
             <Menu
               className={`w-6 h-6 text-gray-500 absolute transition-opacity duration-200 ${
-                toggleDrawer ? 'opacity-0' : 'opacity-100'
+                toggleDrawer ? "opacity-0" : "opacity-100"
               }`}
             />
             <X
               className={`w-6 h-6 text-gray-500 transition-opacity duration-200 ${
-                toggleDrawer ? 'opacity-100' : 'opacity-0'
+                toggleDrawer ? "opacity-100" : "opacity-0"
               }`}
             />
           </button>
@@ -360,7 +366,7 @@ const NavBar = ({ showSearch = true }) => {
             {/* Backdrop */}
             <div
               className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-                toggleDrawer ? 'opacity-50 pointer-events-auto' : 'opacity-0'
+                toggleDrawer ? "opacity-50 pointer-events-auto" : "opacity-0"
               }`}
               onClick={handleCloseSidebar}
             />
@@ -369,7 +375,7 @@ const NavBar = ({ showSearch = true }) => {
             <div
               ref={sidebarRef}
               className={`absolute inset-y-0 left-0 w-[280px] bg-base-200 transform transition-transform duration-300 ease-out pointer-events-auto
-                ${toggleDrawer ? 'translate-x-0' : '-translate-x-full'}`}
+                ${toggleDrawer ? "translate-x-0" : "-translate-x-full"}`}
             >
               <MenuPanel />
             </div>
@@ -391,7 +397,7 @@ const NavBar = ({ showSearch = true }) => {
       {/* Add the wave effect */}
       <ThemeWave />
     </>
-  )
+  );
 };
 
 export default NavBar;

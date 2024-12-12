@@ -30,6 +30,8 @@ import newt from "./newt.png";
 import premiumIcon from "./premium.png";
 import newlogo from "./icon.png";
 
+import nm from "./nm.png";
+
 export { 
     play,
     fire,
@@ -61,5 +63,6 @@ export {
     msw,
     coop,
     subject,
-    newlogo
+    newlogo,
+    nm
 };
