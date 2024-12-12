@@ -4,6 +4,8 @@ import { useDropzone } from "react-dropzone";
 import { formatFileSize } from "@edgestore/react/utils";
 import { v4 as uuidv4 } from 'uuid';
 import { Cloud } from "@/public/assets";
+import { DocumentCheckIcon, DocumentTextIcon, ExclamationCircleIcon } from "@heroicons/react/20/solid";
+import { TrashIcon } from "lucide-react";
 
 const UploadDoc = ({
   files,
