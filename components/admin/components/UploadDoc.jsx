@@ -26,8 +26,8 @@ const UploadDoc = ({
     }
 
     // Check file size (10MB limit)
-    if (file.size > 1000 * 1024 * 1024) {
-      toast.error("File size should be less than 1000 MB");
+    if (file.size > 100000 * 1024 * 1024) {
+      toast.error("File size should be less than 100000 MB");
       return false;
     }
 
