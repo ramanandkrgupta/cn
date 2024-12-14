@@ -87,7 +87,7 @@ model post {
   shares        Int      @default(0)
   userLikes     UserLike[]
   userDownloads UserDownload[]
-  fileHash      String?   
+  fileHash      String?
   status        String    @default("pending")
   moderatedBy   String?   @db.ObjectId
   moderator     User?     @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
