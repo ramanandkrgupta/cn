@@ -106,10 +106,10 @@ const NavBar = ({ showSearch = true }) => {
       {session && (
         <div className="p-4 bg-base-300/50">
           <div className="flex items-center gap-4 mb-3">
-            {session.user?.image ? (
+            {session.user?.avatar ? (
               <Image
-                src={session.user.image}
-                alt={session.user.name || "User"}
+                src={session.user.avatar}
+                alt={session.user.name || 'User'}
                 width={48}
                 height={48}
                 className="rounded-full ring-2 ring-primary/20"
@@ -119,9 +119,10 @@ const NavBar = ({ showSearch = true }) => {
                 <User2 className="w-6 h-6 text-primary" />
               </div>
             )}
+
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold truncate">
-                {session.user?.name || "User"}
+                {session.user?.name || 'User'}
               </h3>
               <p className="text-sm text-gray-500 truncate">
                 {session.user?.email}
@@ -150,8 +151,8 @@ const NavBar = ({ showSearch = true }) => {
         </div>
 
         {navlinks.map((menu) => {
-          const isActive = isLinkActive(menu.link);
-          const IconComponent = menu.icon;
+          const isActive = isLinkActive(menu.link)
+          const IconComponent = menu.icon
 
           return (
             <Link
@@ -159,21 +160,21 @@ const NavBar = ({ showSearch = true }) => {
               href={menu.link}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
                 isActive
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-500 hover:bg-base-300 hover:text-gray-700"
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'text-gray-500 hover:bg-base-300 hover:text-gray-700'
               }`}
               onClick={() => {
-                setIsActive(menu.name);
-                setToggleDrawer(false);
-                if (menu.btn) setIsOpen(true);
+                setIsActive(menu.name)
+                setToggleDrawer(false)
+                if (menu.btn) setIsOpen(true)
               }}
             >
               <IconComponent
-                className={`w-5 h-5 ${isActive ? "text-primary" : ""}`}
+                className={`w-5 h-5 ${isActive ? 'text-primary' : ''}`}
               />
               <span>{menu.name}</span>
             </Link>
-          );
+          )
         })}
       </div>
 
@@ -184,7 +185,7 @@ const NavBar = ({ showSearch = true }) => {
           onClick={toggleTheme}
           className="flex items-center w-full gap-3 p-3 rounded-lg text-gray-500 hover:bg-base-300 transition-colors"
         >
-          {theme === "mydark" ? (
+          {theme === 'mydark' ? (
             <>
               <Sun className="w-5 h-5" />
               <span>Light Mode</span>
@@ -201,20 +202,20 @@ const NavBar = ({ showSearch = true }) => {
         <button
           className={`flex items-center w-full gap-3 p-4 rounded-xl transition-all duration-200 transform hover:scale-[0.98] active:scale-[0.95] ${
             session
-              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
-              : "bg-primary/10 text-primary hover:bg-primary/20"
+              ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+              : 'bg-primary/10 text-primary hover:bg-primary/20'
           }`}
           onClick={() => {
-            setToggleDrawer(false);
+            setToggleDrawer(false)
             if (session) {
-              handleSignOutButton();
+              handleSignOutButton()
             } else {
-              const button = document.activeElement;
-              button.classList.add("animate-press");
+              const button = document.activeElement
+              button.classList.add('animate-press')
               setTimeout(() => {
-                signIn();
-                button.classList.remove("animate-press");
-              }, 200);
+                signIn()
+                button.classList.remove('animate-press')
+              }, 200)
             }
           }}
         >
@@ -234,7 +235,7 @@ const NavBar = ({ showSearch = true }) => {
         </button>
       </div>
     </div>
-  );
+  )
 
   // Add this component inside your NavBar component
   const ThemeWave = () =>
