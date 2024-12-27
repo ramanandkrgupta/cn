@@ -62,9 +62,15 @@ const nextConfig = {
   },
   api: {
     bodyParser: {
+<<<<<<< HEAD
       sizeLimit: '1000mb',
     },
     responseLimit: '1000mb',
+=======
+      sizeLimit: '10000mb',
+    },
+    responseLimit: '10000mb',
+>>>>>>> 1e58d12888b140852b5bebf1e3b2e77c8b72275c
   },
   // Increase header size limit
   webpack: (config, { isServer }) => {
