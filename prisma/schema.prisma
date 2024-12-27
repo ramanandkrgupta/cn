@@ -48,6 +48,8 @@ model User {
   sessions            Session[]
   collections         Collection[]
   aiConversations     AIConversation[]
+   resetToken        String?  
+  resetTokenExpiry  DateTime?
 }
 
 model subject{

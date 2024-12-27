@@ -1,181 +1,320 @@
 import toast from "react-hot-toast";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { formatFileSize } from "@edgestore/react/utils";
 import { v4 as uuidv4 } from 'uuid';
 import { Cloud } from "@/public/assets";
-import { DocumentCheckIcon, DocumentTextIcon, ExclamationCircleIcon } from "@heroicons/react/20/solid";
-import { TrashIcon } from "lucide-react";
+import { DocumentCheckIcon, DocumentTextIcon } from "@heroicons/react/20/solid";
+import { processPDF } from "@/libs/pdf-processor";
+import DocDetails from './DocDetails';
+
+const MAX_FILE_SIZE = 1000 * 1024 * 1024; // 1000MB
+const ALLOWED_FILE_TYPES = ['application/pdf'];
 
 const UploadDoc = ({
   files,
   setFiles,
   removeFile,
-  value,
+  value = [],
   onChange,
   onFilesAdded,
 }) => {
-  const createId = () => uuidv4();
+  const [showDocDetails, setShowDocDetails] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState({
+    total: 0,
+    current: 0,
+    uploading: false
+  });
 
   // Validate file
   const validateFile = async (file) => {
-    // Check file type
-    if (!["application/pdf"].includes(file.type)) {
-      toast.error("Only PDF files are supported");
-      return false;
-    }
-
-    // Check file size (10MB limit)
-    if (file.size > 100000 * 1024 * 1024) {
-      toast.error("File size should be less than 100000 MB");
-      return false;
-    }
-
     try {
-      // Calculate file hash
-      const buffer = await file.arrayBuffer();
-      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      // Check for duplicates
-      const response = await fetch(
-        `/api/v1/members/posts/check-duplicate?hash=${hashHex}`
-      );
-      const data = await response.json();
-      
-      if (data.isDuplicate) {
-        toast.error("This file has already been uploaded");
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error("File size should be less than 1000MB");
         return false;
       }
 
-      return { isValid: true, hash: hashHex };
+      // Check file type
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        toast.error("Only PDF files are allowed");
+        return false;
+      }
+
+      // Check if already selected
+      const isDuplicate = selectedFiles.some(
+        existingFile => existingFile.name === file.name
+      );
+      if (isDuplicate) {
+        toast.error("This file is already selected");
+        return false;
+      }
+
+      // Check total files limit
+      if (selectedFiles.length >= 3) {
+        toast.error("Maximum 3 files can be uploaded at once");
+        return false;
+      }
+
+      return true;
     } catch (error) {
-      console.error("Error validating file:", error);
-      toast.error("Error processing file");
+      console.error('Error validating file:', error);
       return false;
     }
   };
 
   const onDrop = useCallback(async (acceptedFiles) => {
+    if (isUploading) {
+      toast.error("Please wait for current upload to finish");
+      return;
+    }
+
+    const pdfFiles = acceptedFiles.filter(
+      (file) => file.type === "application/pdf"
+    );
+
+    if (pdfFiles.length !== acceptedFiles.length) {
+      toast.error("Only PDF files are allowed");
+      return;
+    }
+
     try {
-      toast.loading('Validating files...', { id: 'prepare-files' });
-      
-      const processedFiles = await Promise.all(acceptedFiles.map(async (file) => {
-        const fileId = createId();
+      // Validate each file
+      for (const file of pdfFiles) {
+        const isValid = await validateFile(file);
+        if (!isValid) return;
+      }
 
-        // Only validate file type, size and check for duplicates
-        const validationResult = await validateFile(file);
-        if (!validationResult) return null;
-
-        return {
-          file,
-          id: fileId,
-          hash: validationResult.hash,
-          originalName: file.name.replace(/\.[^/.]+$/, '')
-        };
+      // Create file objects with IDs
+      const filesWithIds = pdfFiles.map(file => ({
+        id: uuidv4(),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        file: file,
+        originalName: file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
       }));
 
-      toast.dismiss('prepare-files');
-
-      const validFiles = processedFiles.filter(Boolean);
-      if (validFiles.length > 0) {
-        setFiles(validFiles);
-        onFilesAdded(validFiles);
-        toast.success(`${validFiles.length} files ready for details`);
-      }
+      setSelectedFiles(filesWithIds);
+      setShowDocDetails(true);
     } catch (error) {
-      console.error('Error validating files:', error);
-      toast.error('Error validating files');
+      console.error('Error handling files:', error);
+      toast.error("Error handling files");
     }
-  }, []);
+  }, [isUploading]);
+
+  const uploadFile = async (file, details) => {
+    try {
+      // Process PDF with watermark and metadata
+      const processedPdfBytes = await processPDF(file, {
+        title: details.title || file.name,
+        course: details.course || '',
+        semester: details.semester || '',
+        subject: details.subject?.subject_name || '',
+        category: details.category || ''
+      });
+      
+      // Convert processed PDF bytes to File object
+      const processedFile = new File(
+        [processedPdfBytes], 
+        details.originalName || file.name,
+        { type: 'application/pdf' }
+      );
+
+      // Create form data
+      const formData = new FormData();
+      formData.append("file", processedFile);
+      formData.append("details", JSON.stringify({
+        ...details,
+        branch: details.course?.toLowerCase() || 'general'
+      }));
+
+      // Upload the file
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const { url, key } = await response.json();
+
+      // Generate thumbnail
+      let thumbnailUrl = '/images/placeholders/pdf-placeholder.png';
+      try {
+        const thumbnailResponse = await fetch('/api/generate-thumbnail', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, key })
+        });
+
+        if (thumbnailResponse.ok) {
+          const thumbnailResult = await thumbnailResponse.json();
+          thumbnailUrl = thumbnailResult.thumbnailUrl;
+        }
+      } catch (thumbnailError) {
+        console.error('Thumbnail generation error:', thumbnailError);
+      }
+
+      return {
+        url,
+        thumbnailUrl,
+        key
+      };
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (fileDetails) => {
+    if (isUploading) {
+      toast.error("Upload already in progress");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadStatus({
+        total: fileDetails.length,
+        current: 0,
+        uploading: true
+      });
+
+      toast.loading('Processing files...', { id: 'upload' });
+
+      // Process files sequentially
+      const uploadResults = [];
+      for (let i = 0; i < fileDetails.length; i++) {
+        const detail = fileDetails[i];
+        const fileObj = selectedFiles.find(f => f.id === detail.id);
+        
+        if (!fileObj) {
+          console.error("File not found:", detail.id);
+          continue;
+        }
+
+        setUploadStatus(prev => ({
+          ...prev,
+          current: i + 1
+        }));
+
+        // Upload file and get response
+        const uploadResponse = await uploadFile(fileObj.file, {
+          ...detail,
+          course_name: detail.course,
+          semester_code: detail.semester,
+          subject_name: detail.subject?.subject_name,
+          subject_code: detail.subject?.subject_code,
+          originalName: fileObj.originalName
+        });
+
+        uploadResults.push({
+          ...uploadResponse,
+          id: fileObj.id,
+          name: fileObj.name,
+          size: fileObj.size
+        });
+      }
+
+      // Save all file details
+      const saveResponse = await fetch('/api/post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          files: uploadResults,
+          fileDetails: fileDetails
+        })
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save file details');
+      }
+
+      toast.dismiss('upload');
+      toast.success("All files uploaded successfully!");
+      setSelectedFiles([]);
+      setShowDocDetails(false);
+      setUploadStatus({
+        total: 0,
+        current: 0,
+        uploading: false
+      });
+
+      // Update parent component if needed
+      if (onChange) onChange(uploadResults);
+      if (onFilesAdded) onFilesAdded(uploadResults);
+      
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+      toast.dismiss('upload');
+      toast.error(error.message || "Failed to upload files");
+    } finally {
+      setIsUploading(false);
+      setUploadStatus(prev => ({
+        ...prev,
+        uploading: false
+      }));
+    }
+  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      "application/pdf": [".pdf"],
+      'application/pdf': ['.pdf']
     },
-    maxFiles: 3
+    multiple: true,
+    disabled: isUploading
   });
 
   return (
-    <div className="flex flex-col items-center justify-center w-full">
-      <div
-        className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer hover:bg-bray-800 bg-gray-700 border-gray-600 hover:border-gray-500 hover:bg-gray-600"
-        {...getRootProps()}
-      >
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-          <Cloud />
-          <p className="mb-2 text-sm text-gray-400 hidden md:flex">
-            <span className="font-semibold">Click to upload</span>&nbsp;or&nbsp;
-            <span className="font-semibold">Drag & Drop files</span>
-          </p>
-          <a className="btn bg-black md:hidden flex mb-2 text-white">
-            Browse my files
-          </a>
-          <p className="text-sm md:text-xs text-gray-400">
-            Supported file : pdf, doc, docx, pptx
-          </p>
-          <p className="text-sm md:text-xs text-gray-400">
-            Please note that you are allowed to upload a maximum of 3 files.
-          </p>
-          <input
-            id="dropzone-file"
-            type="file"
-            className="hidden"
-            {...getInputProps()}
-          />
-        </div>
-      </div>
-      {value?.map((file, index) => (
-        <div
-          key={index}
-          className="flex h-16 w-full max-w-[100vw] flex-col justify-center rounded border border-gray-300 px-4 py-2 mt-2"
-        >
-          <div className="flex items-center gap-2 text-white">
-            <DocumentTextIcon className="text-gray-400 w-6 h-6 shrink" />
-            <div className="min-w-0 text-sm">
-              <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-                {file.file.name}
-              </div>
-              <div className="text-xs text-gray-400">
-                {formatFileSize(file.file.size)}
-              </div>
-            </div>
-            <div className="grow" />
-            <div className="flex w-12 justify-end text-xs cursor-pointer">
-              {file.progress === "PENDING" ? (
-                <button
-                  className="rounded-md p-1 transition-colors duration-200 text-gray-400 hover:text-white w-5"
-                  onClick={() => removeFile(index)}
-                >
-                  <TrashIcon className="shrink-0 w-5" />
-                </button>
-              ) : file.progress === "ERROR" ? (
-                <ExclamationCircleIcon className="shrink-0 text-red-400 w-6" />
-              ) : file.progress !== "COMPLETE" ? (
-                <div className="cursor-wait">{Math.round(file.progress)}%</div>
-              ) : (
-                <DocumentCheckIcon className="shrink-0 text-gray-400 w-6" />
-              )}
+    <div className="w-full">
+      {!showDocDetails ? (
+        <div className="w-full">
+          <div
+            className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer hover:bg-bray-800 bg-gray-700 border-gray-600 hover:border-gray-500 hover:bg-gray-600 ${
+              isUploading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            {...getRootProps()}
+          >
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <Cloud className="h-12 w-12 text-gray-400" />
+              <p className="mb-2 text-sm text-gray-400">
+                <span className="font-semibold">Click to upload</span> or drag and
+                drop
+              </p>
+              <p className="text-xs text-gray-400">PDF (MAX. 10MB)</p>
+              <p className="text-sm md:text-xs text-gray-400">
+                Please note that you are allowed to upload a maximum of 3 files.
+              </p>
+              <input {...getInputProps()} />
             </div>
           </div>
-          {typeof file.progress === "number" && (
-            <div className="relative h-0">
-              <div className="absolute top-1 h-1 w-full overflow-clip rounded-full bg-gray-700 ">
-                <div
-                  className="h-full transition-all duration-300 ease-in-out bg-white"
-                  style={{
-                    width: file.progress ? `${file.progress}%` : "0%",
-                  }}
-                />
-              </div>
+          {selectedFiles.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Selected Files:</h3>
+              {selectedFiles.map((file) => (
+                <div key={file.id} className="text-sm text-gray-400">
+                  {file.originalName}
+                </div>
+              ))}
             </div>
           )}
         </div>
-      ))}
+      ) : (
+        <DocDetails
+          files={selectedFiles}
+          onSubmit={handleSubmit}
+          isSubmitting={isUploading}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
+import { Inter } from "next/font/google";
 import { AuthProvider, UserProvider } from "@/components/providers";
 import { Toaster } from "react-hot-toast";
 
@@ -17,58 +17,13 @@ export const viewport = {
 }
 
 export const metadata = {
-  title: "Notes Mates.in - Notes, Papers, Videos, Groups",
-  description: "Notes, Papers, Videos, Groups",
-  keywords: "notes mates, notes, papers, videos, groups",
-  author: "Ramanand Kumar Gupta",
-  icons: {
-    icon: [
-      { url: '/favicon/icon.svg' }
-    ],
-    apple: [
-      { url: '/favicon/web-app-manifest-192x192.png' }
-    ],
-    shortcut: ['/favicon/icon.svg'],
-  },
-  manifest: '/favicon/site.webmanifest',
-  openGraph: {
-    title: "Notes Mates.in - Notes, Papers, Videos, Groups",
-    description: "Notes, Papers, Videos, Groups",
-    url: "https://notesmates.in",
-    siteName: "Notes Mates.in",
-    images: [
-      { url: "/icons/icon.png" },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Notes Mates.in - Notes, Papers, Videos, Groups",
-    description: "Notes, Papers, Videos, Groups",
-    images: [
-      { url: "/icons/icon.png" },
-    ],
-  },
-  robots: "index, follow",
-  category: "education",
-  creator: "Ramanand Kumar Gupta",
-  publisher: "Ramanand Kumar Gupta",
-  language: "en-US",
-  verification: {
-    google: "google-site-verification:1234567890",
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Notes Mates",
-  },
-  formatDetection: {
-    telephone: false,
-  }
+  title: "Notes Mates",
+  description: "A Note Sharing Platform",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="mydark">
       <head>
         <link rel="icon" href="/favicon/icon.svg" />
         <link rel="apple-touch-icon" href="/favicon/web-app-manifest-192x192.png" />

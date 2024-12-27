@@ -1,6 +1,4 @@
-// File: components/navigation/Navbar.jsx
-
-"use client";
+'use client';
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -29,9 +27,7 @@ const NavBar = ({ showSearch = true }) => {
   const [post, setPost] = useState("");
   const [isActive, setIsActive] = useState("");
   const [theme, setTheme] = useState("mydark");
-  const [wavePosition, setWavePosition] = useState({ x: 0, y: 0 });
   const [isAnimating, setIsAnimating] = useState(false);
-  const waveRef = useRef(null);
 
   // Add this helper function to check if a link is active
   const isLinkActive = (link) => {
@@ -56,7 +52,7 @@ const NavBar = ({ showSearch = true }) => {
     // Reset animation after it's done
     setTimeout(() => {
       setIsAnimating(false);
-    }, 500); // Reduced from 1000ms to 500ms
+    }, 500);
   };
 
   useEffect(() => {
@@ -254,43 +250,6 @@ const NavBar = ({ showSearch = true }) => {
       </div>
     );
 
-  // Update the ThemeToggleButton component
-  const ThemeToggleButton = ({ mobile = false }) => (
-    <button
-      onClick={(e) => {
-        e.preventDefault(); // Prevent any default behavior
-        e.stopPropagation(); // Stop event propagation
-        toggleTheme(e);
-      }}
-      className={`p-2 hover:bg-base-200 rounded-lg transition-colors relative overflow-hidden
-        ${
-          mobile
-            ? "flex items-center justify-center"
-            : "w-full gap-3 p-3 flex items-center"
-        }`}
-    >
-      {theme === "mydark" ? (
-        <>
-          <Sun
-            className={`w-${mobile ? "6" : "5"} h-${
-              mobile ? "6" : "5"
-            } text-gray-500`}
-          />
-          {!mobile && <span>Light Mode</span>}
-        </>
-      ) : (
-        <>
-          <Moon
-            className={`w-${mobile ? "6" : "5"} h-${
-              mobile ? "6" : "5"
-            } text-gray-500`}
-          />
-          {!mobile && <span>Dark Mode</span>}
-        </>
-      )}
-    </button>
-  );
-
   return (
     <>
       <nav className="flex md:flex-row flex-col-reverse justify-between gap-6">
@@ -302,7 +261,7 @@ const NavBar = ({ showSearch = true }) => {
         {showSearch && (
           <Search setIsPostOpen={setIsPostOpen} setPost={setPost} />
         )}
-        <div className=" hidden md:block">
+        <div className="hidden md:block">
           <div className="items-center flex p-1">
             {session && session.user ? (
               <UserProfile user={session.user} />
@@ -335,7 +294,6 @@ const NavBar = ({ showSearch = true }) => {
           </p>
 
           <div className="flex items-center justify-center">
-            {/* <ThemeToggleButton mobile /> */}
             <Link href="/account/notifications">
               <Bell />
             </Link>

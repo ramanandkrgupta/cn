@@ -16,7 +16,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
 
   useEffect(() => {
-    console.log("Session in component:", session); // Debug log
+    // console.log("Session in component:", session); // Debug log
   }, [session]);
 
   const [metrics, setMetrics] = useState({
