@@ -4,7 +4,7 @@ import { User2, Bell } from 'lucide-react'
 
 const UserProfile = ({ user }) => {
   if (user) {
-    const { image, name, email } = user
+    const { avatar: image, name, email } = user
 
     return (
       <div className="flex items-center gap-4">

@@ -102,9 +102,9 @@ const NavBar = ({ showSearch = true }) => {
       {session && (
         <div className="p-4 bg-base-300/50">
           <div className="flex items-center gap-4 mb-3">
-            {session.user?.image ? (
+            {session.user?.avatar ? (
               <Image
-                src={session.user.image}
+                src={session.user.avatar}
                 alt={session.user.name || "User"}
                 width={48}
                 height={48}

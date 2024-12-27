@@ -41,12 +41,21 @@ module.exports = {
         'fade-theme': {
           '0%': { opacity: '0.5' },
           '100%': { opacity: '0' }
+        },
+        typing: {
+          'from': { width: '0' },
+          'to': { width: '100%' }
+        },
+        blink: {
+          '50%': { borderColor: 'transparent' }
         }
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-out',
         press: 'press 200ms ease-in-out',
-        'fade-theme': 'fade-theme 300ms ease-out forwards'
+        'fade-theme': 'fade-theme 300ms ease-out forwards',
+         typing: 'typing 3.5s steps(40, end)',
+        'cursor-blink': 'blink 1s step-end infinite'
       }
     },
   },
