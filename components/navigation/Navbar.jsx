@@ -1,73 +1,73 @@
-'use client';
+'use client'
 
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useSession, signIn } from "next-auth/react";
-import { handleSignOutButton } from "@/libs/utils";
-import Search from "../Search";
-import { navlinks } from "@/constants";
-import ShareDialogBox from "../models/ShareDialogBox";
-import PostViewDialogBox from "../models/PostViewDialogBox";
-import { nm } from "@/public/icons";
-import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from "lucide-react";
-import Image from "next/image";
-import UserProfile from "./UserProfile";
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useSession, signIn } from 'next-auth/react'
+import { handleSignOutButton } from '@/libs/utils'
+import Search from '../Search'
+import { navlinks } from '@/constants'
+import ShareDialogBox from '../models/ShareDialogBox'
+import PostViewDialogBox from '../models/PostViewDialogBox'
+import { nm } from '@/public/icons'
+import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from 'lucide-react'
+import Image from 'next/image'
+import UserProfile from './UserProfile'
 
 const NavBar = ({ showSearch = true }) => {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
-  const sidebarRef = useRef(null);
-  const menuButtonRef = useRef(null);
+  const { data: session } = useSession()
+  const router = useRouter()
+  const pathname = usePathname()
+  const sidebarRef = useRef(null)
+  const menuButtonRef = useRef(null)
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [toggleDrawer, setToggleDrawer] = useState(false);
-  const [isPostOpen, setIsPostOpen] = useState(false);
-  const [post, setPost] = useState("");
-  const [isActive, setIsActive] = useState("");
-  const [theme, setTheme] = useState("mydark");
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const [toggleDrawer, setToggleDrawer] = useState(false)
+  const [isPostOpen, setIsPostOpen] = useState(false)
+  const [post, setPost] = useState('')
+  const [isActive, setIsActive] = useState('')
+  const [theme, setTheme] = useState('mydark')
+  const [isAnimating, setIsAnimating] = useState(false)
 
   // Add this helper function to check if a link is active
   const isLinkActive = (link) => {
-    if (!pathname) return false;
-    if (link === "/") {
-      return pathname === link;
+    if (!pathname) return false
+    if (link === '/') {
+      return pathname === link
     }
-    return pathname.startsWith(link);
-  };
+    return pathname.startsWith(link)
+  }
 
   // Toggle theme between light and dark
   const toggleTheme = (e) => {
-    e.preventDefault();
-    setIsAnimating(true);
+    e.preventDefault()
+    setIsAnimating(true)
 
     // Change theme immediately
-    const newTheme = theme === "mylight" ? "mydark" : "mylight";
-    setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
+    const newTheme = theme === 'mylight' ? 'mydark' : 'mylight'
+    setTheme(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
 
     // Reset animation after it's done
     setTimeout(() => {
-      setIsAnimating(false);
-    }, 500);
-  };
+      setIsAnimating(false)
+    }, 500)
+  }
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "mydark";
-    setTheme(savedTheme);
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }, []);
+    const savedTheme = localStorage.getItem('theme') || 'mydark'
+    setTheme(savedTheme)
+    document.documentElement.setAttribute('data-theme', savedTheme)
+  }, [])
 
   const handleToggleDrawer = () => {
-    setToggleDrawer((prev) => !prev);
-  };
+    setToggleDrawer((prev) => !prev)
+  }
 
   const handleCloseSidebar = () => {
-    setToggleDrawer(false);
-  };
+    setToggleDrawer(false)
+  }
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -77,14 +77,14 @@ const NavBar = ({ showSearch = true }) => {
         menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target)
       ) {
-        handleCloseSidebar();
+        handleCloseSidebar()
       }
-    };
-    document.addEventListener("click", handleOutsideClick);
+    }
+    document.addEventListener('click', handleOutsideClick)
     return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+      document.removeEventListener('click', handleOutsideClick)
+    }
+  }, [])
 
   // Menu Panel Content
   const MenuPanel = () => (
@@ -105,11 +105,7 @@ const NavBar = ({ showSearch = true }) => {
             {session.user?.avatar ? (
               <Image
                 src={session.user.avatar}
-<<<<<<< HEAD
                 alt={session.user.name || 'User'}
-=======
-                alt={session.user.name || "User"}
->>>>>>> master-2
                 width={48}
                 height={48}
                 className="rounded-full ring-2 ring-primary/20"
@@ -119,7 +115,6 @@ const NavBar = ({ showSearch = true }) => {
                 <User2 className="w-6 h-6 text-primary" />
               </div>
             )}
-
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold truncate">
                 {session.user?.name || 'User'}
@@ -246,20 +241,20 @@ const NavBar = ({ showSearch = true }) => {
       >
         <div
           className={`absolute inset-0 transition-colors duration-300
-            ${theme === "mydark" ? "bg-base-100" : "bg-base-300"}`}
+            ${theme === 'mydark' ? 'bg-base-100' : 'bg-base-300'}`}
           style={{
-            opacity: "0.5",
-            animation: "fade-theme 300ms ease-out forwards",
+            opacity: '0.5',
+            animation: 'fade-theme 300ms ease-out forwards',
           }}
         />
       </div>
-    );
+    )
 
   return (
     <>
       <nav className="flex md:flex-row flex-col-reverse justify-between gap-6">
         <p className="text-primary align-middle text-center subpixel-antialiased text-3xl font-bold hidden sm:block">
-          Notes <span className="text-secondary">Mates</span>{" "}
+          Notes <span className="text-secondary">Mates</span>{' '}
           <span className="badge">.in</span>
         </p>
 
@@ -281,8 +276,8 @@ const NavBar = ({ showSearch = true }) => {
           <div
             className="w-[40px] h-[40px] rounded-[10px] bg-neutral flex justify-center items-center cursor-pointer"
             onClick={(e) => {
-              e.preventDefault();
-              router.push("/");
+              e.preventDefault()
+              router.push('/')
             }}
           >
             <Image
@@ -312,12 +307,12 @@ const NavBar = ({ showSearch = true }) => {
           >
             <Menu
               className={`w-6 h-6 text-gray-500 absolute transition-opacity duration-200 ${
-                toggleDrawer ? "opacity-0" : "opacity-100"
+                toggleDrawer ? 'opacity-0' : 'opacity-100'
               }`}
             />
             <X
               className={`w-6 h-6 text-gray-500 transition-opacity duration-200 ${
-                toggleDrawer ? "opacity-100" : "opacity-0"
+                toggleDrawer ? 'opacity-100' : 'opacity-0'
               }`}
             />
           </button>
@@ -329,7 +324,7 @@ const NavBar = ({ showSearch = true }) => {
             {/* Backdrop */}
             <div
               className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-                toggleDrawer ? "opacity-50 pointer-events-auto" : "opacity-0"
+                toggleDrawer ? 'opacity-50 pointer-events-auto' : 'opacity-0'
               }`}
               onClick={handleCloseSidebar}
             />
@@ -338,7 +333,7 @@ const NavBar = ({ showSearch = true }) => {
             <div
               ref={sidebarRef}
               className={`absolute inset-y-0 left-0 w-[280px] bg-base-200 transform transition-transform duration-300 ease-out pointer-events-auto
-                ${toggleDrawer ? "translate-x-0" : "-translate-x-full"}`}
+                ${toggleDrawer ? 'translate-x-0' : '-translate-x-full'}`}
             >
               <MenuPanel />
             </div>
@@ -360,7 +355,7 @@ const NavBar = ({ showSearch = true }) => {
       {/* Add the wave effect */}
       <ThemeWave />
     </>
-  );
-};
+  )
+}
 
-export default NavBar;
+export default NavBar
