@@ -45,6 +45,17 @@ const passwordValidation = User.omit({
   email: true,
 });
 
+const EmailValidation = z.object({
+  email: z
+    .string({
+      required_error: "Email is required.",
+      invalid_type_error: "Email must be a string.",
+    })
+    .email({ message: "Invalid email address." })
+    .min(5, { message: "Email must be at least 5 characters long." })
+    .max(100, { message: "Email can be at most 100 characters long." }),
+});// eslint-disable-line no-unused-vars
+
 export const UserValidation = {
   registration: User.required({
     email: true,
@@ -61,4 +72,7 @@ export const UserValidation = {
     password: true,
   }),
   changepwd: passwordValidation.required({ password: true }),
+  forgotPassword: EmailValidation.required({
+    email: true,
+  }),
 };

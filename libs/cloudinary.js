@@ -49,26 +49,32 @@ export const generatePDFThumbnail = async (pdfUrl, postId) => {
       folder: 'thumbnails',
       format: 'webp',
       public_id: `post-${postId}`,
+      pages: true,
       transformation: [
-        { width: 300, height: 400, crop: "fill" },
-        { quality: "auto:good" },
-        { page: 1 }
+        { width: 600, crop: "scale" },
+        { quality: "auto" },
+        { fetch_format: "auto" },
+        { page: 1 },
+        { density: 300 },
       ],
-      resource_type: "auto",
     };
 
-    console.log("Cloudinary upload options:", options);
-
-    const result = await cloudinary.uploader.upload(pdfUrl, options);
-    console.log("Cloudinary upload result:", result);
+    // Use the upload API to generate a thumbnail
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(pdfUrl, options, (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          reject(error);
+        } else {
+          console.log('Thumbnail generation successful:', result);
+          resolve(result);
+        }
+      });
+    });
 
     return result.secure_url;
   } catch (error) {
-    console.error('Detailed error in thumbnail generation:', {
-      error,
-      message: error.message,
-      stack: error.stack
-    });
+    console.error('Error generating PDF thumbnail:', error);
     throw error;
   }
 };

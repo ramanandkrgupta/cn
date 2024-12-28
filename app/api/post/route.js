@@ -25,7 +25,6 @@ export async function GET() {
   }
 }
 
-
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -33,133 +32,60 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Increase body parser limit
-    const formData = await req.formData();
-    
-    // Split large data into chunks if needed
-    const fileDetailsStr = formData.get('fileDetails');
-    const userEmail = formData.get('userEmail');
-    const uploadResStr = formData.get('uploadRes');
+    const body = await req.json();
+    const { files, fileDetails } = body;
 
-    // Parse data carefully
-    let fileDetails, uploadRes;
-    try {
-      fileDetails = JSON.parse(fileDetailsStr);
-      uploadRes = JSON.parse(uploadResStr);
-    } catch (error) {
-      return NextResponse.json(
-        { error: "Invalid form data" },
-        { status: 400 }
-      );
-    }
+    console.log('Received data:', { files, fileDetails });
 
-
-
-    if (!fileDetailsStr || !userEmail || !uploadResStr) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-   
-
-    // Get user
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-      select: {
-        id: true,
-        reputationScore: true
-      }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Determine initial status based on user reputation
-    const initialStatus = user.reputationScore > 100 ? "approved" : "pending";
-
-    // Create posts
+    // Create posts for each file
     const posts = await Promise.all(
-      fileDetails.map(async (detail, index) => {
+      files.map(async (file, index) => {
+        const details = fileDetails[index];
+        if (!details) {
+          throw new Error(`No details found for file ${file.name}`);
+        }
+
         // First find or create the subject
         let subject = await prisma.subject.findFirst({
           where: {
-            AND: [
-              { subject_code: detail.subject_code },
-              { course_name: detail.course_name },
-              { semester_code: detail.semester_code }
-            ]
+            subject_code: details.subject_code || details.subject?.subject_code,
+            course_name: details.course_name || details.course,
+            semester_code: details.semester_code || details.semester,
           },
-          select: {
-            id: true,
-            subject_code: true,
-            subject_name: true,
-            course_name: true,
-            semester_code: true
-          }
         });
 
         if (!subject) {
-          // If subject doesn't exist, create it
           subject = await prisma.subject.create({
             data: {
-              subject_code: detail.subject_code,
-              subject_name: detail.subject_name,
-              course_name: detail.course_name,
-              semester_code: detail.semester_code,
-            }
+              subject_code: details.subject_code || details.subject?.subject_code || '',
+              subject_name: details.subject_name || details.subject?.subject_name || '',
+              course_name: details.course_name || details.course || '',
+              semester_code: details.semester_code || details.semester || '',
+            },
           });
         }
 
-        const uploadResult = uploadRes[index];
-      
-
-        // Check for any available URL
-        const fileUrl = uploadResult?.url || uploadResult?.accessUrl;
-        if (!fileUrl) {
-          // console.error("Upload result missing URL:", uploadResult);
-          throw new Error(`Missing file URL for ${detail.file_name}`);
-        }
-
-        
-
-        // Generate thumbnail and store the result
-        let thumbnailUrl = '/images/placeholders/pdf-placeholder.png'; // Default value
-
-        try {
-          // Generate thumbnail after file upload
-          thumbnailUrl = await generateThumbnail(fileUrl, uploadResult.id || `temp-${Date.now()}`);
-          
-        } catch (error) {
-         
-          // Keep using the default placeholder
-        }
-
-        const post = await prisma.post.create({
+        // Create the post
+        return await prisma.post.create({
           data: {
-            title: detail.title,
-            description: detail.description,
-            category: detail.category,
-            course_name: detail.course_name,
-            semester_code: detail.semester_code,
-            subject_name: detail.subject_name,
-            subject_code: detail.subject_code,
-            file_url: fileUrl,
-            thumbnail_url: thumbnailUrl, // Now thumbnailUrl is defined
-            file_name: detail.file_name,
-            fileHash: uploadResult.hash,
-            status: initialStatus,
-            qualityScore: 0,
+            title: details.title || file.name,
+            description: details.description || '',
+            category: details.category || '',
+            course_name: details.course_name || details.course || '',
+            semester_code: details.semester_code || details.semester || '',
+            subject_code: details.subject_code || details.subject?.subject_code || '',
+            subject_name: details.subject_name || details.subject?.subject_name || '',
+            file_url: file.url,
+            file_name: file.name,
+            thumbnail_url: file.thumbnailUrl || '/images/placeholders/pdf-placeholder.png',
+            status: 'pending',
             version: 1,
             isLatestVersion: true,
+            qualityScore: 0.0,
+            premium: false,
             user: {
               connect: {
-                id: user.id
+                email: session.user.email
               }
             },
             subject: {
@@ -167,31 +93,16 @@ export async function POST(req) {
                 id: subject.id
               }
             }
-          }
+          },
         });
-
-        // Create moderation entry if needed
-        if (initialStatus === "pending") {
-          await prisma.contentModeration.create({
-            data: {
-              postId: post.id,
-              status: "pending"
-            }
-          });
-        }
-
-        return post;
       })
     );
 
-    return NextResponse.json({
-      success: true,
-      posts
-    });
-
+    return NextResponse.json({ success: true, posts });
   } catch (error) {
+    console.error("Error saving file details:", error);
     return NextResponse.json(
-      { error: "Server error", message: error.message },
+      { error: "Failed to save file details: " + error.message },
       { status: 500 }
     );
   }

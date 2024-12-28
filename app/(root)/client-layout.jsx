@@ -7,7 +7,7 @@ export default function ClientLayout({ children }) {
   return (
     <>
       <Toaster richColors closeButton position="top-center" />
-      <main className="pb-3">{children}</main>
+      <main className="pb-16">{children}</main>
       <Navigation />
       <FloatingAIButton />
     </>

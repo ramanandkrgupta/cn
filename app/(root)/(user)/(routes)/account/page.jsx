@@ -474,7 +474,7 @@ export default function Profile() {
         {/* Enhanced Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-between p-4 bg-base-300 rounded-xl shadow-sm cursor-pointer hover:bg-red-50 transition-all duration-200 group border border-transparent hover:border-red-200"
+          className="w-full flex items-center justify-between p-4 mt-4 bg-base-300 rounded-xl shadow-sm cursor-pointer hover:bg-red-50 transition-all duration-200 group border border-transparent hover:border-red-200"
         >
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">

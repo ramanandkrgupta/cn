@@ -16,7 +16,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
 
   useEffect(() => {
-    console.log("Session in component:", session); // Debug log
+    // console.log("Session in component:", session); // Debug log
   }, [session]);
 
   const [metrics, setMetrics] = useState({
@@ -273,7 +273,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={closeModal}>
+      <Dialog as="div" className="relative z-50" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

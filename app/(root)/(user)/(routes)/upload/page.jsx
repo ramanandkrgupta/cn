@@ -165,7 +165,7 @@ export default function UploadPage() {
       </div>
 
       {/* Upload section */}
-      <div className="bg-[#1d232a] p-3 rounded-lg mt-5 border border-orange-400 w-full max-h-[490px] mb-5 overflow-auto">
+      <div className="bg-[#1d232a] pb-16 rounded-lg mt-5 border border-orange-400 w-full max-h-screen mb-5 overflow-auto">
         {!showDetails ? (
           <UploadDoc
             files={files}
