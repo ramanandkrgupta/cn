@@ -1,5 +1,5 @@
 import { getSiteUrl } from '@/libs/seohelper'
-import prisma from '@/libS/prisma'
+import prisma from '@/libs/prisma'
 import { courses, semester } from '@/constants'
 
 export default async function sitemap() {
