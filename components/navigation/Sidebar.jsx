@@ -34,7 +34,7 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <aside className="flex justify-between items-center flex-col sticky top-5 h-[89vh]">
+    <aside className="flex justify-between items-center flex-col sticky top-5 h-[89vh] z-50">
       <Link href="/">
         <Icon styles="w-[60px] h-[60px] bg-neutral" imgUrl={nm} imgStyles="w-[60px] h-[60px]" />
       </Link>

@@ -118,17 +118,6 @@ const Team = () => {
       xUsername: 'prankur_patel17',
       linkedinUsername: 'prankur-patel-b3076a30a',
     },
-
-    // {
-    //   name: "Sumit Singh Raghuwanshi",
-    //   role: "Web Developer",
-    //   img: "/team/member-6.jpg",
-    //   githubUsername: "SumitSinghRaghuwanshi1245",
-    //   xUsername: "Sumit_Singh_R",
-    //   linkedinUsername: "sumit-singh-raghuwanshi",
-    //   instagramUsername: "sumitt.singh_"
-
-    // },
   ]
 
   return (

@@ -9,7 +9,7 @@ import Link from "next/link";
 const MyCategoryClient = ({ course, semester, subId }) => {
   const router = useRouter();
   // Extract dynamic route parameter (course)
-  console.log(course);
+  // console.log(course);
   return (
     <div>
      <div className="flex items-center gap-2 onClick={() => router.back()}">

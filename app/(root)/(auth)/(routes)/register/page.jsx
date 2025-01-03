@@ -11,8 +11,8 @@ import Input from "@/components/ui/Input";
 import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 import { UserValidation } from "@/libs/validations/user";
 import toast from "react-hot-toast";
-import { FcGoogle } from "react-icons/fc"; // Add this import
-// import { FaGithub } from "react-icons/fa"; // Add this import
+import { FcGoogle } from "react-icons/fc";
+
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -22,10 +22,9 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Add new state
-  // const [isGithubLoading, setIsGithubLoading] = useState(false); // Add new state
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false); 
 
-  const router = useRouter(); // Ensure useRouter is defined
+  const router = useRouter(); 
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -77,31 +76,13 @@ const RegisterPage = () => {
         redirect: true,
       });
 
-      // Note: The code below won't execute due to redirect: true
+
     } catch (error) {
       console.error("Google signup error:", error);
       toast.error("An error occurred during Google sign up");
       setIsGoogleLoading(false);
     }
   };
-
-  // const handleGithubLogin = async () => {
-  //   try {
-  //     setIsGithubLoading(true);
-  //     console.log("Starting GitHub signup...");
-
-  //     await signIn("github", {
-  //       callbackUrl: "/account",
-  //       redirect: true
-  //     });
-
-  //     // Note: The code below won't execute due to redirect: true
-  //   } catch (error) {
-  //     console.error("GitHub signup error:", error);
-  //     toast.error("An error occurred during GitHub sign up");
-  //     setIsGithubLoading(false);
-  //   }
-  // };
 
   return (
     <>
@@ -206,21 +187,7 @@ const RegisterPage = () => {
                     {isGoogleLoading ? "Signing up..." : "Continue with Google"}
                   </span>
                 </button>
-
-                {/* <button
-                  onClick={handleGithubLogin}
-                  disabled={isGithubLoading}
-                  className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
-                >
-                  {isGithubLoading ? (
-                    <Loader className="w-5 h-5 animate-spin text-gray-400" />
-                  ) : (
-                    <FaGithub className="w-5 h-5" />
-                  )}
-                  <span>
-                    {isGithubLoading ? "Signing up..." : "Continue with GitHub"}
-                  </span>
-                </button> */}
+                {/* Add more Login OPtion Here */}
               </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">

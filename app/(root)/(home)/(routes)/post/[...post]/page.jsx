@@ -12,15 +12,6 @@ const MyPost = ({ params }) => {
   const post = filterUrl(params, fetchedData);
   const [data] = post.map((items) => items);
 
-  //useEffect(() => {
-  //  if (!data) {
-  //    console.log(data.length === 0);
-  //    toast("No data found !");
-      //router.push("/");
-  //  }
-  //}, [data, router]);
-  //
-
   return (
     <div className="md:flex">
       <div>

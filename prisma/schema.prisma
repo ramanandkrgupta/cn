@@ -48,7 +48,7 @@ model User {
   sessions            Session[]
   collections         Collection[]
   aiConversations     AIConversation[]
-   resetToken        String?  
+   resetToken        String? 
   resetTokenExpiry  DateTime?
 }
 
