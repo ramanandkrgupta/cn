@@ -27,26 +27,15 @@ export async function processPDF(file, metadata) {
     
     // Add watermark to each page
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const watermarkText = 'NoteMates.in';
-    const watermarkSize = 60;
-    const opacity = 0.15;
+   
 
     for (const page of pages) {
       const { width, height } = page.getSize();
       
-      // Add diagonal watermark
-      page.drawText(watermarkText, {
-        x: width / 2 - 150,
-        y: height / 2,
-        size: watermarkSize,
-        font,
-        color: rgb(0.5, 0.5, 0.5),
-        opacity,
-        rotate: degrees(45),
-      });
+      
 
       // Add small watermark at bottom
-      page.drawText('Downloaded from NoteMates.in', {
+      page.drawText('Downloaded from www.notesmates.in', {
         x: 30,
         y: 20,
         size: 8,
@@ -57,10 +46,10 @@ export async function processPDF(file, metadata) {
 
       // Add timestamp
       const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-      page.drawText(`Downloaded on: ${timestamp}`, {
+      page.drawText(`Uploaded on: ${timestamp}`, {
         x: width - 200,
         y: 20,
-        size: 8,
+        size: 5,
         font,
         color: rgb(0.4, 0.4, 0.4),
         opacity: 0.8,

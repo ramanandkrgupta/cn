@@ -1,14 +1,16 @@
 "use client";
 import toast from "react-hot-toast";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import dynamic from 'next/dynamic';
 
-import SubCard from "@/components/cards/SubCard";
-import NoDataFound from "@/components/ui/NoDataFound";
-import { useFilterSubject } from "@/libs/hooks/useSubject";
-import SkeletonLoading from "@/components/ui/SkeletonLoading";
+const SubCard = dynamic(() => import('@/components/cards/SubCard'), {
+  loading: () => <SkeletonLoading />,
+});
+const NoDataFound = dynamic(() => import('@/components/ui/NoDataFound'));
+const SkeletonLoading = dynamic(() => import('@/components/ui/SkeletonLoading'));
 
 const ViewSubjects = ({ course, semester }) => {
   const router = useRouter();
@@ -18,42 +20,35 @@ const ViewSubjects = ({ course, semester }) => {
   const [userSelectedData, setUserSelectedData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `/api/v1/public/subjects/filter/${encodeURIComponent(
-            course
-          )}/${encodeURIComponent(semester)}`
-        );
-        const data = await response.json();
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `/api/v1/public/subjects/filter/${encodeURIComponent(course)}/${encodeURIComponent(semester)}`
+      );
+      const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch subjects");
-        }
-
-        // Ensure we're setting an array
-        setUserSelectedData(data.subjects || []);
-      } catch (error) {
-        console.error("Error fetching subjects:", error);
-        toast.error("Failed to load subjects");
-        setUserSelectedData([]);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch subjects");
       }
-    };
 
-    if (course && semester) {
-      fetchData();
+      setUserSelectedData(data.subjects || []);
+    } catch (error) {
+      console.error("Error fetching subjects:", error);
+      toast.error("Failed to load subjects");
+      setUserSelectedData([]);
+    } finally {
+      setIsLoading(false);
     }
   }, [course, semester]);
 
-  // Memoize the data to prevent unnecessary re-renders
-  const data = useMemo(
-    () => (Array.isArray(userSelectedData) ? userSelectedData : []),
-    [userSelectedData]
-  );
+  useEffect(() => {
+    if (course && semester) {
+      fetchData();
+    }
+  }, [course, semester, fetchData]);
+
+  const data = useMemo(() => (Array.isArray(userSelectedData) ? userSelectedData : []), [userSelectedData]);
 
   return (
     <div>

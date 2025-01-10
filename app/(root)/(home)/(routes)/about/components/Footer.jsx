@@ -3,11 +3,11 @@ import { Instagram, MessageCircle } from "lucide-react"; // Import necessary ico
 
 const Footer = () => {
   return (
-    <div className="w-full justify-center pt-5 mt-10 sm:mb-16 border-t-[1px] border-t-[#3F3E45]">
+    <div className="w-full justify-center pt-5 mt-10 border-t-[1px] border-t-[#3F3E45]">
       <p className="font-poppins font-normal text-center text-[18px]  leading-[27px] text-secondary">
         Copyright | 2024 Notes Mates
       </p>
-      <div className="flex justify-center space-x-6 mt-3 mb-16">
+      <div className="flex justify-center space-x-6 mt-3">
         {/* Instagram link */}
         <a
           href="https://www.instagram.com/notesmates.in" // Replace with your Instagram link

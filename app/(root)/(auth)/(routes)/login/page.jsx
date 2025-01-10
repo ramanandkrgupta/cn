@@ -8,7 +8,7 @@ import Input from "@/components/ui/Input";
 import { UserValidation } from "@/libs/validations/user";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
-// import { FaGithub } from "react-icons/fa";
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  // const [isGithubLoading, setIsGithubLoading] = useState(false);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,29 +74,9 @@ const LoginPage = () => {
       setIsGoogleLoading(false);
     }
   };
-
-  // const handleGithubLogin = async () => {
-  //   try {
-  //     setIsGithubLoading(true);
-  //     console.log("Starting GitHub login...");
-
-  //     await signIn("github", {
-  //       callbackUrl: "/account",
-  //       redirect: true
-  //     });
-  //   } catch (error) {
-  //     console.error("GitHub login error:", error);
-  //     toast.error("An error occurred during GitHub login");
-  //     setIsGithubLoading(false);
-  //   }
-  // };
-
-  
-
   return (
     <>
-    
-      <div className="container items-center justify-center">
+     <div className="container items-center justify-center">
         <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -181,21 +161,6 @@ const LoginPage = () => {
                     {isGoogleLoading ? "Signing up..." : "Continue with Google"}
                   </span>
                 </button>
-
-                {/* <button
-                  onClick={handleGithubLogin}
-                  disabled={isGithubLoading}
-                  className="w-full mt-2 py-3 px-4 bg-gray-900 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 flex items-center justify-center gap-2 relative"
-                >
-                  {isGithubLoading ? (
-                    <Loader className="w-5 h-5 animate-spin text-gray-400" />
-                  ) : (
-                    <FaGithub className="w-5 h-5" />
-                  )}
-                  <span>
-                    {isGithubLoading ? "Signing in..." : "Continue with GitHub"}
-                  </span>
-                </button> */}
               </div>
             </div>
             <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
