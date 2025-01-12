@@ -7,32 +7,33 @@ import { banner, resume ,assignment} from '@/public/assets/index.js'
 
 const bannerData = [
   {
+    src: banner,
+    srcLight: resume,
+    link: '',
+    title: 'Notes Mates',
+    description: 'Download web app now if not installed',
+    tag: 'Popular',
+    buttonName: 'Download',
+  },
+  {
     src: resume,
     srcLight: resume,
-    link: 'https://drive.google.com/drive/u/0/folders/1DbxovduKAiHWTIqbftb26CvD7XSjobpp',
+    link: 'https://resume-builder-404b5.web.app',
     title: 'Resume Maker',
     description:
       'This is a free tool to create, preview, and export resumes easily.',
-    tag: 'HOT',
+    tag: 'Hot',
     buttonName: 'Click here',
-  },
-  {
-    src: banner,
-    srcLight: resume,
-    link: 'https://drive.google.com/drive/u/0/folders/1DbxovduKAiHWTIqbftb26CvD7XSjobpp',
-    title: 'Web Development',
-    description: 'Master modern web technologies',
-    tag: 'Popular',
-    buttonName: 'Download',
   },
   {
     src: assignment,
     srcLight: resume,
-    link: 'https://drive.google.com/drive/u/0/folders/1DbxovduKAiHWTIqbftb26CvD7XSjobpp',
-    title: 'Web Development',
-    description: 'Master modern web technologies',
-    tag: 'Popular',
-    buttonName: 'Download',
+    link: 'https://chat.whatsapp.com/KBHOXfCGB9DJPGsHUKpMRs',
+    title: 'Assignment Help',
+    description:
+      'Feeling bored with assignments? Let us take the load and write them for you!',
+    tag: 'Ongoing',
+    buttonName: 'Join Us',
   },
 ]
 
