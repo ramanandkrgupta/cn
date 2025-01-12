@@ -19,6 +19,7 @@ import SmallLoading from "./SmallLoading";
 import banner from "./banner.png"
 import resume from "./resume.png"
 import assignment from "./assignment.png"
+import creative from "./Creative.png"
 
 export {
   addUser,
@@ -42,4 +43,5 @@ export {
   banner,
   resume,
   assignment,
+  creative,
 };

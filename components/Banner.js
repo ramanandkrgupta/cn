@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { banner, resume ,assignment} from '@/public/assets/index.js'
+import { banner, resume ,assignment,creative} from '@/public/assets/index.js'
 
 const bannerData = [
   {
@@ -26,7 +26,7 @@ const bannerData = [
     buttonName: 'Click here',
   },
   {
-    src: assignment,
+    src: creative,
     srcLight: resume,
     link: 'https://chat.whatsapp.com/KBHOXfCGB9DJPGsHUKpMRs',
     title: 'Assignment Help',
