@@ -17,6 +17,9 @@ import SettingIcon from "./SettingIcon";
 import AdminuploadIcon from "./AdminuploadIcon";
 import SmallLoading from "./SmallLoading";
 import banner from "./banner.png"
+import resume from "./resume.png"
+import assignment from "./assignment.png"
+import creative from "./Creative.png"
 
 export {
   addUser,
@@ -36,5 +39,9 @@ export {
   AdminDashIcon,
   SettingIcon,
   AdminuploadIcon,
-  SmallLoading,banner,
+  SmallLoading,
+  banner,
+  resume,
+  assignment,
+  creative,
 };

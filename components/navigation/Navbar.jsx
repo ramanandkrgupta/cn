@@ -1,73 +1,73 @@
-'use client';
+'use client'
 
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useSession, signIn } from "next-auth/react";
-import { handleSignOutButton } from "@/libs/utils";
-import Search from "../Search";
-import { navlinks } from "@/constants";
-import ShareDialogBox from "../models/ShareDialogBox";
-import PostViewDialogBox from "../models/PostViewDialogBox";
-import { nm } from "@/public/icons";
-import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from "lucide-react";
-import Image from "next/image";
-import UserProfile from "./UserProfile";
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useSession, signIn } from 'next-auth/react'
+import { handleSignOutButton } from '@/libs/utils'
+import Search from '../Search'
+import { navlinks } from '@/constants'
+import ShareDialogBox from '../models/ShareDialogBox'
+import PostViewDialogBox from '../models/PostViewDialogBox'
+import { nm } from '@/public/icons'
+import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from 'lucide-react'
+import Image from 'next/image'
+import UserProfile from './UserProfile'
 
 const NavBar = ({ showSearch = true }) => {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
-  const sidebarRef = useRef(null);
-  const menuButtonRef = useRef(null);
+  const { data: session } = useSession()
+  const router = useRouter()
+  const pathname = usePathname()
+  const sidebarRef = useRef(null)
+  const menuButtonRef = useRef(null)
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [toggleDrawer, setToggleDrawer] = useState(false);
-  const [isPostOpen, setIsPostOpen] = useState(false);
-  const [post, setPost] = useState("");
-  const [isActive, setIsActive] = useState("");
-  const [theme, setTheme] = useState("mydark");
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const [toggleDrawer, setToggleDrawer] = useState(false)
+  const [isPostOpen, setIsPostOpen] = useState(false)
+  const [post, setPost] = useState('')
+  const [isActive, setIsActive] = useState('')
+  const [theme, setTheme] = useState('mydark')
+  const [isAnimating, setIsAnimating] = useState(false)
 
   // Add this helper function to check if a link is active
   const isLinkActive = (link) => {
-    if (!pathname) return false;
-    if (link === "/") {
-      return pathname === link;
+    if (!pathname) return false
+    if (link === '/') {
+      return pathname === link
     }
-    return pathname.startsWith(link);
-  };
+    return pathname.startsWith(link)
+  }
 
   // Toggle theme between light and dark
   const toggleTheme = (e) => {
-    e.preventDefault();
-    setIsAnimating(true);
+    e.preventDefault()
+    setIsAnimating(true)
 
     // Change theme immediately
-    const newTheme = theme === "mylight" ? "mydark" : "mylight";
-    setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
+    const newTheme = theme === 'mylight' ? 'mydark' : 'mylight'
+    setTheme(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
 
     // Reset animation after it's done
     setTimeout(() => {
-      setIsAnimating(false);
-    }, 500);
-  };
+      setIsAnimating(false)
+    }, 500)
+  }
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "mydark";
-    setTheme(savedTheme);
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }, []);
+    const savedTheme = localStorage.getItem('theme') || 'mydark'
+    setTheme(savedTheme)
+    document.documentElement.setAttribute('data-theme', savedTheme)
+  }, [])
 
   const handleToggleDrawer = () => {
-    setToggleDrawer((prev) => !prev);
-  };
+    setToggleDrawer((prev) => !prev)
+  }
 
   const handleCloseSidebar = () => {
-    setToggleDrawer(false);
-  };
+    setToggleDrawer(false)
+  }
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -77,14 +77,14 @@ const NavBar = ({ showSearch = true }) => {
         menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target)
       ) {
-        handleCloseSidebar();
+        handleCloseSidebar()
       }
-    };
-    document.addEventListener("click", handleOutsideClick);
+    }
+    document.addEventListener('click', handleOutsideClick)
     return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+      document.removeEventListener('click', handleOutsideClick)
+    }
+  }, [])
 
   // Menu Panel Content
   const MenuPanel = () => (
@@ -103,25 +103,29 @@ const NavBar = ({ showSearch = true }) => {
         <div className="p-4 bg-base-300/50">
           <div className="flex items-center gap-4 mb-3">
             {session.user?.avatar ? (
-              <Image
-                src={session.user.avatar}
-                alt={session.user.name || "User"}
-                width={48}
-                height={48}
-                className="rounded-full ring-2 ring-primary/20"
-              />
+              <Link href="/account/profile">
+                <Image
+                  src={session.user.avatar}
+                  alt={session.user.name || 'User'}
+                  width={48}
+                  height={48}
+                  className="rounded-full ring-2 ring-primary/20"
+                />
+              </Link>
             ) : (
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <User2 className="w-6 h-6 text-primary" />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold truncate">
-                {session.user?.name || "User"}
-              </h3>
-              <p className="text-sm text-gray-500 truncate">
-                {session.user?.email}
-              </p>
+              <Link href="/account/profile">
+                <h3 className="font-semibold truncate w-max">
+                  {session.user?.name || 'User'}
+                </h3>
+                <p className="text-sm text-gray-500 truncate">
+                  {session.user?.email}
+                </p>
+              </Link>
             </div>
           </div>
 
@@ -146,8 +150,8 @@ const NavBar = ({ showSearch = true }) => {
         </div>
 
         {navlinks.map((menu) => {
-          const isActive = isLinkActive(menu.link);
-          const IconComponent = menu.icon;
+          const isActive = isLinkActive(menu.link)
+          const IconComponent = menu.icon
 
           return (
             <Link
@@ -155,21 +159,21 @@ const NavBar = ({ showSearch = true }) => {
               href={menu.link}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
                 isActive
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-500 hover:bg-base-300 hover:text-gray-700"
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'text-gray-500 hover:bg-base-300 hover:text-gray-700'
               }`}
               onClick={() => {
-                setIsActive(menu.name);
-                setToggleDrawer(false);
-                if (menu.btn) setIsOpen(true);
+                setIsActive(menu.name)
+                setToggleDrawer(false)
+                if (menu.btn) setIsOpen(true)
               }}
             >
               <IconComponent
-                className={`w-5 h-5 ${isActive ? "text-primary" : ""}`}
+                className={`w-5 h-5 ${isActive ? 'text-primary' : ''}`}
               />
               <span>{menu.name}</span>
             </Link>
-          );
+          )
         })}
       </div>
 
@@ -180,7 +184,7 @@ const NavBar = ({ showSearch = true }) => {
           onClick={toggleTheme}
           className="flex items-center w-full gap-3 p-3 rounded-lg text-gray-500 hover:bg-base-300 transition-colors"
         >
-          {theme === "mydark" ? (
+          {theme === 'mydark' ? (
             <>
               <Sun className="w-5 h-5" />
               <span>Light Mode</span>
@@ -197,20 +201,20 @@ const NavBar = ({ showSearch = true }) => {
         <button
           className={`flex items-center w-full gap-3 p-4 rounded-xl transition-all duration-200 transform hover:scale-[0.98] active:scale-[0.95] ${
             session
-              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
-              : "bg-primary/10 text-primary hover:bg-primary/20"
+              ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+              : 'bg-primary/10 text-primary hover:bg-primary/20'
           }`}
           onClick={() => {
-            setToggleDrawer(false);
+            setToggleDrawer(false)
             if (session) {
-              handleSignOutButton();
+              handleSignOutButton()
             } else {
-              const button = document.activeElement;
-              button.classList.add("animate-press");
+              const button = document.activeElement
+              button.classList.add('animate-press')
               setTimeout(() => {
-                signIn();
-                button.classList.remove("animate-press");
-              }, 200);
+                signIn()
+                button.classList.remove('animate-press')
+              }, 200)
             }
           }}
         >
@@ -230,7 +234,7 @@ const NavBar = ({ showSearch = true }) => {
         </button>
       </div>
     </div>
-  );
+  )
 
   // Add this component inside your NavBar component
   const ThemeWave = () =>
@@ -241,20 +245,20 @@ const NavBar = ({ showSearch = true }) => {
       >
         <div
           className={`absolute inset-0 transition-colors duration-300
-            ${theme === "mydark" ? "bg-base-100" : "bg-base-300"}`}
+            ${theme === 'mydark' ? 'bg-base-100' : 'bg-base-300'}`}
           style={{
-            opacity: "0.5",
-            animation: "fade-theme 300ms ease-out forwards",
+            opacity: '0.5',
+            animation: 'fade-theme 300ms ease-out forwards',
           }}
         />
       </div>
-    );
+    )
 
   return (
     <>
       <nav className="flex md:flex-row flex-col-reverse justify-between gap-6">
         <p className="text-primary align-middle text-center subpixel-antialiased text-3xl font-bold hidden sm:block">
-          Notes <span className="text-secondary">Mates</span>{" "}
+          Notes <span className="text-secondary">Mates</span>{' '}
           <span className="badge">.in</span>
         </p>
 
@@ -276,8 +280,8 @@ const NavBar = ({ showSearch = true }) => {
           <div
             className="w-[40px] h-[40px] rounded-[10px] bg-neutral flex justify-center items-center cursor-pointer"
             onClick={(e) => {
-              e.preventDefault();
-              router.push("/");
+              e.preventDefault()
+              router.push('/')
             }}
           >
             <Image
@@ -307,12 +311,12 @@ const NavBar = ({ showSearch = true }) => {
           >
             <Menu
               className={`w-6 h-6 text-gray-500 absolute transition-opacity duration-200 ${
-                toggleDrawer ? "opacity-0" : "opacity-100"
+                toggleDrawer ? 'opacity-0' : 'opacity-100'
               }`}
             />
             <X
               className={`w-6 h-6 text-gray-500 transition-opacity duration-200 ${
-                toggleDrawer ? "opacity-100" : "opacity-0"
+                toggleDrawer ? 'opacity-100' : 'opacity-0'
               }`}
             />
           </button>
@@ -324,7 +328,7 @@ const NavBar = ({ showSearch = true }) => {
             {/* Backdrop */}
             <div
               className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-                toggleDrawer ? "opacity-50 pointer-events-auto" : "opacity-0"
+                toggleDrawer ? 'opacity-50 pointer-events-auto' : 'opacity-0'
               }`}
               onClick={handleCloseSidebar}
             />
@@ -333,7 +337,7 @@ const NavBar = ({ showSearch = true }) => {
             <div
               ref={sidebarRef}
               className={`absolute inset-y-0 left-0 w-[280px] bg-base-200 transform transition-transform duration-300 ease-out pointer-events-auto
-                ${toggleDrawer ? "translate-x-0" : "-translate-x-full"}`}
+                ${toggleDrawer ? 'translate-x-0' : '-translate-x-full'}`}
             >
               <MenuPanel />
             </div>
@@ -355,7 +359,7 @@ const NavBar = ({ showSearch = true }) => {
       {/* Add the wave effect */}
       <ThemeWave />
     </>
-  );
-};
+  )
+}
 
-export default NavBar;
+export default NavBar
