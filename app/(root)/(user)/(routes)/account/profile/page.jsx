@@ -79,88 +79,139 @@ const avatarSets = {
 };
 
 export default function EditProfile() {
-  const router = useRouter();
-  const { data: session, status, update: updateSession } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
+  const router = useRouter()
+  const { data: session, status, update: updateSession } = useSession()
+  const [isLoading, setIsLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(true)
   const [userData, setUserData] = useState({
-    name: "",
-    avatar: "",
-  });
+    name: '',
+    avatar: '',
+    university: '',
+    college: '',
+  })
 
+  // New states for colleges data
+  const [collegesData, setCollegesData] = useState([])
+  const [universities, setUniversities] = useState([])
+  const [colleges, setColleges] = useState([])
+
+  // Fetch colleges data
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated") {
-      fetchUserData();
+    const fetchCollegesData = async () => {
+      try {
+        const response = await fetch('/colleges.json')
+        const data = await response.json()
+        setCollegesData(data)
+
+        // Extract unique universities
+        const uniqueUniversities = [
+          ...new Set(data.map((item) => item.university)),
+        ].sort()
+        setUniversities(uniqueUniversities)
+      } catch (error) {
+        console.error('Error loading colleges data:', error)
+        toast.error('Failed to load educational institutions data')
+      }
     }
-  }, [status, router]);
+
+    fetchCollegesData()
+  }, [])
+
+  // Update colleges when university changes
+  useEffect(() => {
+    if (userData.university) {
+      const filteredColleges = collegesData
+        .filter((item) => item.university === userData.university)
+        .map((item) => item.college)
+        .sort()
+      setColleges(filteredColleges)
+    } else {
+      setColleges([])
+    }
+  }, [userData.university, collegesData])
+
+  // Previous useEffect for authentication remains the same
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    } else if (status === 'authenticated') {
+      fetchUserData()
+    }
+  }, [status, router])
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("/api/v1/members/users/profile");
+      const response = await fetch('/api/v1/members/users/profile')
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json()
         setUserData({
-          name: data.name || "",
-          avatar: data.avatar || "/team/member-1.jpeg",
-        });
+          name: data.name || '',
+          avatar: data.avatar || '/team/member-1.jpeg',
+          university: data.university || '',
+          college: data.college || '',
+        })
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error("Failed to load profile data");
+      console.error('Error fetching user data:', error)
+      toast.error('Failed to load profile data')
     } finally {
-      setPageLoading(false);
+      setPageLoading(false)
     }
-  };
+  }
 
+  // Previous handlers remain the same
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setUserData((prev) => ({ ...prev, [name]: value }))
+
+    // Reset college when university changes
+    if (name === 'university') {
+      setUserData((prev) => ({ ...prev, university: value, college: '' }))
+    }
+  }
 
   const handleAvatarChange = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
+        toast.error('Image size should be less than 5MB')
+        return
       }
 
       try {
-        const formData = new FormData();
-        formData.append("file", file);
+        const formData = new FormData()
+        formData.append('file', file)
 
-        const response = await fetch("/api/v1/members/users/avatar", {
-          method: "POST",
+        const response = await fetch('/api/v1/members/users/avatar', {
+          method: 'POST',
           body: formData,
-        });
+        })
 
-        if (!response.ok) throw new Error("Failed to upload avatar");
+        if (!response.ok) throw new Error('Failed to upload avatar')
 
-        const data = await response.json();
-        setUserData((prev) => ({ ...prev, avatar: data.avatarUrl }));
+        const data = await response.json()
+        setUserData((prev) => ({ ...prev, avatar: data.avatarUrl }))
       } catch (error) {
-        console.error("Error handling avatar:", error);
-        toast.error("Failed to process image");
+        console.error('Error handling avatar:', error)
+        toast.error('Failed to process image')
       }
     }
-  };
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
     try {
-      const response = await fetch("/api/v1/members/users/profile", {
-        method: "PUT",
+      const response = await fetch('/api/v1/members/users/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
         // Update the session with new user data
@@ -171,42 +222,42 @@ export default function EditProfile() {
             name: data.name,
             avatar: data.avatar,
           },
-        });
+        })
 
-        toast.success("Profile updated successfully!");
+        toast.success('Profile updated successfully!')
       } else {
-        throw new Error(data.error || "Failed to update profile");
+        throw new Error(data.error || 'Failed to update profile')
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      console.error('Error updating profile:', error)
+      toast.error(error.message || 'Failed to update profile')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false)
 
   const handleAvatarSelect = (avatarUrl) => {
-    setUserData((prev) => ({ ...prev, avatar: avatarUrl }));
-    setShowAvatarSelector(false);
-  };
+    setUserData((prev) => ({ ...prev, avatar: avatarUrl }))
+    setShowAvatarSelector(false)
+  }
 
   const handleNameUpdate = async (newName) => {
     try {
-      const response = await fetch("/api/v1/members/users/profile", {
-        method: "PUT",
+      const response = await fetch('/api/v1/members/users/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: newName,
         }),
-      });
+      })
 
-      if (!response.ok) throw new Error("Failed to update profile");
+      if (!response.ok) throw new Error('Failed to update profile')
 
-      const updatedUser = await response.json();
+      const updatedUser = await response.json()
 
       // Update session
       await updateSession({
@@ -215,17 +266,17 @@ export default function EditProfile() {
           ...session.user,
           name: updatedUser.name,
         },
-      });
+      })
 
       // Trigger profile update event
-      window.dispatchEvent(new Event("profileUpdate"));
+      window.dispatchEvent(new Event('profileUpdate'))
 
-      toast.success("Profile updated successfully");
+      toast.success('Profile updated successfully')
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile");
+      console.error('Error updating profile:', error)
+      toast.error('Failed to update profile')
     }
-  };
+  }
 
   if (pageLoading) {
     return (
@@ -234,7 +285,7 @@ export default function EditProfile() {
           <SkeletonLoading />
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -260,7 +311,7 @@ export default function EditProfile() {
                     userData.avatar ||
                     session?.user.avatar ||
                     `https://api.dicebear.com/6.x/initials/png?seed=${encodeURIComponent(
-                      userData.name || "NM"
+                      userData.name || 'NM'
                     )}&backgroundColor=${getRandomColor()}`
                   }
                   alt={`${userData.name}'s avatar`}
@@ -268,8 +319,8 @@ export default function EditProfile() {
                   height={100}
                   className="object-cover w-full h-full"
                   onError={(e) => {
-                    const seed = encodeURIComponent(userData.name || "NM");
-                    e.target.src = `https://api.dicebear.com/6.x/initials/png?seed=${seed}&backgroundColor=${getRandomColor()}`;
+                    const seed = encodeURIComponent(userData.name || 'NM')
+                    e.target.src = `https://api.dicebear.com/6.x/initials/png?seed=${seed}&backgroundColor=${getRandomColor()}`
                   }}
                 />
                 <label
@@ -281,7 +332,7 @@ export default function EditProfile() {
               </div>
 
               {/* Premium Indicator */}
-              {session?.user?.role === "PRO" && (
+              {session?.user?.role === 'PRO' && (
                 <div className="absolute -top-2 -right-2 flex items-center justify-center">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Crown className="w-4 h-4 text-white" />
@@ -352,7 +403,7 @@ export default function EditProfile() {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <h4 className="text-md font-medium">Premium Avatars</h4>
-                      {session?.user?.role !== "PRO" && (
+                      {session?.user?.role !== 'PRO' && (
                         <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                           PRO Only
                         </span>
@@ -367,15 +418,15 @@ export default function EditProfile() {
                           <button
                             key={index}
                             onClick={() =>
-                              session?.user?.role === "PRO"
+                              session?.user?.role === 'PRO'
                                 ? handleAvatarSelect(avatar)
                                 : null
                             }
                             className={`relative aspect-square rounded-lg overflow-hidden group
                               ${
-                                session?.user?.role === "PRO"
-                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
-                                  : "cursor-not-allowed opacity-75"
+                                session?.user?.role === 'PRO'
+                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
+                                  : 'cursor-not-allowed opacity-75'
                               }`}
                           >
                             <Image
@@ -384,7 +435,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== "PRO" && (
+                            {session?.user?.role !== 'PRO' && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -404,15 +455,15 @@ export default function EditProfile() {
                           <button
                             key={index}
                             onClick={() =>
-                              session?.user?.role === "PRO"
+                              session?.user?.role === 'PRO'
                                 ? handleAvatarSelect(avatar)
                                 : null
                             }
                             className={`relative aspect-square rounded-lg overflow-hidden group
                               ${
-                                session?.user?.role === "PRO"
-                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
-                                  : "cursor-not-allowed opacity-75"
+                                session?.user?.role === 'PRO'
+                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
+                                  : 'cursor-not-allowed opacity-75'
                               }`}
                           >
                             <Image
@@ -421,7 +472,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== "PRO" && (
+                            {session?.user?.role !== 'PRO' && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -441,15 +492,15 @@ export default function EditProfile() {
                           <button
                             key={index}
                             onClick={() =>
-                              session?.user?.role === "PRO"
+                              session?.user?.role === 'PRO'
                                 ? handleAvatarSelect(avatar)
                                 : null
                             }
                             className={`relative aspect-square rounded-lg overflow-hidden group
                               ${
-                                session?.user?.role === "PRO"
-                                  ? "hover:ring-2 hover:ring-primary cursor-pointer"
-                                  : "cursor-not-allowed opacity-75"
+                                session?.user?.role === 'PRO'
+                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
+                                  : 'cursor-not-allowed opacity-75'
                               }`}
                           >
                             <Image
@@ -458,7 +509,7 @@ export default function EditProfile() {
                               fill
                               className="object-cover group-hover:scale-110 transition-transform"
                             />
-                            {session?.user?.role !== "PRO" && (
+                            {session?.user?.role !== 'PRO' && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-primary" />
                               </div>
@@ -468,13 +519,13 @@ export default function EditProfile() {
                       </div>
                     </div>
 
-                    {session?.user?.role !== "PRO" && (
+                    {session?.user?.role !== 'PRO' && (
                       <div className="mt-6 p-4 bg-base-300 rounded-lg text-center">
                         <p className="text-sm mb-2">
                           Upgrade to PRO to unlock all premium avatars!
                         </p>
                         <button
-                          onClick={() => router.push("/account/plans")}
+                          onClick={() => router.push('/account/plans')}
                           className="btn btn-primary btn-sm"
                         >
                           Upgrade Now
@@ -487,9 +538,9 @@ export default function EditProfile() {
             )}
 
             <p className="text-sm text-gray-500 mt-2">
-              {session?.user?.role === "PRO"
-                ? "Premium user - All avatar options available"
-                : "Upgrade to PRO for more avatar options"}
+              {session?.user?.role === 'PRO'
+                ? 'Premium user - All avatar options available'
+                : 'Upgrade to PRO for more avatar options'}
             </p>
           </div>
 
@@ -513,7 +564,7 @@ export default function EditProfile() {
             />
           </div>
 
-          {/* Email (Non-editable) */}
+          {/* Email Field */}
           <div className="space-y-2">
             <label
               htmlFor="email"
@@ -524,27 +575,76 @@ export default function EditProfile() {
             <input
               id="email"
               type="email"
-              value={session?.user.email || ""}
+              value={session?.user.email || ''}
               disabled
               className="w-full p-3 rounded-lg shadow-sm bg-base-200 cursor-not-allowed"
             />
+          </div>
+
+          {/* New University Field */}
+          <div className="space-y-2">
+            <label
+              htmlFor="university"
+              className="text-sm text-secondary font-medium"
+            >
+              University
+            </label>
+            <select
+              id="university"
+              name="university"
+              value={userData.university}
+              onChange={handleInputChange}
+              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
+            >
+              <option value="">Select University</option>
+              {universities.map((university) => (
+                <option key={university} value={university}>
+                  {university}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* New College Field */}
+          <div className="space-y-2">
+            <label
+              htmlFor="college"
+              className="text-sm text-secondary font-medium"
+            >
+              College
+            </label>
+            <select
+              id="college"
+              name="college"
+              value={userData.college}
+              onChange={handleInputChange}
+              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
+              disabled={!userData.university}
+            >
+              <option value="">Select College</option>
+              {colleges.map((college) => (
+                <option key={college} value={college}>
+                  {college}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Save Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow 
+            className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow
               ${
                 isLoading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-primary-focus"
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-primary-focus'
               }`}
           >
-            {isLoading ? "Saving..." : "Save Changes"}
+            {isLoading ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
       </div>
     </div>
-  );
+  )
 }
