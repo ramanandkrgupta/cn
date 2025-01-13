@@ -25,6 +25,8 @@
     "@tabler/icons-react": "^2.45.0",
     "@tanstack/react-table": "^8.9.9",
     "@types/file-saver": "^2.0.7",
+    "@vercel/analytics": "^1.4.1",
+    "@vercel/speed-insights": "^1.1.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
