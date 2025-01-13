@@ -9,7 +9,7 @@ const UploadDoneModel = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
   const closeModal = () => {
     setIsOpen(false);
-    router.push("/dashboard");
+    router.push("/");
   };
 
   return (

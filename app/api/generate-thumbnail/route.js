@@ -17,6 +17,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
+    // Convert the file URL to the public access link
+    
+
     console.log('Generating thumbnail for:', { url, key });
     const thumbnailUrl = await generatePDFThumbnail(url, key);
 

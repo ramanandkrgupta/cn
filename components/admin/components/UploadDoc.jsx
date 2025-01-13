@@ -6,6 +6,8 @@ import { Cloud } from "@/public/assets";
 import { DocumentCheckIcon, DocumentTextIcon } from "@heroicons/react/20/solid";
 import { processPDF } from "@/libs/pdf-processor";
 import DocDetails from './DocDetails';
+import Stepper from '../ui/Stepper';
+import UploadDoneModel from '../ui/UploadDoneModel';
 
 const MAX_FILE_SIZE = 1000 * 1024 * 1024; // 1000MB
 const ALLOWED_FILE_TYPES = ['application/pdf'];
@@ -26,6 +28,10 @@ const UploadDoc = ({
     current: 0,
     uploading: false
   });
+  const [activeStep, setActiveStep] = useState(0);
+  const [isUploadDone, setIsUploadDone] = useState(false);
+
+  const steps = ["Select Files", "Upload Files", "Generate Thumbnails", "Complete"];
 
   // Validate file
   const validateFile = async (file) => {
@@ -104,7 +110,7 @@ const UploadDoc = ({
     }
   }, [isUploading]);
 
-  const uploadFile = async (file, details) => {
+  const uploadFile = async (file, details, updateToast) => {
     try {
       // Process PDF with watermark and metadata
       const processedPdfBytes = await processPDF(file, {
@@ -122,25 +128,52 @@ const UploadDoc = ({
         { type: 'application/pdf' }
       );
 
-      // Create form data
-      const formData = new FormData();
-      formData.append("file", processedFile);
-      formData.append("details", JSON.stringify({
-        ...details,
-        branch: details.course?.toLowerCase() || 'general'
-      }));
+      // Show toast for getting signed URL
+      const signedUrlToastId = toast.loading('Getting signed URL...');
+      setActiveStep(1);
 
-      // Upload the file
-      const response = await fetch("/api/upload", {
+      // Request signed URL from the backend
+      const response = await fetch("/api/signed-url", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: processedFile.name,
+          fileType: processedFile.type,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Upload failed");
+        toast.dismiss(signedUrlToastId);
+        throw new Error("Failed to get signed URL");
       }
 
       const { url, key } = await response.json();
+      toast.dismiss(signedUrlToastId);
+
+      // Show toast for uploading file
+      const uploadToastId = toast.loading(`Uploading file: ${file.name}`);
+      setActiveStep(2);
+
+      // Upload the file directly to Cloudflare R2
+      const uploadResponse = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": processedFile.type,
+        },
+        body: processedFile,
+      });
+
+      if (!uploadResponse.ok) {
+        toast.dismiss(uploadToastId);
+        throw new Error("Upload failed");
+      }
+      toast.dismiss(uploadToastId);
+
+      // Show toast for generating thumbnail
+      const thumbnailToastId = toast.loading('Generating thumbnail...');
+      setActiveStep(3);
 
       // Generate thumbnail
       let thumbnailUrl = '/images/placeholders/pdf-placeholder.png';
@@ -150,7 +183,7 @@ const UploadDoc = ({
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ url, key })
+          body: JSON.stringify({ url: `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`, key: details.id })
         });
 
         if (thumbnailResponse.ok) {
@@ -160,9 +193,10 @@ const UploadDoc = ({
       } catch (thumbnailError) {
         console.error('Thumbnail generation error:', thumbnailError);
       }
+      toast.dismiss(thumbnailToastId);
 
       return {
-        url,
+        url: `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`,
         thumbnailUrl,
         key
       };
@@ -186,8 +220,6 @@ const UploadDoc = ({
         uploading: true
       });
 
-      toast.loading('Processing files...', { id: 'upload' });
-
       // Process files sequentially
       const uploadResults = [];
       for (let i = 0; i < fileDetails.length; i++) {
@@ -204,6 +236,8 @@ const UploadDoc = ({
           current: i + 1
         }));
 
+        const startTime = Date.now();
+
         // Upload file and get response
         const uploadResponse = await uploadFile(fileObj.file, {
           ...detail,
@@ -212,6 +246,19 @@ const UploadDoc = ({
           subject_name: detail.subject?.subject_name,
           subject_code: detail.subject?.subject_code,
           originalName: fileObj.originalName
+        }, (progress) => {
+          const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+          const speed = (progress.loaded / elapsedTime / 1024).toFixed(2); // KB/s
+          const estimatedTime = ((progress.total - progress.loaded) / (progress.loaded / elapsedTime)).toFixed(2); // in seconds
+
+          toast.update(uploadToastId, {
+            render: `Uploading file ${i + 1}/${fileDetails.length}: ${fileObj.name} (${(progress.loaded / 1024).toFixed(2)} KB / ${(progress.total / 1024).toFixed(2)} KB) - Speed: ${speed} KB/s - Estimated time: ${estimatedTime}s`,
+            type: "loading",
+            isLoading: true,
+            autoClose: false,
+            closeOnClick: false,
+            draggable: false,
+          });
         });
 
         uploadResults.push({
@@ -238,7 +285,6 @@ const UploadDoc = ({
         throw new Error('Failed to save file details');
       }
 
-      toast.dismiss('upload');
       toast.success("All files uploaded successfully!");
       setSelectedFiles([]);
       setShowDocDetails(false);
@@ -247,6 +293,8 @@ const UploadDoc = ({
         current: 0,
         uploading: false
       });
+      setActiveStep(4);
+      setIsUploadDone(true);
 
       // Update parent component if needed
       if (onChange) onChange(uploadResults);
@@ -254,7 +302,6 @@ const UploadDoc = ({
       
     } catch (error) {
       console.error("Error in handleSubmit:", error);
-      toast.dismiss('upload');
       toast.error(error.message || "Failed to upload files");
     } finally {
       setIsUploading(false);
@@ -276,6 +323,7 @@ const UploadDoc = ({
 
   return (
     <div className="w-full">
+      <Stepper steps={steps} activeStep={activeStep} />
       {!showDocDetails ? (
         <div className="w-full">
           <div
@@ -315,6 +363,7 @@ const UploadDoc = ({
           isSubmitting={isUploading}
         />
       )}
+      <UploadDoneModel isOpen={isUploadDone} setIsOpen={setIsUploadDone} />
     </div>
   );
 };

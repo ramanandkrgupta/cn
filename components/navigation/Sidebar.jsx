@@ -63,12 +63,12 @@ const Sidebar = () => {
                 >
                   <IconComponent
                     className={`w-6 h-6 ${
-                      isActive ? "text-teal-500" : "text-gray-500"
+                      isActive ? "text-teal-500" : "text-secondary/70"
                     }`}
                   />
                   <span
                     className={`text-xs mt-1 ${
-                      isActive ? "text-teal-500" : "text-gray-500"
+                      isActive ? "text-teal-500" : "text-secondary/70"
                     }`}
                   >
                     {menu.name}
@@ -82,6 +82,7 @@ const Sidebar = () => {
         <button
           onClick={toggleTheme}
           className="p-2 hover:bg-base-200 rounded-lg transition-colors"
+          aria-label="Toggle theme"
         >
           {theme === "mydark" ? (
             <Sun className="w-6 h-6 text-gray-500" />

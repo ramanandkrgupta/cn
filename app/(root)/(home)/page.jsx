@@ -7,8 +7,12 @@ import Notification from "@/components/Notification";
 import Feed from "@/components/Feed";
 import Footer from "./(routes)/about/components/Footer";
 
+
+
 export default function Home() {
   const { userData } = useUserStore();
+
+  
 
   return (
     <>

@@ -9,6 +9,7 @@ export const generateThumbnail = async (fileUrl, postId) => {
       return '/images/placeholders/pdf-placeholder.png';
     }
 
+
     // Generate thumbnail URL using Cloudinary
     console.log("Calling generatePDFThumbnail...");
     const thumbnailUrl = await generatePDFThumbnail(fileUrl, postId);
@@ -26,4 +27,4 @@ export const generateThumbnail = async (fileUrl, postId) => {
   }
 };
 
-export default generateThumbnail; 
+export default generateThumbnail;

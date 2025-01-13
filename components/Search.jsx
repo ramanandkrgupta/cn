@@ -75,7 +75,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
             <Image
               src={search}
               alt="search icon"
-              className="w-[18px] h-[18px] object-contain"
+              className="h-[18px] object-contain"
               width="auto"
             />
           )}

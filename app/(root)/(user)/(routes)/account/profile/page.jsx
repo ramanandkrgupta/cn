@@ -57,7 +57,7 @@ const SkeletonLoading = () => (
 // Avatar categories
 const avatarSets = {
   free: [
-    "/avatars/free/avatar-1.png",
+    "/icons/avatars/free-1.png",
     "/avatars/free/avatar-2.png",
     "/avatars/free/avatar-3.png",
     "/avatars/free/avatar-4.png",

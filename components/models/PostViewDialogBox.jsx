@@ -27,6 +27,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   // Check user's interaction when dialog opens
   useEffect(() => {
@@ -44,6 +45,27 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     };
 
     checkUserInteraction();
+  }, [data.id, session]);
+
+  useEffect(() => {
+    const fetchPdfUrl = async () => {
+      if (session?.user) {
+        const response = await fetch("/api/v1/members/posts/secure-file", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ postId: data.id }),
+        });
+
+        if (response.ok) {
+          const { fileUrl } = await response.json();
+          setPdfUrl(fileUrl);
+        }
+      }
+    };
+
+    fetchPdfUrl();
   }, [data.id, session]);
 
   function closeModal() {
@@ -324,6 +346,17 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <span>{metrics.likes} ❤️</span>
                     <span>{metrics.shares} 📢</span>
                   </div>
+                  {pdfUrl && (
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300"
+                        onClick={() => window.open(`/pdf-view?fileUrl=${encodeURIComponent(pdfUrl)}`, '_blank')}
+                      >
+                        Online Preview
+                      </button>
+                    </div>
+                  )}
                   <div className="flex w-full gap-2">
                     <button
                       type="button"

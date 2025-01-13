@@ -276,6 +276,7 @@ model UserSettings {
   pushNotifications  Boolean  @default(true)
   darkMode           Boolean  @default(false)
   language           String   @default("en")
+  fontSize           String      @default("2")
   user               User     @relation(fields: [userId], references: [id])
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

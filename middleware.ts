@@ -3,6 +3,7 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
+  const token = await getToken({ req: request });
 
   // Handle session endpoint
   if (path === '/api/auth/session') {
@@ -16,7 +17,10 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req: request });
+  // Redirect logged-in users away from the login page
+  if (path === '/login' && token) {
+    return NextResponse.redirect(new URL('/account', request.url));
+  }
 
   // Admin routes protection (except AI training)
   if (path.startsWith('/api/v1/admin') && path !== '/api/v1/admin/ai/train') {
@@ -57,6 +61,7 @@ export const config = {
     '/api/auth/session',
     // Include all API routes except AI training
     '/api/v1/admin/((?!ai/train).)*',
-    '/api/v1/members/:path*'
+    '/api/v1/members/:path*',
+    '/login'
   ]
-}; 
+};

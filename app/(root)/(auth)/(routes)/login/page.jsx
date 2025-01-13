@@ -48,7 +48,7 @@ const LoginPage = () => {
         console.error("SignIn Error:", response.error);
       } else {
         toast.success("Successfully Logged in");
-        window.location.href = "/dashboard";
+        window.location.href = "/account";
       }
     } catch (error) {
       console.error("NEXT_AUTH Error:", error);
