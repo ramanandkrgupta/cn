@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import prisma from "@/libs/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
+import { NextResponse } from 'next/server'
+import prisma from '@/libs/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/auth.config'
 
-// Add helper function at the top
+// Keep existing helper function
 const getRandomColor = () => {
   const colors = [
     '0088CC', // Blue
@@ -12,24 +12,26 @@ const getRandomColor = () => {
     'FFB347', // Orange
     '9370DB', // Purple
     '40E0D0', // Turquoise
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
+  ]
+  return colors[Math.floor(Math.random() * colors.length)]
+}
 
 export async function PUT(req) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const data = await req.json();
-    
-    // Only allow updating specific fields
+    const data = await req.json()
+
+    // Update allowed fields including new university and college
     const allowedUpdates = {
       name: data.name,
-      phoneNumber: data.phoneNumber
-    };
+      phoneNumber: data.phoneNumber,
+      university: data.university,
+      college: data.college,
+    }
 
     // Update user in database
     const updatedUser = await prisma.user.update({
@@ -41,25 +43,27 @@ export async function PUT(req) {
         email: true,
         userRole: true,
         avatar: true,
-        phoneNumber: true
-      }
-    });
+        phoneNumber: true,
+        university: true,
+        college: true,
+      },
+    })
 
-    return NextResponse.json(updatedUser);
+    return NextResponse.json(updatedUser)
   } catch (error) {
-    console.error('Profile update error:', error);
+    console.error('Profile update error:', error)
     return NextResponse.json(
       { error: 'Failed to update profile' },
       { status: 500 }
-    );
+    )
   }
 }
 
 export async function GET(req) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
@@ -70,16 +74,18 @@ export async function GET(req) {
         email: true,
         userRole: true,
         avatar: true,
-        phoneNumber: true
-      }
-    });
+        phoneNumber: true,
+        university: true,
+        college: true,
+      },
+    })
 
-    return NextResponse.json(user);
+    return NextResponse.json(user)
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    console.error('Profile fetch error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch profile' },
       { status: 500 }
-    );
+    )
   }
 }
