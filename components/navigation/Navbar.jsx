@@ -103,25 +103,29 @@ const NavBar = ({ showSearch = true }) => {
         <div className="p-4 bg-base-300/50">
           <div className="flex items-center gap-4 mb-3">
             {session.user?.avatar ? (
-              <Image
-                src={session.user.avatar}
-                alt={session.user.name || 'User'}
-                width={48}
-                height={48}
-                className="rounded-full ring-2 ring-primary/20"
-              />
+              <Link href="/account/profile">
+                <Image
+                  src={session.user.avatar}
+                  alt={session.user.name || 'User'}
+                  width={48}
+                  height={48}
+                  className="rounded-full ring-2 ring-primary/20"
+                />
+              </Link>
             ) : (
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <User2 className="w-6 h-6 text-primary" />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold truncate">
-                {session.user?.name || 'User'}
-              </h3>
-              <p className="text-sm text-gray-500 truncate">
-                {session.user?.email}
-              </p>
+              <Link href="/account/profile">
+                <h3 className="font-semibold truncate w-max">
+                  {session.user?.name || 'User'}
+                </h3>
+                <p className="text-sm text-gray-500 truncate">
+                  {session.user?.email}
+                </p>
+              </Link>
             </div>
           </div>
 
