@@ -1,17 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { User2, Bell } from 'lucide-react'
-
+import { NotificationBell } from '@/components/NotificationBell'
 const UserProfile = ({ user }) => {
   if (user) {
     const { avatar: image, name, email } = user
 
     return (
       <div className="flex items-center gap-4">
-        {/* Notifications Link */}
-        <Link href="/account/notifications" aria-label="Notifications">
-          <Bell className="w-6 h-6 text-primary" />
-        </Link>
+        {/* Notifications Bell Component */}
+        <NotificationBell />
 
         {/* Profile Details Link */}
         <Link href="/account" className="flex items-center gap-4">
