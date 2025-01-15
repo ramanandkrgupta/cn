@@ -273,7 +273,7 @@ export default function EditProfile() {
 
   return (
     <div className="bg-base-100 min-h">
-      <div className="mx-auto px-4 max-w-lg py-6 bg-red-950">
+      <div className="mx-auto px-4 max-w-lg py-6 ">
         <div className="flex items-center gap-2 mb-6">
           <button onClick={() => router.back()} aria-label="Go Back">
             <ArrowLeft className="w-6 h-6" />
