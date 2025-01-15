@@ -69,34 +69,47 @@ export default function EditProfile() {
     avatar: '',
     university: '',
     college: '',
+    level: '',
+    stream: '',
+    degree: '',
+    specialization: '',
+    year: '',
+    semester: '',
   })
 
-  // New states for colleges data
+  // States for data
   const [collegesData, setCollegesData] = useState([])
   const [universities, setUniversities] = useState([])
   const [colleges, setColleges] = useState([])
+  const [courseData, setCourseData] = useState(null)
   const [isAvatarUpdating, setIsAvatarUpdating] = useState(false)
 
-  // Fetch colleges data
+  // Fetch initial data
   useEffect(() => {
-    const fetchCollegesData = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch('/colleges.json')
-        const data = await response.json()
-        setCollegesData(data)
+        // Fetch colleges data
+        const collegesResponse = await fetch('/colleges.json')
+        const colleges = await collegesResponse.json()
+        setCollegesData(colleges)
 
         // Extract unique universities
         const uniqueUniversities = [
-          ...new Set(data.map((item) => item.university)),
+          ...new Set(colleges.map((item) => item.university)),
         ].sort()
         setUniversities(uniqueUniversities)
+
+        // Fetch courses data
+        const coursesResponse = await fetch('/courses.json')
+        const courses = await coursesResponse.json()
+        setCourseData(courses)
       } catch (error) {
-        console.error('Error loading colleges data:', error)
-        toast.error('Failed to load educational institutions data')
+        console.error('Error loading data:', error)
+        toast.error('Failed to load educational data')
       }
     }
 
-    fetchCollegesData()
+    fetchInitialData()
   }, [])
 
   // Update colleges when university changes
@@ -112,7 +125,7 @@ export default function EditProfile() {
     }
   }, [userData.university, collegesData])
 
-  // Previous useEffect for authentication remains the same
+  // Authentication check
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
@@ -131,6 +144,12 @@ export default function EditProfile() {
           avatar: data.avatar || '/team/member-1.jpeg',
           university: data.university || '',
           college: data.college || '',
+          level: data.level || '',
+          stream: data.stream || '',
+          degree: data.degree || '',
+          specialization: data.specialization || '',
+          year: data.year || '',
+          semester: data.semester || '',
         })
       }
     } catch (error) {
@@ -141,15 +160,38 @@ export default function EditProfile() {
     }
   }
 
-  // Previous handlers remain the same
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setUserData((prev) => ({ ...prev, [name]: value }))
+    setUserData((prev) => {
+      const newData = { ...prev, [name]: value }
 
-    // Reset college when university changes
-    if (name === 'university') {
-      setUserData((prev) => ({ ...prev, university: value, college: '' }))
-    }
+      // Reset dependent fields when parent field changes
+      switch (name) {
+        case 'university':
+          return { ...newData, college: '' }
+        case 'level':
+          return {
+            ...newData,
+            stream: '',
+            degree: '',
+            specialization: '',
+            year: '',
+            semester: '',
+          }
+        case 'stream':
+          return {
+            ...newData,
+            degree: '',
+            specialization: '',
+            year: '',
+            semester: '',
+          }
+        case 'degree':
+          return { ...newData, year: '', semester: '' }
+        default:
+          return newData
+      }
+    })
   }
 
   const handleAvatarChange = async (e) => {
@@ -197,7 +239,6 @@ export default function EditProfile() {
       const data = await response.json()
 
       if (response.ok) {
-        // Update the session with new user data
         await updateSession({
           ...session,
           user: {
@@ -226,40 +267,40 @@ export default function EditProfile() {
     setShowAvatarSelector(false)
   }
 
-  const handleNameUpdate = async (newName) => {
-    try {
-      const response = await fetch('/api/v1/members/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: newName,
-        }),
-      })
+  // const handleNameUpdate = async (newName) => {
+  //   try {
+  //     const response = await fetch('/api/v1/members/users/profile', {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         name: newName,
+  //       }),
+  //     })
 
-      if (!response.ok) throw new Error('Failed to update profile')
+  //     if (!response.ok) throw new Error('Failed to update profile')
 
-      const updatedUser = await response.json()
+  //     const updatedUser = await response.json()
 
-      // Update session
-      await updateSession({
-        ...session,
-        user: {
-          ...session.user,
-          name: updatedUser.name,
-        },
-      })
+  //     // Update session
+  //     await updateSession({
+  //       ...session,
+  //       user: {
+  //         ...session.user,
+  //         name: updatedUser.name,
+  //       },
+  //     })
 
-      // Trigger profile update event
-      window.dispatchEvent(new Event('profileUpdate'))
+  //     // Trigger profile update event
+  //     window.dispatchEvent(new Event('profileUpdate'))
 
-      toast.success('Profile updated successfully')
-    } catch (error) {
-      console.error('Error updating profile:', error)
-      toast.error('Failed to update profile')
-    }
-  }
+  //     toast.success('Profile updated successfully')
+  //   } catch (error) {
+  //     console.error('Error updating profile:', error)
+  //     toast.error('Failed to update profile')
+  //   }
+  // }
 
   if (pageLoading) {
     return (
@@ -273,7 +314,7 @@ export default function EditProfile() {
 
   return (
     <div className="bg-base-100 min-h">
-      <div className="mx-auto px-4 max-w-lg py-6 ">
+      <div className="mx-auto px-4 max-w-lg py-6">
         <div className="flex items-center gap-2 mb-6">
           <button onClick={() => router.back()} aria-label="Go Back">
             <ArrowLeft className="w-6 h-6" />
@@ -307,6 +348,7 @@ export default function EditProfile() {
           session={session}
           universities={universities}
           colleges={colleges}
+          courseData={courseData}
           isLoading={isLoading}
           onInputChange={handleInputChange}
           onSubmit={handleSubmit}

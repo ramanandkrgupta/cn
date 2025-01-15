@@ -17,6 +17,13 @@ model User {
   isMobileVerified    Boolean              @default(false)
   university          String?
   college             String?
+  level               String?
+  
+  stream              String?
+  degree              String?
+  specialization      String?
+  year                String?
+  semester            String?
   subjects            subject[] // Corrected to match model name
   posts               post[] // Corrected to match model name
   userRole            Role                 @default(USER)
@@ -50,8 +57,8 @@ model User {
   sessions            Session[]
   collections         Collection[]
   aiConversations     AIConversation[]
-   resetToken        String?
-  resetTokenExpiry  DateTime?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
 
 }
 

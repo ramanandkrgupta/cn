@@ -25,13 +25,19 @@ export async function PUT(req) {
 
     const data = await req.json()
 
-    // Update allowed fields including new university, college, and avatar
+    // Update allowed fields including new educational fields
     const allowedUpdates = {
       name: data.name,
       phoneNumber: data.phoneNumber,
       university: data.university,
       college: data.college,
-      avatar: data.avatar, // Include avatar in allowed updates
+      avatar: data.avatar,
+      level: data.level, // New field
+      stream: data.stream, // New field
+      degree: data.degree, // New field
+      specialization: data.specialization, // New field
+      year: data.year, // New field
+      semester: data.semester, // New field
     }
 
     // Update user in database
@@ -47,6 +53,12 @@ export async function PUT(req) {
         phoneNumber: true,
         university: true,
         college: true,
+        level: true,
+        stream: true,
+        degree: true,
+        specialization: true,
+        year: true,
+        semester: true,
       },
     })
 
@@ -78,6 +90,12 @@ export async function GET(req) {
         phoneNumber: true,
         university: true,
         college: true,
+        level: true,
+        stream: true,
+        degree: true,
+        specialization: true,
+        year: true,
+        semester: true,
       },
     })
 
