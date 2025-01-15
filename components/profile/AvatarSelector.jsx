@@ -59,7 +59,7 @@ export const AvatarSelector = ({
 
           {/* 3D Avatars */}
           <div className="mb-6">
-            <h5 className="text-sm text-gray-500 mb-2">3D Style</h5>
+            <h5 className="text-sm text-gray-500 mb-2">Anime Girl</h5>
             <div className="grid grid-cols-4 gap-4">
               {avatarSets.pro.slice(0, 4).map((avatar, index) => (
                 <button
@@ -92,7 +92,7 @@ export const AvatarSelector = ({
 
           {/* Anime Avatars */}
           <div className="mb-6">
-            <h5 className="text-sm text-gray-500 mb-2">Anime Style</h5>
+            <h5 className="text-sm text-gray-500 mb-2">Anime Boy</h5>
             <div className="grid grid-cols-4 gap-4">
               {avatarSets.pro.slice(4, 8).map((avatar, index) => (
                 <button
@@ -125,7 +125,7 @@ export const AvatarSelector = ({
 
           {/* Pixel Art Avatars */}
           <div>
-            <h5 className="text-sm text-gray-500 mb-2">Pixel Art Style</h5>
+            <h5 className="text-sm text-gray-500 mb-2">Animated Animals</h5>
             <div className="grid grid-cols-4 gap-4">
               {avatarSets.pro.slice(8).map((avatar, index) => (
                 <button
