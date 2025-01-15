@@ -25,12 +25,13 @@ export async function PUT(req) {
 
     const data = await req.json()
 
-    // Update allowed fields including new university and college
+    // Update allowed fields including new university, college, and avatar
     const allowedUpdates = {
       name: data.name,
       phoneNumber: data.phoneNumber,
       university: data.university,
       college: data.college,
+      avatar: data.avatar, // Include avatar in allowed updates
     }
 
     // Update user in database

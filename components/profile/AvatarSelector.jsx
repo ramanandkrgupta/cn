@@ -9,8 +9,16 @@ export const AvatarSelector = ({
   onSelect,
   avatarSets,
   session,
+  isLoading,
 }) => {
   const router = useRouter()
+
+
+  const handleAvatarClick = async (avatar) => {
+    if (session?.user?.role === 'PRO' || avatarSets.free.includes(avatar)) {
+      await onSelect(avatar)
+    }
+  }
 
   if (!show) return null
 
@@ -156,6 +164,29 @@ export const AvatarSelector = ({
             </div>
           </div>
         </div>
+
+        {/* hii */}
+
+        {avatarSets.free.map((avatar, index) => (
+          <button
+            key={index}
+            onClick={() => handleAvatarClick(avatar)}
+            disabled={isLoading}
+            className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all group"
+          >
+            <Image
+              src={avatar}
+              alt={`Free avatar ${index + 1}`}
+              fill
+              className="object-cover group-hover:scale-110 transition-transform"
+            />
+            {isLoading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
+            )}
+          </button>
+        ))}
 
         {session?.user?.role !== 'PRO' && (
           <div className="mt-6 p-4 bg-base-300 rounded-lg text-center">

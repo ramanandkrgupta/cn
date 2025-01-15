@@ -23,7 +23,6 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
-
 // Avatar categories
 const avatarSets = {
   free: [
@@ -57,7 +56,6 @@ const avatarSets = {
     '/icons/avatars/premium/animeanimals/premium-2.png',
     '/icons/avatars/premium/animeanimals/premium-3.png',
     '/icons/avatars/premium/animeanimals/premium-4.png',
-
   ],
 }
 
@@ -77,6 +75,7 @@ export default function EditProfile() {
   const [collegesData, setCollegesData] = useState([])
   const [universities, setUniversities] = useState([])
   const [colleges, setColleges] = useState([])
+  const [isAvatarUpdating, setIsAvatarUpdating] = useState(false)
 
   // Fetch colleges data
   useEffect(() => {
@@ -173,6 +172,7 @@ export default function EditProfile() {
         if (!response.ok) throw new Error('Failed to upload avatar')
 
         const data = await response.json()
+        console.log('Uploaded avatar URL:', data.avatarUrl) // Debug log
         setUserData((prev) => ({ ...prev, avatar: data.avatarUrl }))
       } catch (error) {
         console.error('Error handling avatar:', error)
@@ -299,6 +299,7 @@ export default function EditProfile() {
           onSelect={handleAvatarSelect}
           avatarSets={avatarSets}
           session={session}
+          isLoading={isAvatarUpdating}
         />
 
         <ProfileForm
