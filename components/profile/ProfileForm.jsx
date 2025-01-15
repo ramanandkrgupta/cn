@@ -12,6 +12,8 @@ export const ProfileForm = ({
   const [courseData, setCourseData] = useState(null)
   const [selectedLevel, setSelectedLevel] = useState(userData.level || '')
   const [selectedStream, setSelectedStream] = useState(userData.stream || '')
+  const [links, setLinks] = useState(userData.links || []) // Dynamic links
+  const [location, setLocation] = useState(userData.location || '')
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -30,6 +32,34 @@ export const ProfileForm = ({
     return courseData && selectedLevel
       ? Object.keys(courseData[selectedLevel])
       : []
+  }
+
+  const addLink = () => {
+    setLinks([...links, { type: '', url: '' }])
+  }
+
+  const updateLink = (index, key, value) => {
+    const updatedLinks = links.map((link, i) =>
+      i === index ? { ...link, [key]: value } : link
+    )
+    setLinks(updatedLinks)
+    onInputChange({
+      target: {
+        name: 'links',
+        value: updatedLinks,
+      },
+    })
+  }
+
+  const removeLink = (index) => {
+    const updatedLinks = links.filter((_, i) => i !== index)
+    setLinks(updatedLinks)
+    onInputChange({
+      target: {
+        name: 'links',
+        value: updatedLinks,
+      },
+    })
   }
 
   const getAvailableDegrees = () => {
@@ -310,16 +340,78 @@ export const ProfileForm = ({
         </select>
       </div>
 
+      {/* Location Field */}
+      <div className="space-y-2">
+        <label
+          htmlFor="location"
+          className="text-sm text-secondary font-medium"
+        >
+          Location (Optional)
+        </label>
+        <input
+          id="location"
+          name="location"
+          type="text"
+          value={location}
+          onChange={(e) => {
+            setLocation(e.target.value)
+            onInputChange(e)
+          }}
+          placeholder="Enter your location"
+          className="w-full p-3 rounded-lg shadow-sm bg-base-200"
+        />
+      </div>
+
+      {/* Links Section */}
+      <div className="space-y-2">
+        <label className="text-sm text-secondary font-medium">Links</label>
+        {links.map((link, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <select
+              value={link.type}
+              onChange={(e) => updateLink(index, 'type', e.target.value)}
+              className="p-3 rounded-lg shadow-sm bg-base-200"
+            >
+              <option value="">Select Link Type</option>
+              <option value="GitHub">GitHub</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Facebook">Facebook</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Twitter">Twitter</option>
+              {/* Add more link types as needed */}
+            </select>
+            <input
+              type="url"
+              value={link.url}
+              onChange={(e) => updateLink(index, 'url', e.target.value)}
+              placeholder="Enter URL"
+              className="flex-grow p-3 rounded-lg shadow-sm bg-base-200"
+            />
+            <button
+              type="button"
+              onClick={() => removeLink(index)}
+              className="p-2 text-red-500"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addLink}
+          className="p-3 bg-secondary text-white font-medium rounded-lg shadow-sm hover:bg-secondary-focus"
+        >
+          Add Link
+        </button>
+      </div>
+
       {/* Submit Button */}
       <button
         type="submit"
         disabled={isLoading}
-        className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow
-          ${
-            isLoading
-              ? 'opacity-50 cursor-not-allowed'
-              : 'hover:bg-primary-focus'
-          }`}
+        className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow ${
+          isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-focus'
+        }`}
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>

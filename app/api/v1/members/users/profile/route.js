@@ -38,6 +38,8 @@ export async function PUT(req) {
       specialization: data.specialization, // New field
       year: data.year, // New field
       semester: data.semester, // New field
+      location: data.location, // New field
+      links: data.links, // New field
     }
 
     // Update user in database
@@ -59,6 +61,8 @@ export async function PUT(req) {
         specialization: true,
         year: true,
         semester: true,
+        location: true,
+        links: true,
       },
     })
 
@@ -96,6 +100,8 @@ export async function GET(req) {
         specialization: true,
         year: true,
         semester: true,
+        location: true,
+        links: true,
       },
     })
 

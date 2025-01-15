@@ -20,6 +20,21 @@
           "semesters": 8
         },
         {
+          "name": "Artificial Intelligence & Data Science(AIDS)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Artificial Intelligence & Machine Learning(AIML)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Internet of Things(IOT)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
           "name": "Mechanical Engineering",
           "years": 4,
           "semesters": 8

@@ -32,18 +32,6 @@ const avatarSets = {
     '/icons/avatars/free-4.png',
   ],
   pro: [
-    // '/avatars/premium/3d/3d-1.png',
-    // '/avatars/premium/3d/3d-2.png',
-    // '/avatars/premium/3d/3d-3.png',
-    // '/avatars/premium/3d/3d-4.png',
-    // '/avatars/premium/anime/anime-1.png',
-    // '/avatars/premium/anime/anime-2.png',
-    // '/avatars/premium/anime/anime-3.png',
-    // '/avatars/premium/anime/anime-4.png',
-    // '/avatars/premium/pixel/pixel-1.png',
-    // '/avatars/premium/pixel/pixel-2.png',
-    // '/avatars/premium/pixel/pixel-3.png',
-    // '/avatars/premium/pixel/pixel-4.png',
     '/icons/avatars/premium/animegirl/premium-1.png',
     '/icons/avatars/premium/animegirl/premium-2.png',
     '/icons/avatars/premium/animegirl/premium-3.png',
@@ -75,6 +63,8 @@ export default function EditProfile() {
     specialization: '',
     year: '',
     semester: '',
+    location: '', // Add location
+    links: [], // Add links (array to store multiple links)
   })
 
   // States for data
@@ -150,6 +140,8 @@ export default function EditProfile() {
           specialization: data.specialization || '',
           year: data.year || '',
           semester: data.semester || '',
+          location: data.location || '', // Add location
+          links: data.links || [], // Add links
         })
       }
     } catch (error) {
@@ -266,41 +258,6 @@ export default function EditProfile() {
     setUserData((prev) => ({ ...prev, avatar: avatarUrl }))
     setShowAvatarSelector(false)
   }
-
-  // const handleNameUpdate = async (newName) => {
-  //   try {
-  //     const response = await fetch('/api/v1/members/users/profile', {
-  //       method: 'PUT',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         name: newName,
-  //       }),
-  //     })
-
-  //     if (!response.ok) throw new Error('Failed to update profile')
-
-  //     const updatedUser = await response.json()
-
-  //     // Update session
-  //     await updateSession({
-  //       ...session,
-  //       user: {
-  //         ...session.user,
-  //         name: updatedUser.name,
-  //       },
-  //     })
-
-  //     // Trigger profile update event
-  //     window.dispatchEvent(new Event('profileUpdate'))
-
-  //     toast.success('Profile updated successfully')
-  //   } catch (error) {
-  //     console.error('Error updating profile:', error)
-  //     toast.error('Failed to update profile')
-  //   }
-  // }
 
   if (pageLoading) {
     return (

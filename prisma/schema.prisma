@@ -18,7 +18,7 @@ model User {
   university          String?
   college             String?
   level               String?
-  
+
   stream              String?
   degree              String?
   specialization      String?
@@ -59,6 +59,8 @@ model User {
   aiConversations     AIConversation[]
   resetToken          String?
   resetTokenExpiry    DateTime?
+  location            String?
+  links               Json?
 
 }
 
