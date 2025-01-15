@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Camera, Crown } from 'lucide-react'
+import { SkeletonLoading } from '@/components/profile/SkeletonLoading'
+import { AvatarSection } from '@/components/profile/AvatarSection'
+import { AvatarSelector } from '@/components/profile/AvatarSelector'
+import { ProfileForm } from '@/components/profile/ProfileForm'
 
 // Helper function to generate random hex color
 const getRandomColor = () => {
@@ -19,40 +23,6 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
-// Skeleton loading component
-const SkeletonLoading = () => (
-  <div className="animate-pulse">
-    {/* Header Skeleton */}
-    <div className="flex items-center gap-2 mb-6">
-      <div className="w-6 h-6 bg-base-300 rounded"></div>
-      <div className="h-8 w-48 bg-base-300 rounded"></div>
-    </div>
-
-    {/* Avatar Section Skeleton */}
-    <div className="flex flex-col items-center mb-8">
-      <div className="w-24 h-24 rounded-full bg-base-300"></div>
-      <div className="mt-3 h-8 w-32 bg-base-300 rounded"></div>
-    </div>
-
-    {/* Form Fields Skeleton */}
-    <div className="space-y-6">
-      {/* Name Field */}
-      <div>
-        <div className="h-4 w-20 bg-base-300 rounded mb-2"></div>
-        <div className="h-12 w-full bg-base-300 rounded"></div>
-      </div>
-
-      {/* Email Field */}
-      <div>
-        <div className="h-4 w-20 bg-base-300 rounded mb-2"></div>
-        <div className="h-12 w-full bg-base-300 rounded"></div>
-      </div>
-
-      {/* Submit Button */}
-      <div className="h-12 w-full bg-base-300 rounded mt-8"></div>
-    </div>
-  </div>
-)
 
 // Avatar categories
 const avatarSets = {
@@ -290,7 +260,7 @@ export default function EditProfile() {
 
   return (
     <div className="bg-base-100 min-h">
-      <div className="mx-auto px-4 max-w-lg py-6">
+      <div className="mx-auto px-4 max-w-lg py-6 bg-red-950">
         <div className="flex items-center gap-2 mb-6">
           <button onClick={() => router.back()} aria-label="Go Back">
             <ArrowLeft className="w-6 h-6" />
@@ -300,350 +270,33 @@ export default function EditProfile() {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center">
-            <div className="relative">
-              {/* Main Avatar */}
-              <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg relative group">
-                <Image
-                  src={
-                    userData.avatar ||
-                    session?.user.avatar ||
-                    `https://api.dicebear.com/6.x/initials/png?seed=${encodeURIComponent(
-                      userData.name || 'NM'
-                    )}&backgroundColor=${getRandomColor()}`
-                  }
-                  alt={`${userData.name}'s avatar`}
-                  width={100}
-                  height={100}
-                  className="object-cover w-full h-full"
-                  onError={(e) => {
-                    const seed = encodeURIComponent(userData.name || 'NM')
-                    e.target.src = `https://api.dicebear.com/6.x/initials/png?seed=${seed}&backgroundColor=${getRandomColor()}`
-                  }}
-                />
-                <label
-                  htmlFor="avatar"
-                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                >
-                  <Camera className="w-6 h-6 text-white" />
-                </label>
-              </div>
+        <AvatarSection
+          userData={userData}
+          session={session}
+          getRandomColor={getRandomColor}
+          onAvatarChange={handleAvatarChange}
+          onAvatarSelectorToggle={() =>
+            setShowAvatarSelector(!showAvatarSelector)
+          }
+        />
 
-              {/* Premium Indicator */}
-              {session?.user?.role === 'PRO' && (
-                <div className="absolute -top-2 -right-2 flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-              )}
-            </div>
+        <AvatarSelector
+          show={showAvatarSelector}
+          onClose={() => setShowAvatarSelector(false)}
+          onSelect={handleAvatarSelect}
+          avatarSets={avatarSets}
+          session={session}
+        />
 
-            {/* Avatar Selection Options */}
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <input
-                id="avatar"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAvatarSelector(!showAvatarSelector)}
-                  className="btn btn-sm btn-outline"
-                >
-                  Choose Default Avatar
-                </button>
-                <label htmlFor="avatar" className="btn btn-sm btn-primary">
-                  Upload Custom
-                </label>
-              </div>
-            </div>
-
-            {/* Default Avatar Selector Modal */}
-            {showAvatarSelector && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-base-200 p-6 rounded-lg max-w-3xl w-full max-h-[80vh] overflow-y-auto">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">Choose an Avatar</h3>
-                    <button
-                      onClick={() => setShowAvatarSelector(false)}
-                      className="btn btn-sm btn-ghost"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Free Avatars Section */}
-                  <div className="mb-8">
-                    <h4 className="text-md font-medium mb-3">Free Avatars</h4>
-                    <div className="grid grid-cols-4 gap-4">
-                      {avatarSets.free.map((avatar, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleAvatarSelect(avatar)}
-                          className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all group"
-                        >
-                          <Image
-                            src={avatar}
-                            alt={`Free avatar ${index + 1}`}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Premium Avatars Section */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <h4 className="text-md font-medium">Premium Avatars</h4>
-                      {session?.user?.role !== 'PRO' && (
-                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                          PRO Only
-                        </span>
-                      )}
-                    </div>
-
-                    {/* 3D Avatars */}
-                    <div className="mb-6">
-                      <h5 className="text-sm text-gray-500 mb-2">3D Style</h5>
-                      <div className="grid grid-cols-4 gap-4">
-                        {avatarSets.pro.slice(0, 4).map((avatar, index) => (
-                          <button
-                            key={index}
-                            onClick={() =>
-                              session?.user?.role === 'PRO'
-                                ? handleAvatarSelect(avatar)
-                                : null
-                            }
-                            className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${
-                                session?.user?.role === 'PRO'
-                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
-                                  : 'cursor-not-allowed opacity-75'
-                              }`}
-                          >
-                            <Image
-                              src={avatar}
-                              alt={`3D avatar ${index + 1}`}
-                              fill
-                              className="object-cover group-hover:scale-110 transition-transform"
-                            />
-                            {session?.user?.role !== 'PRO' && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <Crown className="w-6 h-6 text-primary" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Anime Avatars */}
-                    <div className="mb-6">
-                      <h5 className="text-sm text-gray-500 mb-2">
-                        Anime Style
-                      </h5>
-                      <div className="grid grid-cols-4 gap-4">
-                        {avatarSets.pro.slice(4, 8).map((avatar, index) => (
-                          <button
-                            key={index}
-                            onClick={() =>
-                              session?.user?.role === 'PRO'
-                                ? handleAvatarSelect(avatar)
-                                : null
-                            }
-                            className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${
-                                session?.user?.role === 'PRO'
-                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
-                                  : 'cursor-not-allowed opacity-75'
-                              }`}
-                          >
-                            <Image
-                              src={avatar}
-                              alt={`Anime avatar ${index + 1}`}
-                              fill
-                              className="object-cover group-hover:scale-110 transition-transform"
-                            />
-                            {session?.user?.role !== 'PRO' && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <Crown className="w-6 h-6 text-primary" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Pixel Art Avatars */}
-                    <div>
-                      <h5 className="text-sm text-gray-500 mb-2">
-                        Pixel Art Style
-                      </h5>
-                      <div className="grid grid-cols-4 gap-4">
-                        {avatarSets.pro.slice(8).map((avatar, index) => (
-                          <button
-                            key={index}
-                            onClick={() =>
-                              session?.user?.role === 'PRO'
-                                ? handleAvatarSelect(avatar)
-                                : null
-                            }
-                            className={`relative aspect-square rounded-lg overflow-hidden group
-                              ${
-                                session?.user?.role === 'PRO'
-                                  ? 'hover:ring-2 hover:ring-primary cursor-pointer'
-                                  : 'cursor-not-allowed opacity-75'
-                              }`}
-                          >
-                            <Image
-                              src={avatar}
-                              alt={`Pixel art avatar ${index + 1}`}
-                              fill
-                              className="object-cover group-hover:scale-110 transition-transform"
-                            />
-                            {session?.user?.role !== 'PRO' && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <Crown className="w-6 h-6 text-primary" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {session?.user?.role !== 'PRO' && (
-                      <div className="mt-6 p-4 bg-base-300 rounded-lg text-center">
-                        <p className="text-sm mb-2">
-                          Upgrade to PRO to unlock all premium avatars!
-                        </p>
-                        <button
-                          onClick={() => router.push('/account/plans')}
-                          className="btn btn-primary btn-sm"
-                        >
-                          Upgrade Now
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <p className="text-sm text-gray-500 mt-2">
-              {session?.user?.role === 'PRO'
-                ? 'Premium user - All avatar options available'
-                : 'Upgrade to PRO for more avatar options'}
-            </p>
-          </div>
-
-          {/* Name Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="text-sm text-secondary font-medium"
-            >
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={userData.name}
-              onChange={handleInputChange}
-              placeholder="Enter your name"
-              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
-              required
-            />
-          </div>
-
-          {/* Email Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm text-secondary font-medium"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={session?.user.email || ''}
-              disabled
-              className="w-full p-3 rounded-lg shadow-sm bg-base-200 cursor-not-allowed"
-            />
-          </div>
-
-          {/* New University Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="university"
-              className="text-sm text-secondary font-medium"
-            >
-              University
-            </label>
-            <select
-              id="university"
-              name="university"
-              value={userData.university}
-              onChange={handleInputChange}
-              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
-            >
-              <option value="">Select University</option>
-              {universities.map((university) => (
-                <option key={university} value={university}>
-                  {university}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* New College Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="college"
-              className="text-sm text-secondary font-medium"
-            >
-              College
-            </label>
-            <select
-              id="college"
-              name="college"
-              value={userData.college}
-              onChange={handleInputChange}
-              className="w-full p-3 rounded-lg shadow-sm bg-base-200"
-              disabled={!userData.university}
-            >
-              <option value="">Select College</option>
-              {colleges.map((college) => (
-                <option key={college} value={college}>
-                  {college}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Save Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3 px-6 bg-primary text-white font-medium rounded-lg shadow
-              ${
-                isLoading
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'hover:bg-primary-focus'
-              }`}
-          >
-            {isLoading ? 'Saving...' : 'Save Changes'}
-          </button>
-        </form>
+        <ProfileForm
+          userData={userData}
+          session={session}
+          universities={universities}
+          colleges={colleges}
+          isLoading={isLoading}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmit}
+        />
       </div>
     </div>
   )
