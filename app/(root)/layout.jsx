@@ -1,5 +1,5 @@
 // app/(root)/layout.jsx
-
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "react-hot-toast";
 import { Navigation } from "@/components/navigation";
 
@@ -17,15 +17,8 @@ export default function RootLayout({ children }) {
         data-website-id="ce416d58-503a-40cd-9663-7e7618ecc8f7"
       ></script>
 
-      {/* <script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-DFFQPQG8G4"
-      ></script>
-      <script>
-        window.dataLayer = window.dataLayer || []; function gtag()
-        {dataLayer.push(arguments)}
-        gtag('js', new Date()); gtag('config', 'G-DFFQPQG8G4');
-      </script> */}
+      
+      <GoogleAnalytics gaId="G-DFFQPQG8G4" />
     </>
   );
 }
