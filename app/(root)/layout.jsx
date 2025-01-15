@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
         data-website-id="ce416d58-503a-40cd-9663-7e7618ecc8f7"
       ></script>
 
-      <script
+      {/* <script
         async
         src="https://www.googletagmanager.com/gtag/js?id=G-DFFQPQG8G4"
       ></script>
@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         window.dataLayer = window.dataLayer || []; function gtag()
         {dataLayer.push(arguments)}
         gtag('js', new Date()); gtag('config', 'G-DFFQPQG8G4');
-      </script>
+      </script> */}
     </>
   );
 }
