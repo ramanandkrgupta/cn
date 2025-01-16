@@ -1,6 +1,6 @@
 'use client'
-import React from 'react'
-import { useSession } from 'next-auth/react'
+import React, { useEffect } from 'react'
+import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Users, UserPlus } from 'lucide-react'
 import {
@@ -14,12 +14,19 @@ import {
 
 const ProfilePage = () => {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status, update: updateSession } = useSession()
   const user = session?.user
 
-  // Transform user data into the format expected by components
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      signIn()
+    }
+  }, [status])
+
+
+
+
   const userStats = {
-    // Academic Details
     location: user?.location || 'Not specified',
     semester: user?.semester || 'Not specified',
     year: user?.year || 'Not specified',
@@ -29,8 +36,6 @@ const ProfilePage = () => {
     stream: user?.stream || 'Not specified',
     degree: user?.degree || 'Not specified',
     specialization: user?.specialization || 'Not specified',
-
-    // Stats
     reputationScore: user?.reputationScore || 0,
     uploadCount: user?.uploadCount || 0,
     verifiedUploads: user?.verifiedUploads || 0,
@@ -41,8 +46,6 @@ const ProfilePage = () => {
     downloads: '0',
     views: '0 views',
     streak: '0',
-
-    // Social Links - Find GitHub link from links array
     github: user?.links?.find((link) => link.type === 'GitHub')?.url || '',
     linkedin: '',
     facebook: '',
@@ -66,9 +69,13 @@ const ProfilePage = () => {
               following={userStats.following}
             />
 
-            <div className="flex">
-              <UserAvatar user={{ ...user, avatar: user?.avatar }} />
-              <div className="flex flex-col ml-2 mb-4">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <img
+                src={user?.avatar || '/default-avatar.png'}
+                alt={user?.name || 'User avatar'}
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover"
+              />
+              <div className="flex flex-col">
                 <h1 className="text-lg font-bold">
                   {user?.name || 'User Name'}
                 </h1>
@@ -78,6 +85,22 @@ const ProfilePage = () => {
                 <p className="text-sm font-thin text-gray-500 truncate max-w-[250px]">
                   {userStats.university}
                 </p>
+
+                {/* Stats for mobile view */}
+                <div className="flex sm:hidden items-center gap-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm">
+                      {userStats.followers} followers
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm">
+                      {userStats.following} following
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -88,8 +111,8 @@ const ProfilePage = () => {
               Edit Profile
             </button>
 
-            {/* Stats Section */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Stats for desktop view */}
+            <div className="hidden sm:grid grid-cols-2 gap-4 mb-6">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-gray-600" />
                 <span className="text-sm">{userStats.followers} followers</span>
