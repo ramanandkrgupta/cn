@@ -1,9 +1,8 @@
-// app/account/profile/page.tsx
 'use client'
 import React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Users,UserPlus} from 'lucide-react';
+import { Users, UserPlus } from 'lucide-react'
 import {
   Header,
   UserAvatar,
@@ -18,29 +17,42 @@ const ProfilePage = () => {
   const { data: session } = useSession()
   const user = session?.user
 
+  // Transform user data into the format expected by components
   const userStats = {
-    location: 'Bhopal',
-    semester: '6th',
-    year: '3rd',
-    linkedin: 'username',
-    github: 'username',
-    facebook: 'username',
-    twitter: 'username',
-    reddit: 'username',
-    discord: 'username',
-    telegram: 'username',
-    snapchat: 'username',
-    instagram: 'username',
-    website: 'https://example.com',
-    followers: '120',
-    following: '89',
-    readingTime: '32hrs',
-    likes: '234',
-    uploads: '12',
-    downloads: '45',
-    course: 'Btech',
-    branch: 'AIDS',
-    streak:'34',
+    // Academic Details
+    location: user?.location || 'Not specified',
+    semester: user?.semester || 'Not specified',
+    year: user?.year || 'Not specified',
+    college: user?.college || 'Not specified',
+    university: user?.university || 'Not specified',
+    level: user?.level || 'Not specified',
+    stream: user?.stream || 'Not specified',
+    degree: user?.degree || 'Not specified',
+    specialization: user?.specialization || 'Not specified',
+
+    // Stats
+    reputationScore: user?.reputationScore || 0,
+    uploadCount: user?.uploadCount || 0,
+    verifiedUploads: user?.verifiedUploads || 0,
+    followers: '0',
+    following: '0',
+    readingTime: '0 hrs',
+    likes: '0',
+    downloads: '0',
+    views: '0 views',
+    streak: '0',
+
+    // Social Links - Find GitHub link from links array
+    github: user?.links?.find((link) => link.type === 'GitHub')?.url || '',
+    linkedin: '',
+    facebook: '',
+    twitter: '',
+    reddit: '',
+    discord: '',
+    telegram: '',
+    snapchat: '',
+    instagram: '',
+    website: '',
   }
 
   return (
@@ -55,13 +67,16 @@ const ProfilePage = () => {
             />
 
             <div className="flex">
-              <UserAvatar user={user} />
+              <UserAvatar user={{ ...user, avatar: user?.avatar }} />
               <div className="flex flex-col ml-2 mb-4">
                 <h1 className="text-lg font-bold">
                   {user?.name || 'User Name'}
                 </h1>
-                <p className="text-sm font-thin">
-                  {user?.college || 'College Name'}
+                <p className="text-sm font-thin truncate max-w-[250px]">
+                  {userStats.college}
+                </p>
+                <p className="text-sm font-thin text-gray-500 truncate max-w-[250px]">
+                  {userStats.university}
                 </p>
               </div>
             </div>
@@ -72,8 +87,9 @@ const ProfilePage = () => {
             >
               Edit Profile
             </button>
-            {/* New Followers/Following Section */}
-            <div className="flex justify-between mb-6">
+
+            {/* Stats Section */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-gray-600" />
                 <span className="text-sm">{userStats.followers} followers</span>
@@ -94,7 +110,10 @@ const ProfilePage = () => {
         {/* Right Section */}
         <div className="flex-1 flex flex-col gap-6">
           <Achievements />
-          <Uploads />
+          <Uploads
+            uploadCount={userStats.uploadCount}
+            verifiedUploads={userStats.verifiedUploads}
+          />
         </div>
       </div>
     </div>

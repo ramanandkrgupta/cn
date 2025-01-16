@@ -1,6 +1,7 @@
 // components/profile/ProfileStats.tsx
 import React from 'react'
-import { Clock, ThumbsUp, Upload, Download } from 'lucide-react'
+import { Clock, ThumbsUp, Upload, Download ,EyeIcon} from 'lucide-react'
+import { EyeDropperIcon } from '@heroicons/react/20/solid'
 
 const ProfileStats = ({ stats }) => {
   return (
@@ -20,8 +21,8 @@ const ProfileStats = ({ stats }) => {
           <p className="text-sm">{stats.uploads}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Download className="w-4 h-4 text-primary" />
-          <p className="text-sm">{stats.downloads}</p>
+          <EyeIcon className="w-4 h-4 text-primary" />
+          <p className="text-sm">{stats.views}</p>
         </div>
       </div>
     </div>

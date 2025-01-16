@@ -1,4 +1,3 @@
-// components/profile/ProfileDetails.tsx
 import React from 'react'
 import {
   Building2,
@@ -6,8 +5,14 @@ import {
   GraduationCap,
   Linkedin,
   ScrollText,
+  BookOpen,
+  School,
+  Glasses,
+  GraduationCap as Education,
+  BookOpen as Stream,
 } from 'lucide-react'
 import {
+  FaGithub,
   FaFacebook,
   FaTwitter,
   FaReddit,
@@ -15,7 +20,6 @@ import {
   FaTelegram,
   FaSnapchat,
   FaInstagram,
-  FaGithub,
 } from 'react-icons/fa'
 
 const ProfileDetails = ({ details }) => {
@@ -30,6 +34,22 @@ const ProfileDetails = ({ details }) => {
             <p className="text-sm">Location: {details.location}</p>
           </div>
           <div className="flex items-center gap-3">
+            <School className="w-4 h-4 text-primary" />
+            <p className="text-sm">Level: {details.level}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Stream className="w-4 h-4 text-primary" />
+            <p className="text-sm">Stream: {details.stream}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Education className="w-4 h-4 text-primary" />
+            <p className="text-sm">Degree: {details.degree}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Glasses className="w-4 h-4 text-primary" />
+            <p className="text-sm">Specialization: {details.specialization}</p>
+          </div>
+          <div className="flex items-center gap-3">
             <Calendar className="w-4 h-4 text-primary" />
             <p className="text-sm">Year: {details.year}</p>
           </div>
@@ -37,58 +57,44 @@ const ProfileDetails = ({ details }) => {
             <GraduationCap className="w-4 h-4 text-primary" />
             <p className="text-sm">Semester: {details.semester}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Calendar className="w-4 h-4 text-primary" />
-            <p className="text-sm">Course: {details.course}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Calendar className="w-4 h-4 text-primary" />
-            <p className="text-sm">Branch: {details.branch}</p>
-          </div>
         </div>
 
-        {/* Social Links */}
+        {/* Social Links - Only show if they exist */}
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Linkedin className="w-4 h-4 text-primary" />
-            <p className="text-sm">LinkedIn: {details.linkedin}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaGithub className="w-4 h-4 text-primary" />
-            <p className="text-sm">GitHub: {details.github}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaFacebook className="w-4 h-4 text-primary" />
-            <p className="text-sm">Facebook: {details.facebook}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaTwitter className="w-4 h-4 text-primary" />
-            <p className="text-sm">Twitter: {details.twitter}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaReddit className="w-4 h-4 text-primary" />
-            <p className="text-sm">Reddit: {details.reddit}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaDiscord className="w-4 h-4 text-primary" />
-            <p className="text-sm">Discord: {details.discord}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaTelegram className="w-4 h-4 text-primary" />
-            <p className="text-sm">Telegram: {details.telegram}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaSnapchat className="w-4 h-4 text-primary" />
-            <p className="text-sm">Snapchat: {details.snapchat}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaInstagram className="w-4 h-4 text-primary" />
-            <p className="text-sm">Instagram: {details.instagram}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <ScrollText className="w-4 h-4 text-primary" />
-            <p className="text-sm">Website: {details.website}</p>
-          </div>
+          {details.github && (
+            <div className="flex items-center gap-3">
+              <FaGithub className="w-4 h-4 text-primary" />
+              <a
+                href={details.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline"
+              >
+                GitHub Profile
+              </a>
+            </div>
+          )}
+          {Object.entries({
+            linkedin: [Linkedin, 'LinkedIn'],
+            facebook: [FaFacebook, 'Facebook'],
+            twitter: [FaTwitter, 'Twitter'],
+            reddit: [FaReddit, 'Reddit'],
+            discord: [FaDiscord, 'Discord'],
+            telegram: [FaTelegram, 'Telegram'],
+            snapchat: [FaSnapchat, 'Snapchat'],
+            instagram: [FaInstagram, 'Instagram'],
+            website: [ScrollText, 'Website'],
+          }).map(
+            ([key, [Icon, label]]) =>
+              details[key] && (
+                <div key={key} className="flex items-center gap-3">
+                  <Icon className="w-4 h-4 text-primary" />
+                  <p className="text-sm">
+                    {label}: {details[key]}
+                  </p>
+                </div>
+              )
+          )}
         </div>
       </div>
     </div>
