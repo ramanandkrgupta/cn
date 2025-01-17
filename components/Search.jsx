@@ -5,12 +5,14 @@ import { search } from "@/public/assets";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useDebounce } from "@/libs/hooks/useDebounce";
 import { useTypewriter } from '@/libs/hooks/useTypewriter';
+import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { useRouter } from 'next/navigation';
 
 const Search = ({ setIsPostOpen, setPost }) => {
   const [searchText, setSearchText] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState({ posts: [], users: [] });
   const [loading, setLoading] = useState(false);
-  
+
   const placeholders = [
     "Search for Notes, PYQ's",
     "Search bt-101 pyq",
@@ -23,7 +25,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
   // Debounce search query
   const debouncedSearch = useDebounce(async (query) => {
     if (!query || query.length < 2) {
-      setResults([]);
+      setResults({ posts: [], users: [] });
       return;
     }
 
@@ -34,10 +36,10 @@ const Search = ({ setIsPostOpen, setPost }) => {
       );
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
-      setResults(data.posts);
+      setResults(data);
     } catch (error) {
       console.error("Search error:", error);
-      setResults([]);
+      setResults({ posts: [], users: [] });
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
 
   const handleClose = () => {
     setSearchText("");
-    setResults([]);
+    setResults({ posts: [], users: [] });
   };
 
   return (
@@ -63,7 +65,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
             value={searchText}
             onChange={handleSearchChange}
             placeholder={placeholderText}
-            className="font-epilogue font-normal text-[16px] placeholder:text-[var(--primarySun)] 
+            className="font-epilogue font-normal text-[16px] placeholder:text-[var(--primarySun)]
             text-white bg-transparent outline-none w-full relative
             placeholder:after:content-['|'] placeholder:after:ml-0.5 placeholder:after:animate-pulse"
           />
@@ -106,10 +108,17 @@ const SearchDropDown = ({
   setIsPostOpen,
   setPost,
 }) => {
+  const router = useRouter();
+
   const handleModel = (post) => {
     setPost(post);
     setIsPostOpen(true);
-    
+  };
+
+  const handleUserClick = (userId) => {
+    console.log("Clicking user with ID:", userId); // Debug log
+    closeSearch(); // Close search dropdown
+    router.push(`/profile/${userId}`);
   };
 
   return (
@@ -124,24 +133,65 @@ const SearchDropDown = ({
             "Searching..."
           ) : (
             <>
-              {results.length} <span>results for</span> "{searchText}"
+              {(results.posts?.length || 0) + (results.users?.length || 0)} <span>results for</span> "{searchText}"
             </>
           )}
         </div>
       </div>
 
       <div className="overflow-y-auto max-h-[400px] space-y-2 pr-2 scrollbar-thin scrollbar-track-[#1c1c24] scrollbar-thumb-primary scrollbar-thumb-rounded-full">
-        {results.map((post) => (
-          <div
-            key={post.id}
-            title={`file Details : \n subject name : ${post.subject_name} \n semester : ${post.semester_code} \n course name : ${post.course_name}`}
-            className="flex rounded-full py-2 px-3 w-full hover:bg-[#2c2f32] justify-between items-center cursor-pointer"
-            onClick={() => handleModel(post)}
-          >
-            <p className="text-secondary font-medium">{post.title}</p>
-            <p className="text-gray-400 text-sm">{post.category}</p>
+        {/* Users Section */}
+        {results.users?.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-400 mb-2">People</h3>
+            {results.users.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center space-x-3 p-2 hover:bg-[#2c2f32] rounded-lg cursor-pointer"
+                onClick={() => handleUserClick(user.id)}
+              >
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <UserCircleIcon className="w-8 h-8 text-gray-400" />
+                )}
+                <div>
+                  <p className="text-secondary font-medium">{user.name}</p>
+                  <p className="text-xs text-gray-400">{user.university || user.email}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+
+        {/* Posts Section */}
+        {results.posts?.length > 0 && (
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 mb-2">Posts</h3>
+            {results.posts.map((post) => (
+              <div
+                key={post.id}
+                title={`file Details : \n subject name : ${post.subject_name} \n semester : ${post.semester_code} \n course name : ${post.course_name}`}
+                className="flex rounded-lg py-2 px-3 w-full hover:bg-[#2c2f32] justify-between items-center cursor-pointer"
+                onClick={() => handleModel(post)}
+              >
+                <p className="text-secondary font-medium">{post.title}</p>
+                <p className="text-gray-400 text-sm">{post.category}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No Results Message */}
+        {!loading && !results.posts?.length && !results.users?.length && (
+          <div className="text-center text-gray-400 py-4">
+            No results found for "{searchText}"
+          </div>
+        )}
       </div>
     </div>
   );

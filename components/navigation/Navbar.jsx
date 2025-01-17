@@ -13,6 +13,7 @@ import { nm } from '@/public/icons'
 import { Sun, Moon, Menu, X, LogOut, LogIn, User2, Bell } from 'lucide-react'
 import Image from 'next/image'
 import UserProfile from './UserProfile'
+import { NotificationBell } from '@/components/NotificationBell'
 
 const NavBar = ({ showSearch = true }) => {
   const { data: session } = useSession()
@@ -298,9 +299,10 @@ const NavBar = ({ showSearch = true }) => {
           </p>
 
           <div className="flex items-center justify-center">
-            <Link href="/account/notifications">
+            {/* <Link href="/account/notifications">
               <Bell />
-            </Link>
+            </Link> */}
+            <NotificationBell />
           </div>
 
           <button

@@ -50,4 +50,4 @@ export async function PUT(req) {
     console.error("Error updating notification:", error);
     return NextResponse.json({ error: "Error updating notification" }, { status: 500 });
   }
-} 
+}

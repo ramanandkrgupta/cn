@@ -31,7 +31,7 @@ import {
 
 import seven from "@/public/icons/seven.PNG";
 import eight from "@/public/icons/eight.PNG";
-import { aiml, bca, btech, ce, ec, ex, me } from "@/public/course/icons";
+import { aiml, bca, btech, ce, ec, ex, me ,aids,iot} from "@/public/course/icons";
 import { LayoutGrid } from "lucide-react";
 
 
@@ -106,62 +106,77 @@ export const category = [
 export const courses = [
   {
     id: 1,
-    name: "Computer Science & Engineering (CSE)",
+    name: 'Computer Science & Engineering (CSE)',
     imgUrl: btech,
-    link: "cse",
+    link: 'cse',
     description:
-      "Computer Science & Engineering (CSE) is an academic program that provides in-depth knowledge of computer science and its applications.",
+      'Computer Science & Engineering (CSE) is an academic program that provides in-depth knowledge of computer science and its applications.',
   },
   {
     id: 2,
-    name: "Computer Science & Information Technology (CS & IT)",
+    name: 'Computer Science & Information Technology (CS & IT)',
     imgUrl: bca,
-    link: "csit",
+    link: 'csit',
     description:
-      "Computer Science & Information Technology (CS & IT) is an academic program that provides in-depth knowledge of computer science and its applications.",
+      'Computer Science & Information Technology (CS & IT) is an academic program that provides in-depth knowledge of computer science and its applications.',
   },
   {
     id: 3,
-    name: "Artificial Intelligence & Machine Learning (AIML)",
+    name: 'Artificial Intelligence & Machine Learning (AIML)',
     imgUrl: aiml,
-    link: "aiml",
+    link: 'aiml',
     description:
-      "Artificial Intelligence & Machine Learning (AIML) is an academic program that provides in-depth knowledge of artificial intelligence and machine learning.",
+      'Artificial Intelligence & Machine Learning (AIML) is an academic program that provides in-depth knowledge of artificial intelligence and machine learning.',
   },
   {
     id: 4,
-    name: "Electronics & Communication (EC)",
+    name: 'Electronics & Communication (EC)',
     imgUrl: ec,
-    link: "ec",
+    link: 'ec',
     description:
-      "Electronics & Communication (EC) is an academic program that provides in-depth knowledge of electronics and communication.",
+      'Electronics & Communication (EC) is an academic program that provides in-depth knowledge of electronics and communication.',
   },
   {
     id: 5,
-    name: "Electrical & Electronics (EX)",
+    name: 'Electrical & Electronics (EX)',
     imgUrl: ex,
-    link: "ex",
+    link: 'ex',
     description:
-      "Electrical & Electronics (EX) is an academic program that provides in-depth knowledge of electrical and electronics.",
+      'Electrical & Electronics (EX) is an academic program that provides in-depth knowledge of electrical and electronics.',
   },
   {
     id: 6,
-    name: "Civil Engineering (CE)",
+    name: 'Civil Engineering (CE)',
     imgUrl: ce,
-    link: "ce",
+    link: 'ce',
     description:
-      "Civil Engineering (CE) is an academic program that provides in-depth knowledge of civil engineering.",
+      'Civil Engineering (CE) is an academic program that provides in-depth knowledge of civil engineering.',
   },
   {
     id: 7,
-    name: "Mechanical Engineering (ME)",
+    name: 'Mechanical Engineering (ME)',
     imgUrl: me,
-    link: "me",
+    link: 'me',
     description:
-      "Mechanical Engineering (ME) is an academic program that provides in-depth knowledge of mechanical engineering.",
+      'Mechanical Engineering (ME) is an academic program that provides in-depth knowledge of mechanical engineering.',
   },
-
-];
+  {
+    id: 8,
+    name: 'Artificial Intelligence & Data Science (AIDS)',
+    imgUrl: aids,
+    link: 'aids',
+    description:
+      'Artificial Intelligence & Data Science (AIDS) is an academic program that provides in-depth knowledge of artificial intelligence and data science.',
+  },
+  {
+    id: 9,
+    name: 'Internet Of Things (IOT)',
+    imgUrl: iot,
+    link: 'iot',
+    description:
+    'Internet Of Things (IOT) is an academic program that provides in-depth knowledge of internet of things.',
+  },
+]
 
 export const semester = [
   {

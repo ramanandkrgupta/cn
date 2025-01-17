@@ -1,0 +1,401 @@
+{
+  "Undergraduate": {
+    "Engineering": {
+      "degrees": [
+        {
+          "name": "B.Tech (Bachelor of Technology)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "B.E. (Bachelor of Engineering)",
+          "years": 4,
+          "semesters": 8
+        }
+      ],
+      "specializations": [
+        {
+          "name": "Computer Science and Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Artificial Intelligence & Data Science(AIDS)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Artificial Intelligence & Machine Learning(AIML)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Internet of Things(IOT)",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Mechanical Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Electrical Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Civil Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Aerospace Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Chemical Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Electronics and Communication Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Information Technology",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Biotechnology Engineering",
+          "years": 4,
+          "semesters": 8
+        },
+        {
+          "name": "Industrial Engineering",
+          "years": 4,
+          "semesters": 8
+        }
+      ]
+    },
+    "Medical": {
+      "degrees": [
+        {
+          "name": "MBBS",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "BDS",
+          "years": 5,
+          "semesters": 8
+        },
+        {
+          "name": "BAMS",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "BHMS",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "BPT",
+          "years": 4,
+          "semesters": 8
+        }
+      ],
+      "specializations": [
+        {
+          "name": "General Medicine",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Surgery",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Pediatrics",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Gynecology",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Orthopedics",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Dermatology",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Radiology",
+          "years": 5.5,
+          "semesters": 9
+        },
+        {
+          "name": "Anesthesiology",
+          "years": 5.5,
+          "semesters": 9
+        }
+      ]
+    },
+    "Science": {
+      "degrees": [
+        {
+          "name": "B.Sc",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "BCA",
+          "years": 3,
+          "semesters": 6
+        }
+      ],
+      "specializations": [
+        {
+          "name": "Physics",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Chemistry",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Biology",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Mathematics",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Computer Science",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Biotechnology",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Environmental Science",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Statistics",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Astronomy",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Marine Biology",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Microbiology",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Biochemistry",
+          "years": 3,
+          "semesters": 6
+        }
+      ]
+    }
+  },
+  "Postgraduate": {
+    "Engineering": {
+      "degrees": [
+        {
+          "name": "M.Tech",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "M.E.",
+          "years": 2,
+          "semesters": 4
+        }
+      ],
+      "specializations": [
+        {
+          "name": "Advanced Computing",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "Robotics",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "VLSI Design",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "Power Systems",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "Structural Engineering",
+          "years": 2,
+          "semesters": 4
+        },
+        {
+          "name": "Manufacturing Engineering",
+          "years": 2,
+          "semesters": 4
+        }
+      ]
+    },
+    "Medical": {
+      "degrees": [
+        {
+          "name": "MD",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "MS",
+          "years": 3,
+          "semesters": 6
+        }
+      ],
+      "specializations": [
+        {
+          "name": "Internal Medicine",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Surgery",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Pediatrics",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Obstetrics & Gynecology",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Psychiatry",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Orthopedics",
+          "years": 3,
+          "semesters": 6
+        }
+      ]
+    }
+  },
+  "Doctoral": {
+    "PhD": {
+      "degrees": [
+        {
+          "name": "Ph.D. in Engineering",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        },
+        {
+          "name": "Ph.D. in Medicine",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        },
+        {
+          "name": "Ph.D. in Science",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        },
+        {
+          "name": "Ph.D. in Arts",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        },
+        {
+          "name": "Ph.D. in Commerce",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        },
+        {
+          "name": "Ph.D. in Law",
+          "years": 3,
+          "semesters": 6,
+          "maxYears": 6
+        }
+      ]
+    }
+  },
+  "Diploma and Certificate Courses": {
+    "Engineering": {
+      "degrees": [
+        {
+          "name": "Diploma in Engineering",
+          "years": 3,
+          "semesters": 6
+        }
+      ],
+      "specializations": [
+        {
+          "name": "Civil Engineering",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Mechanical Engineering",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Electrical Engineering",
+          "years": 3,
+          "semesters": 6
+        },
+        {
+          "name": "Electronics Engineering",
+          "years": 3,
+          "semesters": 6
+        }
+      ]
+    }
+  }
+}
