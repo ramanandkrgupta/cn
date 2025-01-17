@@ -61,8 +61,8 @@ model User {
   aiConversations     AIConversation[]
   resetToken          String?
   resetTokenExpiry    DateTime?
-
-
+  followedBy         Follows[] @relation("following")
+  following          Follows[] @relation("follower")
 }
 
 model subject{
@@ -447,4 +447,15 @@ model AITraining {
   timestamp    DateTime @default(now())
   status       String   @default("pending") // pending, completed, failed
   stats        Json?    // Training statistics
+}
+
+model Follows {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  followerId  String   @db.ObjectId
+  following   User     @relation("following", fields: [followingId], references: [id])
+  followingId String   @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }

@@ -79,19 +79,19 @@ export async function PUT(req) {
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const userId = session.user.id
+
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
         email: true,
-        userRole: true,
         avatar: true,
-        phoneNumber: true,
         university: true,
         college: true,
         level: true,
@@ -101,16 +101,38 @@ export async function GET(req) {
         year: true,
         semester: true,
         location: true,
+        uploadCount: true,
+        verifiedUploads: true,
+        reputationScore: true,
         links: true,
-      },
+      }
     })
 
-    return NextResponse.json(user)
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Get follower and following counts
+    const followData = await prisma.follows.findMany({
+      where: {
+        OR: [
+          { followingId: userId },
+          { followerId: userId }
+        ]
+      }
+    })
+
+    // Calculate followers and following
+    const followers = followData.filter(f => f.followingId === userId).length
+    const following = followData.filter(f => f.followerId === userId).length
+
+    return NextResponse.json({
+      ...user,
+      followers,
+      following
+    })
   } catch (error) {
-    console.error('Profile fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch profile' },
-      { status: 500 }
-    )
+    console.error('Error fetching user profile:', error)
+    return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
   }
 }

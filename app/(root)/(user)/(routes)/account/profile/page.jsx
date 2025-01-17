@@ -66,8 +66,8 @@ const ProfilePage = () => {
     reputationScore: userData.reputationScore || 0,
     uploadCount: userData.uploadCount || 0,
     verifiedUploads: userData.verifiedUploads || 0,
-    followers: '0',
-    following: '0',
+    followers: userData.followers || 0,
+    following: userData.following || 0,
     readingTime: '0 hrs',
     likes: '0',
     downloads: '0',
@@ -112,15 +112,21 @@ const ProfilePage = () => {
                   {userStats.university}
                 </p>
 
-                {/* Stats for mobile view */}
+                {/* Mobile View Stats */}
                 <div className="flex sm:hidden items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => router.push(`/profile/${userData.id}/followers`)}
+                  >
                     <Users className="w-5 h-5 text-gray-600" />
                     <span className="text-sm">
                       {userStats.followers} followers
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => router.push(`/profile/${userData.id}/following`)}
+                  >
                     <UserPlus className="w-5 h-5 text-gray-600" />
                     <span className="text-sm">
                       {userStats.following} following
@@ -137,13 +143,19 @@ const ProfilePage = () => {
               Edit Profile
             </button>
 
-            {/* Stats for desktop view */}
+            {/* Desktop View Stats */}
             <div className="hidden sm:grid grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => router.push(`/profile/${userData.id}/followers`)}
+              >
                 <Users className="w-5 h-5 text-gray-600" />
                 <span className="text-sm">{userStats.followers} followers</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => router.push(`/profile/${userData.id}/following`)}
+              >
                 <UserPlus className="w-5 h-5 text-gray-600" />
                 <span className="text-sm">{userStats.following} following</span>
               </div>
