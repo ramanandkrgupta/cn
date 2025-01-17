@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
-  email               String               @unique
-  isEmailVerified     Boolean              @default(false)
-  name                String?
-  password            String
-  phoneNumber         String?
-  isMobileVerified    Boolean              @default(false)
-  university          String?
-  college             String?
-  level               String?
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  email            String  @unique
+  isEmailVerified  Boolean @default(false)
+  name             String?
+  password         String
+  phoneNumber      String?
+  isMobileVerified Boolean @default(false)
+  university       String?
+  college          String?
+  level            String?
 
   stream              String?
   degree              String?
@@ -47,10 +47,10 @@ model User {
   downloads           UserDownload[]
   settings            UserSettings?
   notifications       Notification[]
-  moderatedPosts      post[]    @relation("ModeratedPosts")
-  reputationScore     Int       @default(0)
-  uploadCount         Int       @default(0)
-  verifiedUploads     Int       @default(0)
+  moderatedPosts      post[]               @relation("ModeratedPosts")
+  reputationScore     Int                  @default(0)
+  uploadCount         Int                  @default(0)
+  verifiedUploads     Int                  @default(0)
   reports             Report[]
   moderatedContent    ContentModeration[]  @relation("ModeratedContent")
   quizzes             Quiz[]
@@ -61,61 +61,61 @@ model User {
   aiConversations     AIConversation[]
   resetToken          String?
   resetTokenExpiry    DateTime?
-  followedBy         Follows[] @relation("following")
-  following          Follows[] @relation("follower")
+  followedBy          Follows[]            @relation("following")
+  following           Follows[]            @relation("follower")
 }
 
-model subject{
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  User          User?      @relation(fields: [userId], references: [id])
-  userId        String?    @db.ObjectId
+model subject {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?     @relation(fields: [userId], references: [id])
+  userId        String?   @db.ObjectId
   course_name   String
   semester_code String
   subject_code  String
   subject_name  String
   videos        video[] // Corrected to match model name
-  posts         post[]     // Add this line to create relation with posts
-  createdAt     DateTime?   @default(now())
-  updatedAt     DateTime?   @updatedAt
+  posts         post[] // Add this line to create relation with posts
+  createdAt     DateTime? @default(now())
+  updatedAt     DateTime? @updatedAt
   // MockTest      MockTest?
 }
 
 model post {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  user          User?    @relation(fields: [userId], references: [id])
-  userId        String?  @db.ObjectId
-  course_name   String
-  semester_code String
-  subject_code  String
-  subject_name  String
-  title         String
-  description   String
-  category      String?
-  premium       Boolean  @default(false)
-  file_url      String?
-  thumbnail_url String?
-  file_name     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  downloads     Int      @default(0)
-  likes         Int      @default(0)
-  shares        Int      @default(0)
-  userLikes     UserLike[]
-  userDownloads UserDownload[]
-  fileHash      String?
-  status        String    @default("pending")
-  moderatedBy   String?   @db.ObjectId
-  moderator     User?     @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
-  moderatedAt   DateTime?
-  moderationNote String?
-  qualityScore  Float     @default(0.0)
-  reports       Report[]
-  version       Int       @default(1)
-  previousVersion String?  @db.ObjectId
-  isLatestVersion Boolean @default(true)
-  subject       subject?   @relation(fields: [subjectId], references: [id])
-  subjectId     String?    @db.ObjectId
-  collections   PostsInCollections[]
+  id              String               @id @default(auto()) @map("_id") @db.ObjectId
+  user            User?                @relation(fields: [userId], references: [id])
+  userId          String?              @db.ObjectId
+  course_name     String
+  semester_code   String
+  subject_code    String
+  subject_name    String
+  title           String
+  description     String
+  category        String?
+  premium         Boolean              @default(false)
+  file_url        String?
+  thumbnail_url   String?
+  file_name       String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  downloads       Int                  @default(0)
+  likes           Int                  @default(0)
+  shares          Int                  @default(0)
+  userLikes       UserLike[]
+  userDownloads   UserDownload[]
+  fileHash        String?
+  status          String               @default("pending")
+  moderatedBy     String?              @db.ObjectId
+  moderator       User?                @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
+  moderatedAt     DateTime?
+  moderationNote  String?
+  qualityScore    Float                @default(0.0)
+  reports         Report[]
+  version         Int                  @default(1)
+  previousVersion String?              @db.ObjectId
+  isLatestVersion Boolean              @default(true)
+  subject         subject?             @relation(fields: [subjectId], references: [id])
+  subjectId       String?              @db.ObjectId
+  collections     PostsInCollections[]
 }
 
 model video {
@@ -235,7 +235,7 @@ model MockTest {
   maxMarks    Int
   duration    Int // Duration in minutes
   createdAt   DateTime @default(now())
-//  Subject     subject  @relation(fields: [subjectId], references: [id])
+  //  Subject     subject  @relation(fields: [subjectId], references: [id])
 }
 
 enum Role {
@@ -270,6 +270,7 @@ model UserLike {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   post      post     @relation(fields: [postId], references: [id])
+
   @@unique([userId, postId])
 }
 
@@ -289,7 +290,7 @@ model UserSettings {
   pushNotifications  Boolean  @default(true)
   darkMode           Boolean  @default(false)
   language           String   @default("en")
-  fontSize           String      @default("2")
+  fontSize           String   @default("2")
   user               User     @relation(fields: [userId], references: [id])
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -300,10 +301,10 @@ model UserSettings {
 model Notification {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
-  type      String   // 'like', 'download', 'share', 'admin'
+  type      String // 'like', 'download', 'share', 'admin'
   message   String
-  image     String?  // Optional image URL
-  link      String?  // Optional link URL
+  image     String? // Optional image URL
+  link      String? // Optional link URL
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
@@ -322,39 +323,39 @@ model Report {
 }
 
 model ContentModeration {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  postId      String    @db.ObjectId
-  status      String    // pending, approved, rejected
-  reviewedBy  String?   @db.ObjectId
-  reviewer    User?     @relation("ModeratedContent", fields: [reviewedBy], references: [id])
-  note        String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId     String   @db.ObjectId
+  status     String // pending, approved, rejected
+  reviewedBy String?  @db.ObjectId
+  reviewer   User?    @relation("ModeratedContent", fields: [reviewedBy], references: [id])
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Quiz {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  topic       String
-  difficulty  String       // EASY, MEDIUM, HARD
-  questions   Question[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  user        User?        @relation(fields: [userId], references: [id])
-  userId      String?      @db.ObjectId
-  attempts    QuizAttempt[]
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  topic      String
+  difficulty String // EASY, MEDIUM, HARD
+  questions  Question[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  user       User?         @relation(fields: [userId], references: [id])
+  userId     String?       @db.ObjectId
+  attempts   QuizAttempt[]
 }
 
 model Question {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  quiz          Quiz      @relation(fields: [quizId], references: [id])
-  quizId        String    @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  quizId        String   @db.ObjectId
   question      String
-  options       String[]  // Array of possible answers
+  options       String[] // Array of possible answers
   correctAnswer String
-  explanation   String?   // Explanation for the correct answer
-  type          String    // MCQ, TRUE_FALSE, etc.
-  points        Int       @default(1)
+  explanation   String? // Explanation for the correct answer
+  type          String // MCQ, TRUE_FALSE, etc.
+  points        Int      @default(1)
 }
 
 model QuizAttempt {
@@ -364,7 +365,7 @@ model QuizAttempt {
   user        User      @relation(fields: [userId], references: [id])
   userId      String    @db.ObjectId
   score       Int
-  answers     Json      // Store user answers
+  answers     Json // Store user answers
   startedAt   DateTime  @default(now())
   completedAt DateTime?
 }
@@ -398,7 +399,7 @@ model Session {
 }
 
 model VerificationToken {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
   token      String   @unique
   expires    DateTime
@@ -410,12 +411,12 @@ model Collection {
   id          String               @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  userId      String              @db.ObjectId
-  user        User                @relation(fields: [userId], references: [id])
+  userId      String               @db.ObjectId
+  user        User                 @relation(fields: [userId], references: [id])
   posts       PostsInCollections[]
-  isPublic    Boolean             @default(false)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  isPublic    Boolean              @default(false)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 }
 
 model PostsInCollections {
@@ -433,10 +434,10 @@ model AIConversation {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
-  type      String   @default("chat")  // chat, quiz, study_plan, explain
+  type      String   @default("chat") // chat, quiz, study_plan, explain
   query     String
   response  String   @db.String
-  context   String?  @db.String  // JSON string of context
+  context   String?  @db.String // JSON string of context
   timestamp DateTime @default(now())
 }
 
@@ -446,7 +447,7 @@ model AITraining {
   dataSnapshot String   @db.String
   timestamp    DateTime @default(now())
   status       String   @default("pending") // pending, completed, failed
-  stats        Json?    // Training statistics
+  stats        Json? // Training statistics
 }
 
 model Follows {

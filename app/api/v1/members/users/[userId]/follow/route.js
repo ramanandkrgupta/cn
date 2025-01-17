@@ -7,13 +7,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 export async function POST(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
+    console.log("Session:", session); // Debug log
 
-    // Check if user is logged in
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Please login to follow users" }, { status: 401 });
     }
 
-    const { userId } = params; // User to follow
+    const { userId } = params;
     const followerId = session.user.id;
 
     // Validate user IDs
@@ -53,6 +53,23 @@ export async function POST(req, { params }) {
         followingId: userId,
       },
     });
+
+    // Create notification with try-catch
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: userId,
+          type: 'FOLLOW',
+          message: `${session.user.name} started following you`,
+          image: session.user.avatar,
+          link: `/profile/${session.user.id}`,
+          read: false,
+        },
+      });
+      console.log("Notification created successfully");
+    } catch (notifError) {
+      console.error("Error creating notification:", notifError);
+    }
 
     // Get updated counts
     const followData = await prisma.follows.findMany({
