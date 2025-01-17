@@ -237,6 +237,16 @@ export default function EditProfile() {
             ...session.user,
             name: data.name,
             avatar: data.avatar,
+            university: data.university,
+            college: data.college,
+            level: data.level,
+            stream: data.stream,
+            degree: data.degree,
+            specialization: data.specialization,
+            year: data.year,
+            semester: data.semester,
+            location: data.location,
+            links: data.links,
           },
         })
 

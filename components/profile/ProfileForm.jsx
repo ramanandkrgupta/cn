@@ -363,47 +363,9 @@ export const ProfileForm = ({
       </div>
 
       {/* Links Section */}
-      <div className="space-y-2">
-        <label className="text-sm text-secondary font-medium">Links</label>
-        {links.map((link, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <select
-              value={link.type}
-              onChange={(e) => updateLink(index, 'type', e.target.value)}
-              className="p-3 rounded-lg shadow-sm bg-base-200"
-            >
-              <option value="">Select Link Type</option>
-              <option value="GitHub">GitHub</option>
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Facebook">Facebook</option>
-              <option value="Instagram">Instagram</option>
-              <option value="Twitter">Twitter</option>
-              {/* Add more link types as needed */}
-            </select>
-            <input
-              type="url"
-              value={link.url}
-              onChange={(e) => updateLink(index, 'url', e.target.value)}
-              placeholder="Enter URL"
-              className="flex-grow p-3 rounded-lg shadow-sm bg-base-200"
-            />
-            <button
-              type="button"
-              onClick={() => removeLink(index)}
-              className="p-2 text-red-500"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={addLink}
-          className="p-3 bg-secondary text-white font-medium rounded-lg shadow-sm hover:bg-secondary-focus"
-        >
-          Add Link
-        </button>
-      </div>
+
+      {/*  */}
+
 
       {/* Submit Button */}
       <button

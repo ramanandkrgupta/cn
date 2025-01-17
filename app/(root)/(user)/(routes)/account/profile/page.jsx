@@ -1,7 +1,9 @@
-'use client'
-import React, { useEffect } from 'react'
+'use client' // Ensure client-side rendering
+
+import React, { useEffect, useState } from 'react'
 import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'react-hot-toast'
 import { Users, UserPlus } from 'lucide-react'
 import {
   Header,
@@ -13,32 +15,57 @@ import {
 } from '@/components/profile'
 
 const ProfilePage = () => {
+  const { data: session, status } = useSession()
   const router = useRouter()
-  const { data: session, status, update: updateSession } = useSession()
-  const user = session?.user
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      signIn()
+    const fetchUserData = async () => {
+      if (status === 'authenticated') {
+        try {
+          const response = await fetch('/api/v1/members/users/profile')
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data')
+          }
+          const data = await response.json()
+          setUserData(data)
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+          toast.error('Failed to load user data')
+        } finally {
+          setLoading(false)
+        }
+      } else if (status === 'unauthenticated') {
+        toast.error('Please sign in to access your profile')
+        signIn() // Redirect to sign-in
+      }
     }
+
+    fetchUserData()
   }, [status])
 
+  if (loading) {
+    return <div>Loading...</div> // Show loading state
+  }
 
-
+  if (!userData) {
+    return <div>No user data available.</div> // Show fallback UI
+  }
 
   const userStats = {
-    location: user?.location || 'Not specified',
-    semester: user?.semester || 'Not specified',
-    year: user?.year || 'Not specified',
-    college: user?.college || 'Not specified',
-    university: user?.university || 'Not specified',
-    level: user?.level || 'Not specified',
-    stream: user?.stream || 'Not specified',
-    degree: user?.degree || 'Not specified',
-    specialization: user?.specialization || 'Not specified',
-    reputationScore: user?.reputationScore || 0,
-    uploadCount: user?.uploadCount || 0,
-    verifiedUploads: user?.verifiedUploads || 0,
+    location: userData.location || 'Not specified',
+    semester: userData.semester || 'Not specified',
+    year: userData.year || 'Not specified',
+    college: userData.college || 'Not specified',
+    university: userData.university || 'Not specified',
+    level: userData.level || 'Not specified',
+    stream: userData.stream || 'Not specified',
+    degree: userData.degree || 'Not specified',
+    specialization: userData.specialization || 'Not specified',
+    reputationScore: userData.reputationScore || 0,
+    uploadCount: userData.uploadCount || 0,
+    verifiedUploads: userData.verifiedUploads || 0,
     followers: '0',
     following: '0',
     readingTime: '0 hrs',
@@ -46,7 +73,7 @@ const ProfilePage = () => {
     downloads: '0',
     views: '0 views',
     streak: '0',
-    github: user?.links?.find((link) => link.type === 'GitHub')?.url || '',
+    github: userData.links?.find((link) => link.type === 'GitHub')?.url || '',
     linkedin: '',
     facebook: '',
     twitter: '',
@@ -68,16 +95,15 @@ const ProfilePage = () => {
               followers={userStats.followers}
               following={userStats.following}
             />
-
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <img
-                src={user?.avatar || '/default-avatar.png'}
-                alt={user?.name || 'User avatar'}
+                src={userData.avatar || '/default-avatar.png'}
+                alt={userData.name || 'User avatar'}
                 className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover"
               />
               <div className="flex flex-col">
                 <h1 className="text-lg font-bold">
-                  {user?.name || 'User Name'}
+                  {userData.name || 'User Name'}
                 </h1>
                 <p className="text-sm font-thin truncate max-w-[250px]">
                   {userStats.college}
