@@ -319,6 +319,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <li>Course : {data.course_name}</li>
                     <li>Semester : {data.semester_code}</li>
                     <li>Category : {data.category}</li>
+                    <li>File Size : {(data.file_size / (1024 * 1024)).toFixed(2)} MB</li> {/* Display file size */}
                   </ul>
                 </div>
                 <div className="mt-4 flex flex-col gap-2">
@@ -337,7 +338,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                           toast.error("Please login to download files");
                           return;
                         }
-                        handleDownload(data.id, data.file_name);
+                        handleDownload(data.id, data.title);
                       }}
                     >
                       {!session?.user ? (

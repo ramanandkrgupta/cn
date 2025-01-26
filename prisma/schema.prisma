@@ -85,6 +85,7 @@ model post {
   file_url      String?
   thumbnail_url String?
   file_name     String?
+  file_size     Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   downloads     Int      @default(0)

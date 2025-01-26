@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 
-export async function GET(req, { params }) {
+export async function GET(req) {
   try {
-    const [courseName, semester] = params.filtered;
+    const url = new URL(req.url);
+    const params = url.pathname.split('/').filter(Boolean);
+    const [courseName, semester] = params.slice(-2);
 
     // Validate parameters
     if (!courseName || !semester) {

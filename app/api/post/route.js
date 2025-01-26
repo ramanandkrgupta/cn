@@ -77,6 +77,7 @@ export async function POST(req) {
             subject_name: details.subject_name || details.subject?.subject_name || '',
             file_url: file.url,
             file_name: file.name,
+            file_size: file.size,
             thumbnail_url: file.thumbnailUrl || '/images/placeholders/pdf-placeholder.png',
             status: 'pending',
             version: 1,

@@ -80,9 +80,13 @@ export async function GET(req) {
       },
     })
 
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
     return NextResponse.json(user)
   } catch (error) {
-    console.error('Profile fetch error:', error)
+    console.error('Profile fetch error:', error.message, error.stack)
     return NextResponse.json(
       { error: 'Failed to fetch profile' },
       { status: 500 }

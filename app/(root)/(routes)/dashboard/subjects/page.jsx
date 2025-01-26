@@ -19,7 +19,7 @@ import {
   Calendar,
   ArrowUpDown,
 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import SubjectModal from "./components/SubjectModal";
 import { courses } from "@/constants";
 import debounce from "lodash/debounce";
@@ -171,11 +171,13 @@ export default function SubjectsPage() {
       const data = await response.json();
       setSubjects(data.subjects);
       setPagination(data.pagination);
+      setStats(data.stats);
     } catch (error) {
       console.error("Error fetching subjects:", error);
       toast.error("Failed to load subjects");
     } finally {
       setTableLoading(false);
+      setLoading(false); // Set loading to false after data is fetched
     }
   };
 
