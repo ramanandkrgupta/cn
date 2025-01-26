@@ -4,12 +4,12 @@ import PropTypes from "prop-types";
 
 // Define static options
 const CATEGORIES = [
-  "Study Materials",
-  "Question Papers",
-  "Syllabus",
-  "Notes",
-  "Other"
-];
+  'Handwritten Notes',
+  'Study Materials',
+  'Question Papers',
+  'Syllabus',
+  'Other',
+]
 
 const COURSES = [
   { id: "cse", name: "Computer Science Engineering" },
@@ -68,7 +68,7 @@ const DocDetails = ({ files, onSubmit }) => {
   const BatchSettingsForm = () => (
     <div className="space-y-4 p-4 bg-base-200 rounded-lg">
       <h3 className="font-semibold">Batch Settings</h3>
-      
+
       {/* Category */}
       <div>
         <label className="label">Category</label>
@@ -230,7 +230,7 @@ const DocDetails = ({ files, onSubmit }) => {
 
   // Validate batch settings
   const isValidBatchSettings = () => {
-    return batchSettings.category && batchSettings.course && 
+    return batchSettings.category && batchSettings.course &&
            batchSettings.semester && batchSettings.subject;
   };
 
@@ -250,7 +250,7 @@ const DocDetails = ({ files, onSubmit }) => {
 
   // Validate individual file details
   const isValidFileDetails = (detail) => {
-    return detail.category && detail.course && 
+    return detail.category && detail.course &&
            detail.semester && detail.subject;
   };
 
@@ -298,7 +298,7 @@ const DocDetails = ({ files, onSubmit }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <BatchModeToggle />
-      
+
       {/* Progress bar */}
       <ProgressBar progress={uploadProgress} />
 

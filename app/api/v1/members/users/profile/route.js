@@ -25,12 +25,21 @@ export async function PUT(req) {
 
     const data = await req.json()
 
-    // Update allowed fields including new university and college
+    // Update allowed fields including new educational fields
     const allowedUpdates = {
       name: data.name,
       phoneNumber: data.phoneNumber,
       university: data.university,
       college: data.college,
+      avatar: data.avatar,
+      level: data.level, // New field
+      stream: data.stream, // New field
+      degree: data.degree, // New field
+      specialization: data.specialization, // New field
+      year: data.year, // New field
+      semester: data.semester, // New field
+      location: data.location, // New field
+      links: data.links, // New field
     }
 
     // Update user in database
@@ -46,6 +55,14 @@ export async function PUT(req) {
         phoneNumber: true,
         university: true,
         college: true,
+        level: true,
+        stream: true,
+        degree: true,
+        specialization: true,
+        year: true,
+        semester: true,
+        location: true,
+        links: true,
       },
     })
 
@@ -62,28 +79,40 @@ export async function PUT(req) {
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const userId = session.user.id
+
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
         email: true,
-        userRole: true,
         avatar: true,
-        phoneNumber: true,
         university: true,
         college: true,
-      },
+        level: true,
+        stream: true,
+        degree: true,
+        specialization: true,
+        year: true,
+        semester: true,
+        location: true,
+        uploadCount: true,
+        verifiedUploads: true,
+        reputationScore: true,
+        links: true,
+      }
     })
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+<<<<<<< HEAD
     return NextResponse.json(user)
   } catch (error) {
     console.error('Profile fetch error:', error.message, error.stack)
@@ -91,5 +120,29 @@ export async function GET(req) {
       { error: 'Failed to fetch profile' },
       { status: 500 }
     )
+=======
+    // Get follower and following counts
+    const followData = await prisma.follows.findMany({
+      where: {
+        OR: [
+          { followingId: userId },
+          { followerId: userId }
+        ]
+      }
+    })
+
+    // Calculate followers and following
+    const followers = followData.filter(f => f.followingId === userId).length
+    const following = followData.filter(f => f.followerId === userId).length
+
+    return NextResponse.json({
+      ...user,
+      followers,
+      following
+    })
+  } catch (error) {
+    console.error('Error fetching user profile:', error)
+    return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
+>>>>>>> 10db11ea68d238ea24a5fac413375c25403cfbeb
   }
 }

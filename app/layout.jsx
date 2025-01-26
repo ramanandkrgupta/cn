@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import { AuthProvider, UserProvider } from "@/components/providers";
 import { Toaster } from "react-hot-toast";
 
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
+// import { SpeedInsights } from "@vercel/speed-insights/next"
+// import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,8 +41,8 @@ export default function RootLayout({ children }) {
           <UserProvider>
             <Toaster />
             {children}
-            <SpeedInsights />
-            <Analytics />
+            {/* <SpeedInsights /> */}
+            {/* <Analytics /> */}
           </UserProvider>
         </AuthProvider>
       </body>
