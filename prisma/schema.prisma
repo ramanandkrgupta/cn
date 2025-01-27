@@ -18,7 +18,9 @@ model User {
   university       String?
   college          String?
   level            String?
-
+  streak           Int       @default(0)
+  maxStreak        Int       @default(0)
+  lastVisit       DateTime?
   stream              String?
   degree              String?
   specialization      String?
