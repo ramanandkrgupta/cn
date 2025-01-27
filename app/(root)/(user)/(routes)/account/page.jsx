@@ -291,72 +291,63 @@ const ProFeaturesSection = ({ items, router }) => (
 );
 
 export default function Profile() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const { userData, isLoading: storeLoading } = useUserStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const { userData, isLoading: storeLoading } = useUserStore()
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Use userData from Zustand store
   useEffect(() => {
     if (userData) {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [userData]);
+  }, [userData])
 
-  // Early return for loading state
-  if (isLoading || storeLoading || status === "loading") {
-    return <SkeletonLoading />;
+  if (isLoading || storeLoading || status === 'loading') {
+    return <SkeletonLoading />
   }
 
-  // Early return for unauthenticated users
-  if (status === "unauthenticated") {
-    router.push("/login");
-    return null;
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
   }
 
-  // Get user role from Zustand store or session
-  const userRole = userData?.userRole || userData?.role || session?.user?.role;
-
-  // Get stats from userData
-  const stats = getProfileStats(userData || session);
-
-  // Get menu items with updated role
+  const userRole = userData?.userRole || userData?.role || session?.user?.role
+  const stats = getProfileStats(userData || session)
   const menuItems = getMenuItems(router, userRole, {
     ...session,
     user: {
       ...session?.user,
       role: userRole,
     },
-  });
+  })
+  const proMenuItems = getProMenuItems(userRole)
 
-  // Get pro menu items with updated role
-  const proMenuItems = getProMenuItems(userRole);
-
-  // Add logout handler
   const handleLogout = async () => {
     try {
-      await signOut({ redirect: false });
-      router.push("/login");
-      toast.success("Logged out successfully");
+      await signOut({ redirect: false })
+      router.push('/login')
+      toast.success('Logged out successfully')
     } catch (error) {
-      toast.error("Failed to logout");
+      toast.error('Failed to logout')
     }
-  };
+  }
 
   return (
     <div className="bg-base-100 min-h">
-      <div className="mx-auto px-4 max-w-lg py-6">
+      {/* Changed max-width and added responsive padding */}
+      <div className="mx-auto px-4 md:px-6 max-w-lg md:max-w-6xl py-6 md:py-8">
         {/* Enhanced Profile Card */}
-        <div className="block mt-4 p-6 bg-base-300 rounded-lg shadow-lg">
-          <div className="flex items-center space-x-4">
+        <div className="block mt-4 p-6 bg-base-300 rounded-lg shadow-lg md:p-8">
+          <div className="flex items-center space-x-4 md:space-x-6">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-base-200">
+              {/* Increased image size for desktop */}
+              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden bg-base-200">
                 <Link href="/account/profile">
                   <Image
                     src={userData?.avatar || '/icons/icon.png'}
                     alt="profile"
-                    width={64}
-                    height={64}
+                    width={96}
+                    height={96}
                     className="object-cover w-full h-full"
                     priority
                     loading="eager"
@@ -367,24 +358,25 @@ export default function Profile() {
                 </Link>
               </div>
               {userData?.role === 'PRO' && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                  <Crown size={14} className="text-white" />
+                <div className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
+                  <Crown size={14} className="text-white md:h-5 md:w-5" />
                 </div>
               )}
             </div>
             <div className="flex-1">
               <Link href="/account/profile">
-                <div className="text-lg font-semibold text-secondary w-max ">
+                {/* Increased text size for desktop */}
+                <div className="text-lg md:text-2xl font-semibold text-secondary w-max">
                   {userData?.name || session?.user?.name}
                 </div>
-                <div className="text-sm text-gray-500 w-max ">
+                <div className="text-sm md:text-base text-gray-500 w-max">
                   {userData?.email || session?.user?.email}
                 </div>
               </Link>
 
               <div className="flex items-center gap-2 mt-2">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1
+                  className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium inline-flex items-center gap-1
                   ${
                     userRole === 'PRO'
                       ? 'bg-primary/10 text-primary'
@@ -397,14 +389,37 @@ export default function Profile() {
                   {userRole || 'FREE'} User
                 </span>
                 {userRole === 'PRO' && (
-                  <span className="text-xs text-gray-500">Lifetime</span>
+                  <span className="text-xs md:text-sm text-gray-500">
+                    Lifetime
+                  </span>
                 )}
+              </div>
+            </div>
+            {/* Added stats to the right on desktop */}
+            <div className="hidden md:grid grid-cols-3 gap-8 ml-auto min-w-[400px] p-4 bg-base-200 rounded-lg">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary">
+                  {stats.uploads}
+                </div>
+                <div className="text-sm text-gray-500">Uploads</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-secondary">
+                  {stats.downloads}
+                </div>
+                <div className="text-sm text-gray-500">Downloads</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-accent">
+                  {stats.reputation}
+                </div>
+                <div className="text-sm text-gray-500">Reputation</div>
               </div>
             </div>
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 mt-6 p-4 bg-base-200 rounded-lg">
+          {/* Stats Row - Only visible on mobile */}
+          <div className="grid grid-cols-3 gap-4 mt-6 p-4 bg-base-200 rounded-lg md:hidden">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
                 {stats.uploads}
@@ -426,78 +441,123 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Menu Sections */}
-        <div className="mt-6 space-y-4">
-          {/* Account Section */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-500 px-2 mb-2">
-              ACCOUNT
-            </h3>
-            <div className="space-y-2">
-              {menuItems.slice(0, 2).map((item, index) => (
-                <MenuItem key={index} item={item} router={router} />
-              ))}
+        {/* Menu Sections - Added grid for desktop */}
+        <div className="mt-6 md:mt-8 md:grid md:grid-cols-12 md:gap-6">
+          {/* Left Column */}
+          <div className="md:col-span-4 space-y-4">
+            {/* Account Section */}
+            <div className="mb-4">
+              <h3 className="text-sm md:text-base font-medium text-gray-500 px-2 mb-2">
+                ACCOUNT
+              </h3>
+              <div className="space-y-2">
+                {menuItems.slice(0, 2).map((item, index) => (
+                  <MenuItem key={index} item={item} router={router} />
+                ))}
+              </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="mb-4">
+              <h3 className="text-sm md:text-base font-medium text-gray-500 px-2 mb-2">
+                CONTENT
+              </h3>
+              <div className="space-y-2">
+                {menuItems.slice(2, 3).map((item, index) => (
+                  <MenuItem key={index} item={item} router={router} />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* PRO Features Section - Only show if user is PRO */}
-          {userRole === 'PRO' && (
-            <ProFeaturesSection items={proMenuItems} router={router} />
-          )}
+          {/* Right Column */}
+          <div className="md:col-span-8 space-y-4">
+            {/* PRO Features Section - Only show if user is PRO */}
+            {userRole === 'PRO' && (
+              <div className="mb-4">
+                <h3 className="text-sm md:text-base font-medium text-primary flex items-center gap-2 px-2 mb-2">
+                  <Crown size={14} className="md:w-5 md:h-5" />
+                  PRO FEATURES
+                </h3>
+                {/* Changed to grid for desktop */}
+                <div className="md:grid md:grid-cols-2 md:gap-4">
+                  {proMenuItems.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={() => router.push(item.path)}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 rounded-xl shadow-sm transition-all duration-200 group border border-primary/10 mb-2 md:mb-0"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <span className="text-secondary font-medium block md:text-lg">
+                            {item.title}
+                          </span>
+                          <span className="text-xs md:text-sm text-gray-500">
+                            {item.description}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {item.badge}
+                        <ChevronRight
+                          size={18}
+                          className="text-gray-500 group-hover:translate-x-1 transition-transform"
+                        />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {/* Show PRO Benefits Teaser for non-PRO users */}
-          {userRole !== 'PRO' && (
-            <ProBenefitsTeaser
-              onUpgrade={() => router.push('/account/plans')}
-            />
-          )}
+            {/* Show PRO Benefits Teaser for non-PRO users */}
+            {userRole !== 'PRO' && (
+              <ProBenefitsTeaser
+                onUpgrade={() => router.push('/account/plans')}
+                session={session}
+              />
+            )}
 
-          {/* Content Section */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-500 px-2 mb-2">
-              CONTENT
-            </h3>
-            <div className="space-y-2">
-              {menuItems.slice(2, 3).map((item, index) => (
-                <MenuItem key={index} item={item} router={router} />
-              ))}
+            {/* Preferences Section */}
+            <div className="mb-4">
+              <h3 className="text-sm md:text-base font-medium text-gray-500 px-2 mb-2">
+                PREFERENCES
+              </h3>
+              <div className="space-y-2">
+                {menuItems.slice(3).map((item, index) => (
+                  <MenuItem key={index} item={item} router={router} />
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Preferences Section */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-500 px-2 mb-2">
-              PREFERENCES
-            </h3>
-            <div className="space-y-2">
-              {menuItems.slice(3).map((item, index) => (
-                <MenuItem key={index} item={item} router={router} />
-              ))}
-            </div>
+            {/* Enhanced Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-between p-4 mt-4 bg-base-300 rounded-xl shadow-sm cursor-pointer hover:bg-red-50 transition-all duration-200 group border border-transparent hover:border-red-200"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                  <LogOut size={20} className="text-red-500" />
+                </div>
+                <div>
+                  <span className="font-medium block text-red-500 md:text-lg">
+                    Logout
+                  </span>
+                  <span className="text-xs md:text-sm text-gray-500">
+                    Sign out of your account
+                  </span>
+                </div>
+              </div>
+              <ChevronRight
+                size={18}
+                className="text-gray-500 group-hover:translate-x-1 transition-transform"
+              />
+            </button>
           </div>
         </div>
-
-        {/* Enhanced Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-between p-4 mt-4 bg-base-300 rounded-xl shadow-sm cursor-pointer hover:bg-red-50 transition-all duration-200 group border border-transparent hover:border-red-200"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-              <LogOut size={20} className="text-red-500" />
-            </div>
-            <div>
-              <span className="font-medium block text-red-500">Logout</span>
-              <span className="text-xs text-gray-500">
-                Sign out of your account
-              </span>
-            </div>
-          </div>
-          <ChevronRight
-            size={18}
-            className="text-gray-500 group-hover:transform group-hover:translate-x-1 transition-transform"
-          />
-        </button>
       </div>
       <AppVersion />
     </div>

@@ -112,15 +112,6 @@ export async function GET(req) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-<<<<<<< HEAD
-    return NextResponse.json(user)
-  } catch (error) {
-    console.error('Profile fetch error:', error.message, error.stack)
-    return NextResponse.json(
-      { error: 'Failed to fetch profile' },
-      { status: 500 }
-    )
-=======
     // Get follower and following counts
     const followData = await prisma.follows.findMany({
       where: {
@@ -143,6 +134,5 @@ export async function GET(req) {
   } catch (error) {
     console.error('Error fetching user profile:', error)
     return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
->>>>>>> 10db11ea68d238ea24a5fac413375c25403cfbeb
   }
 }
