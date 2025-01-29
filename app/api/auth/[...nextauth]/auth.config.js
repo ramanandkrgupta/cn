@@ -161,6 +161,9 @@ export const authOptions = {
           semester: token.semester,
           location: token.location,
           links: token.links,
+          streak: token.streak || 0,
+          maxStreak: token.maxStreak || 0,
+          lastVisit: token.lastVisit || null,
         }
       }
       return session
@@ -168,4 +171,4 @@ export const authOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
-} 
+}

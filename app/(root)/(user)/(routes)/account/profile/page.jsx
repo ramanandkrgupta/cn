@@ -14,6 +14,82 @@ import {
   Uploads,
 } from '@/components/profile'
 
+
+const ProfileLoadingSkeleton = () => {
+  return (
+    <div className="min-h-screen bg-base-100 p-4 lg:p-8">
+      <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto">
+        {/* Left Section Skeleton */}
+        <div className="w-full lg:w-[40%] bg-base-200 rounded-xl p-6 shadow-lg">
+          <div className="flex flex-col">
+            {/* Profile Info Skeleton */}
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-4 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </div>
+            </div>
+
+            {/* Edit Profile Button Skeleton */}
+            <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse my-4" />
+
+            {/* Stats Skeleton - Reduced */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                />
+              ))}
+            </div>
+
+            {/* Profile Details Skeleton - Reduced */}
+            <div className="space-y-2 mt-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section Skeleton - Simplified */}
+        <div className="flex-1 flex flex-col gap-6">
+          {/* Achievements Skeleton */}
+          <div className="bg-base-200 rounded-xl p-6 shadow-lg">
+            <div className="h-8 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Uploads Skeleton */}
+          <div className="bg-base-200 rounded-xl p-6 shadow-lg">
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
 const ProfilePage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -45,8 +121,9 @@ const ProfilePage = () => {
     fetchUserData()
   }, [status])
 
+  // In ProfilePage component
   if (loading) {
-    return <div>Loading...</div> // Show loading state
+    return <ProfileLoadingSkeleton /> // Use the new loading skeleton
   }
 
   if (!userData) {
@@ -116,7 +193,9 @@ const ProfilePage = () => {
                 <div className="flex sm:hidden items-center gap-4 mt-4">
                   <div
                     className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                    onClick={() => router.push(`/profile/${userData.id}/followers`)}
+                    onClick={() =>
+                      router.push(`/profile/${userData.id}/followers`)
+                    }
                   >
                     <Users className="w-5 h-5 text-gray-600" />
                     <span className="text-sm">
@@ -125,7 +204,9 @@ const ProfilePage = () => {
                   </div>
                   <div
                     className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                    onClick={() => router.push(`/profile/${userData.id}/following`)}
+                    onClick={() =>
+                      router.push(`/profile/${userData.id}/following`)
+                    }
                   >
                     <UserPlus className="w-5 h-5 text-gray-600" />
                     <span className="text-sm">
