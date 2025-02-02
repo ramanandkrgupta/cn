@@ -5,7 +5,7 @@ import {
   IconBrandLinkedin,
   IconBrandX,
 } from "@tabler/icons-react";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 
 const SocialLinks = ({
   githubUsername,
@@ -63,62 +63,62 @@ const SocialLink = ({ icon, tooltip, url }) => {
 const Team = () => {
   const teamMembers = [
     {
-      name: 'Lokendra Patel',
-      role: 'Founder & CEO',
-      img: '/team/member-02.jpg',
-      githubUsername: 'lokendra508',
-      xUsername: 'Lokendr52277034',
-      linkedinUsername: 'lokendra-patel-233719220',
-      instagramUsername: '_lokendra_022',
+      name: "Lokendra Patel",
+      role: "Founder & CEO",
+      img: "/team/member-02.jpg",
+      githubUsername: "lokendra508",
+      xUsername: "Lokendr52277034",
+      linkedinUsername: "lokendra-patel-233719220",
+      instagramUsername: "_lokendra_022",
     },
     {
-      name: 'Ramanand Kumar Gupta',
-      role: 'Full Stack Web Developer',
-      img: '/team/member-1.jpeg',
-      githubUsername: 'ramanandkrgupta',
-      xUsername: 'RAMANANDKUMARSAW',
-      linkedinUsername: 'ramanand-kumar-saw',
-      instagramUsername: 'ramanand-kumar-18',
+      name: "Ramanand Kumar Gupta",
+      role: "Full Stack Web Developer",
+      img: "/team/member-1.jpeg",
+      githubUsername: "ramanandkrgupta",
+      xUsername: "RAMANANDKUMARSAW",
+      linkedinUsername: "ramanand-kumar-saw",
+      instagramUsername: "ramanand-kumar-18",
     },
     {
-      name: 'Nitesh Chourasiya ',
-      role: 'Tester & Web Developer',
-      img: '/team/member-09.jpeg',
-      githubUsername: 'jattu8602',
-      xUsername: 'JatinTurbo',
-      linkedinUsername: 'nitesh-chourasiya-a66715292',
-      instagramUsername: 'chaurasiyajatin68',
+      name: "Nitesh Chourasiya ",
+      role: "Tester & Web Developer",
+      img: "/team/member-09.jpeg",
+      githubUsername: "jattu8602",
+      xUsername: "JatinTurbo",
+      linkedinUsername: "nitesh-chourasiya-a66715292",
+      instagramUsername: "chaurasiyajatin68",
     },
     {
-      name: ' Ashutosh Tripathi',
-      role: 'Advertising Head',
-      img: '/team/member-03.jpg',
-      linkedinUsername: 'ashutosh-tripathi-315386169',
+      name: " Ashutosh Tripathi",
+      role: "Advertising Head",
+      img: "/team/member-03.jpg",
+      linkedinUsername: "ashutosh-tripathi-315386169",
     },
     {
-      name: 'Anit Bajpai',
-      role: 'Content Management Head & Advertising Coordinator ',
-      img: '/team/member-08.jpg',
-      xUsername: 'AnitBajpai1',
+      name: "Anit Bajpai",
+      role: "Content Management Head & Advertising Coordinator ",
+      img: "/team/member-08.jpg",
+      xUsername: "AnitBajpai1",
     },
     {
-      name: 'Samradh Patel',
-      role: ' ',
-      img: '/team/member-04.jpg',
-      githubUsername: '    ',
-      xUsername: 'PatelSamradh',
-      linkedinUsername: 'samradhpatel',
+      name: "Samradh Patel",
+      role: " ",
+      img: "/team/member-04.jpg",
+      githubUsername: "    ",
+      xUsername: "PatelSamradh",
+      linkedinUsername: "samradhpatel",
     },
 
     {
-      name: 'Prankur Patel',
-      role: 'Graphic Designer ',
-      img: '/team/member-05.jpg',
+      name: "Prankur Patel",
+      role: "Graphic Designer ",
+      img: "/team/member-05.jpg",
 
-      xUsername: 'prankur_patel17',
-      linkedinUsername: 'prankur-patel-b3076a30a',
+      xUsername: "prankur_patel17",
+      linkedinUsername: "prankur-patel-b3076a30a",
     },
-  ]
+  ];
 
   return (
     <div className="px-4 py-1 mx-auto">
@@ -151,11 +151,11 @@ const Team = () => {
                 <SocialLinks {...member} />
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 };
 
 export default Team;

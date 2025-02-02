@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 
 const Icon = ({ styles, name, imgUrl, isActive, handleClick }) => {
   return (

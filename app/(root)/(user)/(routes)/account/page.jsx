@@ -1,10 +1,10 @@
 "use client";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import Link from 'next/link';
+import Link from "next/link";
 import {
   User,
   CreditCard,
@@ -353,7 +353,7 @@ export default function Profile() {
               <div className="w-16 h-16 rounded-full overflow-hidden bg-base-200">
                 <Link href="/account/profile">
                   <Image
-                    src={userData?.avatar || '/icons/icon.png'}
+                    src={userData?.avatar || "/icons/icon.png"}
                     alt="profile"
                     width={64}
                     height={64}
@@ -361,12 +361,12 @@ export default function Profile() {
                     priority
                     loading="eager"
                     onError={(e) => {
-                      e.target.src = '/icons/icon.png'
+                      e.target.src = "/icons/icon.png";
                     }}
                   />
                 </Link>
               </div>
-              {userData?.role === 'PRO' && (
+              {userData?.role === "PRO" && (
                 <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                   <Crown size={14} className="text-white" />
                 </div>
@@ -386,17 +386,17 @@ export default function Profile() {
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1
                   ${
-                    userRole === 'PRO'
-                      ? 'bg-primary/10 text-primary'
-                      : userRole === 'ADMIN'
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'bg-blue-100 text-blue-800'
+                    userRole === "PRO"
+                      ? "bg-primary/10 text-primary"
+                      : userRole === "ADMIN"
+                      ? "bg-purple-100 text-purple-800"
+                      : "bg-blue-100 text-blue-800"
                   }`}
                 >
-                  {userRole === 'PRO' && <Sparkles size={12} />}
-                  {userRole || 'FREE'} User
+                  {userRole === "PRO" && <Sparkles size={12} />}
+                  {userRole || "FREE"} User
                 </span>
-                {userRole === 'PRO' && (
+                {userRole === "PRO" && (
                   <span className="text-xs text-gray-500">Lifetime</span>
                 )}
               </div>
@@ -441,14 +441,14 @@ export default function Profile() {
           </div>
 
           {/* PRO Features Section - Only show if user is PRO */}
-          {userRole === 'PRO' && (
+          {userRole === "PRO" && (
             <ProFeaturesSection items={proMenuItems} router={router} />
           )}
 
           {/* Show PRO Benefits Teaser for non-PRO users */}
-          {userRole !== 'PRO' && (
+          {userRole !== "PRO" && (
             <ProBenefitsTeaser
-              onUpgrade={() => router.push('/account/plans')}
+              onUpgrade={() => router.push("/account/plans")}
             />
           )}
 
@@ -501,5 +501,5 @@ export default function Profile() {
       </div>
       <AppVersion />
     </div>
-  )
+  );
 }

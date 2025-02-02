@@ -1,5 +1,5 @@
 // full path /components/admin/ui/UploadDoneModel.jsx
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { XMarkIcon } from "@heroicons/react/20/solid";

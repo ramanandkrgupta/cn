@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import { Fragment } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { Dialog, Transition } from "@headlessui/react";

@@ -19,7 +19,7 @@ import {
   Volume2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 
 export default function AIAssistant() {
   const { data: session } = useSession();

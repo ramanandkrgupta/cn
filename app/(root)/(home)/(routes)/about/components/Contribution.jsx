@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import Link from "next/link";
 import { IconBrandGithub } from "@tabler/icons-react";
 const Contribution = () => {

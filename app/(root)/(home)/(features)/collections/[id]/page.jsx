@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { Folder, Lock, Globe } from "lucide-react";
 import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 
 export default function CollectionView() {
   const params = useParams();
@@ -79,10 +79,7 @@ export default function CollectionView() {
                 <div key={post.id} className="group">
                   <div className="aspect-[3/4] rounded-lg overflow-hidden">
                     <Image
-                      src={
-                        post.thumbnail_url ||
-                        "/images/placeholders/pdf-placeholder.png"
-                      }
+                      src={post.thumbnail_url || "/img/preview.png"}
                       alt={post.title}
                       width={200}
                       height={267}

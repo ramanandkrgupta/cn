@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import { handleSignOutButton } from "@/libs/utils";
 import { useEffect, useRef, useState } from "react";
 import { close, menu } from "@/public/assets";

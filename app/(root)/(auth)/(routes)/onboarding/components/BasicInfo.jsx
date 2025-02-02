@@ -1,6 +1,6 @@
 // app/(root)/(auth)/(routes)/onboarding/components/BasicInfo.jsx
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/CustomImage";
 import { Camera } from "lucide-react";
 
 const BasicInfo = ({ formData, setFormData, onNext }) => {
@@ -12,7 +12,7 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result);
-        setFormData({...formData, avatar: file});
+        setFormData({ ...formData, avatar: file });
       };
       reader.readAsDataURL(file);
     }
@@ -31,13 +31,13 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
   return (
     <form onSubmit={handleNext} className="space-y-6">
       <h2 className="text-2xl font-bold">Basic Information</h2>
-      
+
       {/* Avatar Upload */}
       <div className="flex flex-col items-center gap-4">
         <div className="relative w-24 h-24">
           <div className="w-24 h-24 rounded-full overflow-hidden">
             {avatarPreview ? (
-              <Image 
+              <Image
                 src={avatarPreview}
                 alt="Avatar preview"
                 layout="fill"
@@ -57,7 +57,7 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
             id="avatar-upload"
           />
           <label
-            htmlFor="avatar-upload" 
+            htmlFor="avatar-upload"
             className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer"
           >
             <Camera className="w-4 h-4 text-white" />
@@ -73,7 +73,9 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
           <input
             type="text"
             value={formData.firstName}
-            onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, firstName: e.target.value })
+            }
             className="input input-bordered w-full"
             required
           />
@@ -81,9 +83,11 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
         <div>
           <label className="label">Last Name</label>
           <input
-            type="text"  
+            type="text"
             value={formData.lastName}
-            onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
             className="input input-bordered w-full"
             required
           />
@@ -96,7 +100,9 @@ const BasicInfo = ({ formData, setFormData, onNext }) => {
         <input
           type="tel"
           value={formData.phoneNumber}
-          onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+          onChange={(e) =>
+            setFormData({ ...formData, phoneNumber: e.target.value })
+          }
           className="input input-bordered w-full"
           required
         />
