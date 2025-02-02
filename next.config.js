@@ -5,6 +5,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV !== "development", // Remove console.log in production
   },
   images: {
+    ununoptimized: true,
     domains: [
       'lh3.googleusercontent.com',
       'avatars.githubusercontent.com',

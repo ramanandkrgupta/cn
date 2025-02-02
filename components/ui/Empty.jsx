@@ -1,4 +1,4 @@
-import Image from "@/components/CustomImage";
+import Image from "next/image";
 
 export const Empty = ({ label, error, reset }) => {
   return (

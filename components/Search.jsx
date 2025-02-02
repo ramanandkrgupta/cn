@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
+
 import { search } from "@/public/assets";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useDebounce } from "@/libs/hooks/useDebounce";

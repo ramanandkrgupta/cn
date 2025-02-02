@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
+
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";

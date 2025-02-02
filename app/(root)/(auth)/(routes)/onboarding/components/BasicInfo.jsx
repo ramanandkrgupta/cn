@@ -1,6 +1,7 @@
 // app/(root)/(auth)/(routes)/onboarding/components/BasicInfo.jsx
 import { useState } from "react";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
+
 import { Camera } from "lucide-react";
 
 const BasicInfo = ({ formData, setFormData, onNext }) => {

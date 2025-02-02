@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { Folder, Lock, Globe } from "lucide-react";
 import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
 
 export default function CollectionView() {
   const params = useParams();

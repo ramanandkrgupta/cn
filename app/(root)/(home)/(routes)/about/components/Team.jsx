@@ -5,7 +5,7 @@ import {
   IconBrandLinkedin,
   IconBrandX,
 } from "@tabler/icons-react";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
 
 const SocialLinks = ({
   githubUsername,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
 
 import { subject } from "@/public/icons";
 

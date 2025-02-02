@@ -15,7 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { useRouter } from "next/navigation";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
 
 export default function Collections() {
   const { data: session } = useSession();

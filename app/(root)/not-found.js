@@ -1,7 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 import { useRouter } from "next/navigation";
-import Image from "@/components/CustomImage";
+import Image from "next/image";
+
 
 export default function NotFound() {
   const router = useRouter();
