@@ -1,21 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV !== "development", // Remove console.log in production
   },
   images: {
     domains: [
-      'lh3.googleusercontent.com', // For Google profile photos
-      'avatars.githubusercontent.com', // For GitHub profile photos (if you're using GitHub auth)
+      'lh3.googleusercontent.com',
+      'avatars.githubusercontent.com',
       'github.com',
       'www.notesmates.in',
       'notesmates.in',
       'picsum.photos',
       'files.edgestore.dev',
       'res.cloudinary.com',
-      'api.dicebear.com',  // Using DiceBear as alternative
+      'api.dicebear.com',
     ],
     remotePatterns: [
       {
@@ -27,15 +26,6 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: '/api/auth/callback/google',
-  //       destination: '/dashboard',
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
   async headers() {
     return [
       {
@@ -58,32 +48,25 @@ const nextConfig = {
     ];
   },
   experimental: {
-    serverActions: true,
+    serverActions: {}, // Fixed: Changed from true to an empty object
   },
-  api: {
-    bodyParser: {
-      sizeLimit: '10000mb',
-    },
-    responseLimit: '10000mb',
-  },
-  // Increase header size limit
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
         stream: false,
         crypto: false,
-      }
+      };
     }
     config.module.rules.push({
       test: /\.(pdf)$/i,
       type: 'asset/resource'
     });
-    return config
+    return config;
   },
 };
 
-// Configuration object tells the next-pwa plugin
+// PWA Configuration
 const withPWA = require("next-pwa")({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -91,5 +74,5 @@ const withPWA = require("next-pwa")({
   skipWaiting: true,
 });
 
-// Export the combined configuration for Next.js with PWA support
+// Export configuration
 module.exports = withPWA(nextConfig);
