@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config.js";
 
 export async function GET(req) {
   try {
@@ -34,8 +34,7 @@ export async function GET(req) {
         subject_name: true,
         course_name: true,
         semester_code: true,
-      },
-      take: 5,
+      }
     });
 
     // Search users
