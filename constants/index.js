@@ -31,7 +31,7 @@ import {
 
 import seven from "@/public/icons/seven.PNG";
 import eight from "@/public/icons/eight.PNG";
-import { aiml, bca, btech, ce, ec, ex, me ,aids,iot} from "@/public/course/icons";
+import { aiml, bca, btech, ce, ec, ex, me ,aids,iot,ee,cs} from "@/public/course/icons";
 import { LayoutGrid } from "lucide-react";
 
 
@@ -174,7 +174,23 @@ export const courses = [
     imgUrl: iot,
     link: 'iot',
     description:
-    'Internet Of Things (IOT) is an academic program that provides in-depth knowledge of internet of things.',
+      'Internet Of Things (IOT) is an academic program that provides in-depth knowledge of internet of things.',
+  },
+  {
+    id: 10,
+    name: 'Electrical Engineering (EE)',
+    imgUrl: ee,
+    link: 'ee',
+    description:
+      'Electrical Engineering (EE) is an advanced technology and technology that provides in-depth information about electrical engineering.',
+  },
+  {
+    id: 11,
+    name: 'Cyber Security (CS)',
+    imgUrl: cs,
+    link: 'cs',
+    description:
+      'Cyber Security (CS) is an academic program that provides in-depth knowledge of cyber security.',
   },
 ]
 
