@@ -21,8 +21,8 @@ export const NotificationBell = () => {
   useEffect(() => {
     fetchUnreadCount()
     // Set up polling for new notifications
-    const interval = setInterval(fetchUnreadCount, 30000) // Poll every 30 seconds
-    return () => clearInterval(interval)
+    // const interval = setInterval(fetchUnreadCount) // Poll every 30 seconds
+    // return () => clearInterval(interval)
   }, [])
 
   return (

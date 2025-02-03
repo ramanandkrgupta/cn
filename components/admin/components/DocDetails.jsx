@@ -4,21 +4,7 @@ import PropTypes from "prop-types";
 
 import { category, courses, semester } from "@/constants/index"
 
-// Define static options
-const CATEGORIES = [
-  'Handwritten Notes',
-  'Study Materials',
-  'Question Papers',
-  'Syllabus',
-  'Other',
-]
 
-const COURSES = [
-  { id: "cse", name: "Computer Science Engineering" },
-  { id: "me", name: "Mechanical Engineering" },
-  { id: "ce", name: "Civil Engineering" },
-  { id: "ec", name: "Electronics & Communication" }
-];
 
 const SEMESTERS = [
   { id: "one", name: "Semester 1" },
