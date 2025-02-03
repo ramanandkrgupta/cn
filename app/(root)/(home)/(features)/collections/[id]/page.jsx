@@ -79,10 +79,7 @@ export default function CollectionView() {
                 <div key={post.id} className="group">
                   <div className="aspect-[3/4] rounded-lg overflow-hidden">
                     <Image
-                      src={
-                        post.thumbnail_url ||
-                        "/images/placeholders/pdf-placeholder.png"
-                      }
+                      src={post.thumbnail_url || "/img/preview.png"}
                       alt={post.title}
                       width={200}
                       height={267}

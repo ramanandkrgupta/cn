@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -62,7 +63,7 @@ const AdminSidebar = () => {
         </div>
       </div>
       <div className="font-medium text-xs text-gray-400 mb-5 mr-5">
-       notesmates@2024
+        notesmates@2024
       </div>
     </aside>
   );

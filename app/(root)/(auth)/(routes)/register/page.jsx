@@ -23,6 +23,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false); 
+  const [termsAccepted, setTermsAccepted] = useState(true); // Default to true
 
   const router = useRouter(); 
 
@@ -153,7 +154,21 @@ const RegisterPage = () => {
                   <p className="text-red-500 font-semibold mt-2">{error}</p>
                 )}
                 <PasswordStrengthMeter password={password} />
-
+                <div className="flex items-center mb-6">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-400">
+                    I accept the{" "}
+                    <Link href="/terms" className="text-green-400 hover:underline">
+                      terms and conditions
+                    </Link>
+                  </label>
+                </div>
                 <motion.button
                   className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
               font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 

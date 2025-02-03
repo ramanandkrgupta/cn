@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
@@ -151,6 +152,7 @@ const PostCard = ({ data, onUpdate }) => {
             height={400}
             className="transition-transform duration-300 group-hover:scale-105 object-cover"
             priority
+            unoptimized
           />
         </div>
 

@@ -23,6 +23,7 @@ const UserAvatar = ({ user }) => {
           width={128}
           height={128}
           className="object-cover"
+          unoptimized
         />
       </div>
       {user?.role === 'PRO' && (

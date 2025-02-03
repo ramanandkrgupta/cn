@@ -2,21 +2,9 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import PropTypes from "prop-types";
 
-// Define static options
-const CATEGORIES = [
-  'Handwritten Notes',
-  'Study Materials',
-  'Question Papers',
-  'Syllabus',
-  'Other',
-]
+import { category, courses, semester } from "@/constants/index"
 
-const COURSES = [
-  { id: "cse", name: "Computer Science Engineering" },
-  { id: "me", name: "Mechanical Engineering" },
-  { id: "ce", name: "Civil Engineering" },
-  { id: "ec", name: "Electronics & Communication" }
-];
+
 
 const SEMESTERS = [
   { id: "one", name: "Semester 1" },
@@ -78,9 +66,9 @@ const DocDetails = ({ files, onSubmit }) => {
           className="select select-bordered w-full"
         >
           <option value="">Select Category</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
+          {category.map((cat) => (
+            <option key={cat.id} value={cat.name}>
+              {cat.name}
             </option>
           ))}
         </select>
@@ -95,8 +83,8 @@ const DocDetails = ({ files, onSubmit }) => {
           className="select select-bordered w-full"
         >
           <option value="">Select Course</option>
-          {COURSES.map((course) => (
-            <option key={course.id} value={course.id}>
+          {courses.map((course) => (
+            <option key={course.id} value={course.link}>
               {course.name}
             </option>
           ))}
@@ -317,7 +305,7 @@ const DocDetails = ({ files, onSubmit }) => {
 
           {/* Individual file fields */}
           <div>
-            <label className="label">Title</label>
+            <label className="label">✍️ Title</label>
             <input
               type="text"
               value={detail.title}
@@ -331,7 +319,7 @@ const DocDetails = ({ files, onSubmit }) => {
           {!batchMode && (
             <>
               <div>
-                <label className="label">Category</label>
+                <label className="label">🔖 Category</label>
                 <select
                   value={detail.category}
                   onChange={(e) => handleInputChange(index, "category", e.target.value)}
@@ -339,16 +327,16 @@ const DocDetails = ({ files, onSubmit }) => {
                   required
                 >
                   <option value="">Select Category</option>
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
+                  {category.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="label">Course</label>
+                <label className="label">🧑‍🎓 Course</label>
                 <select
                   value={detail.course}
                   onChange={(e) => {
@@ -361,8 +349,8 @@ const DocDetails = ({ files, onSubmit }) => {
                   required
                 >
                   <option value="">Select Course</option>
-                  {COURSES.map((course) => (
-                    <option key={course.id} value={course.id}>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.link}>
                       {course.name}
                     </option>
                   ))}
@@ -370,7 +358,7 @@ const DocDetails = ({ files, onSubmit }) => {
               </div>
 
               <div>
-                <label className="label">Semester</label>
+                <label className="label">🫰 Semester</label>
                 <select
                   value={detail.semester}
                   onChange={(e) => {
@@ -392,7 +380,7 @@ const DocDetails = ({ files, onSubmit }) => {
               </div>
 
               <div>
-                <label className="label">Subject</label>
+                <label className="label">📚 Subject</label>
                 <select
                   value={detail.subject?.subject_code || ""}
                   onChange={(e) => {
@@ -413,7 +401,8 @@ const DocDetails = ({ files, onSubmit }) => {
               </div>
 
               <div>
-                <label className="label">Description</label>
+                <label className="label">🔍 Description</label>
+                <p className="text-sm text-gray-400">BT-101 unit-2 water resources</p>
                 <textarea
                   value={detail.description}
                   onChange={(e) => handleInputChange(index, "description", e.target.value)}

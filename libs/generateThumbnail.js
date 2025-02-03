@@ -6,7 +6,7 @@ export const generateThumbnail = async (fileUrl, postId) => {
 
     if (!fileUrl) {
       console.error("No file URL provided for thumbnail generation");
-      return '/images/placeholders/pdf-placeholder.png';
+      return 'https://res.cloudinary.com/dk6p24i8q/image/upload/e_improve:outdoor/thumbnails/preview';
     }
 
 
@@ -23,7 +23,7 @@ export const generateThumbnail = async (fileUrl, postId) => {
       stack: error.stack
     });
     // Return a default thumbnail if generation fails
-    return '/images/placeholders/pdf-placeholder.png';
+    return 'https://res.cloudinary.com/dk6p24i8q/image/upload/e_improve:outdoor/thumbnails/preview';
   }
 };
 

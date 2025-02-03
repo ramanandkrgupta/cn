@@ -1,12 +1,13 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
+
 import { search } from "@/public/assets";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useDebounce } from "@/libs/hooks/useDebounce";
-import { useTypewriter } from '@/libs/hooks/useTypewriter';
+import { useTypewriter } from "@/libs/hooks/useTypewriter";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const Search = ({ setIsPostOpen, setPost }) => {
   const [searchText, setSearchText] = useState("");
@@ -17,7 +18,7 @@ const Search = ({ setIsPostOpen, setPost }) => {
     "Search for Notes, PYQ's",
     "Search bt-101 pyq",
     "Search cn-201 notes",
-    "Search study materials"
+    "Search study materials",
   ];
 
   const placeholderText = useTypewriter(placeholders, 100, 50, 2000);
@@ -133,7 +134,8 @@ const SearchDropDown = ({
             "Searching..."
           ) : (
             <>
-              {(results.posts?.length || 0) + (results.users?.length || 0)} <span>results for</span> "{searchText}"
+              {(results.posts?.length || 0) + (results.users?.length || 0)}{" "}
+              <span>results for</span> "{searchText}"
             </>
           )}
         </div>
@@ -161,7 +163,9 @@ const SearchDropDown = ({
                 )}
                 <div>
                   <p className="text-secondary font-medium">{user.name}</p>
-                  <p className="text-xs text-gray-400">{user.university || user.email}</p>
+                  <p className="text-xs text-gray-400">
+                    {user.university || user.email}
+                  </p>
                 </div>
               </div>
             ))}

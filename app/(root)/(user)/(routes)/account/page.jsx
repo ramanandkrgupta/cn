@@ -1,10 +1,11 @@
 "use client";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import Link from 'next/link';
+import Link from "next/link";
 import {
   User,
   CreditCard,
@@ -344,7 +345,7 @@ export default function Profile() {
               <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden bg-base-200">
                 <Link href="/account/profile">
                   <Image
-                    src={userData?.avatar || '/icons/icon.png'}
+                    src={userData?.avatar || "/icons/icon.png"}
                     alt="profile"
                     width={96}
                     height={96}
@@ -352,14 +353,20 @@ export default function Profile() {
                     priority
                     loading="eager"
                     onError={(e) => {
-                      e.target.src = '/icons/icon.png'
+                      e.target.src = "/icons/icon.png";
                     }}
                   />
                 </Link>
               </div>
+<<<<<<< HEAD
               {userData?.role === 'PRO' && (
                 <div className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
                   <Crown size={14} className="text-white md:h-5 md:w-5" />
+=======
+              {userData?.role === "PRO" && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                  <Crown size={14} className="text-white" />
+>>>>>>> upstream/master-2
                 </div>
               )}
             </div>
@@ -378,20 +385,25 @@ export default function Profile() {
                 <span
                   className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium inline-flex items-center gap-1
                   ${
-                    userRole === 'PRO'
-                      ? 'bg-primary/10 text-primary'
-                      : userRole === 'ADMIN'
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'bg-blue-100 text-blue-800'
+                    userRole === "PRO"
+                      ? "bg-primary/10 text-primary"
+                      : userRole === "ADMIN"
+                      ? "bg-purple-100 text-purple-800"
+                      : "bg-blue-100 text-blue-800"
                   }`}
                 >
-                  {userRole === 'PRO' && <Sparkles size={12} />}
-                  {userRole || 'FREE'} User
+                  {userRole === "PRO" && <Sparkles size={12} />}
+                  {userRole || "FREE"} User
                 </span>
+<<<<<<< HEAD
                 {userRole === 'PRO' && (
                   <span className="text-xs md:text-sm text-gray-500">
                     Lifetime
                   </span>
+=======
+                {userRole === "PRO" && (
+                  <span className="text-xs text-gray-500">Lifetime</span>
+>>>>>>> upstream/master-2
                 )}
               </div>
             </div>
@@ -470,6 +482,7 @@ export default function Profile() {
             </div>
           </div>
 
+<<<<<<< HEAD
           {/* Right Column */}
           <div className="md:col-span-8 space-y-4">
             {/* PRO Features Section - Only show if user is PRO */}
@@ -520,6 +533,19 @@ export default function Profile() {
                 session={session}
               />
             )}
+=======
+          {/* PRO Features Section - Only show if user is PRO */}
+          {userRole === "PRO" && (
+            <ProFeaturesSection items={proMenuItems} router={router} />
+          )}
+
+          {/* Show PRO Benefits Teaser for non-PRO users */}
+          {userRole !== "PRO" && (
+            <ProBenefitsTeaser
+              onUpgrade={() => router.push("/account/plans")}
+            />
+          )}
+>>>>>>> upstream/master-2
 
             {/* Preferences Section */}
             <div className="mb-4">
@@ -561,5 +587,10 @@ export default function Profile() {
       </div>
       <AppVersion />
     </div>
+<<<<<<< HEAD
   )
 }
+=======
+  );
+}
+>>>>>>> upstream/master-2

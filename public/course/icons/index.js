@@ -7,8 +7,11 @@ import ex from "./ex.webp";
 import me from "./me.webp";
 import aids from "./aids.png";
 import iot from "./iot.png";
+import ee from "./ee.png";
+import cs from "./cs.png";
 
 
-export { aiml, bca, btech, ce, ec, ex, me,iot,aids};
+
+export { aiml, bca, btech, ce, ec, ex, me,iot,aids,ee,cs};
 
 
