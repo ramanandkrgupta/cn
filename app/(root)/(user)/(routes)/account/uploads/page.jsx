@@ -7,20 +7,16 @@ import PostCard from '@/components/cards/PostCard'
 import NoDataFound from '@/components/ui/NoDataFound'
 
 // Skeleton loading component
+
 const SkeletonLoading = () => (
   <div className="animate-pulse">
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="bg-base-300 rounded-lg aspect-square relative">
-          <div className="absolute top-2 right-2 flex gap-2">
-            <div className="w-8 h-8 rounded-full bg-base-100" />
-            <div className="w-8 h-8 rounded-full bg-base-100" />
-          </div>
-        </div>
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+        <div key={i} className="bg-base-300 rounded-lg aspect-[3/4]" />
       ))}
     </div>
   </div>
-)
+);
 
 export default function UserUploads() {
   const router = useRouter()
