@@ -358,15 +358,9 @@ export default function Profile() {
                   />
                 </Link>
               </div>
-<<<<<<< HEAD
-              {userData?.role === 'PRO' && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
-                  <Crown size={14} className="text-white md:h-5 md:w-5" />
-=======
               {userData?.role === "PRO" && (
                 <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                   <Crown size={14} className="text-white" />
->>>>>>> upstream/master-2
                 </div>
               )}
             </div>
@@ -395,15 +389,8 @@ export default function Profile() {
                   {userRole === "PRO" && <Sparkles size={12} />}
                   {userRole || "FREE"} User
                 </span>
-<<<<<<< HEAD
-                {userRole === 'PRO' && (
-                  <span className="text-xs md:text-sm text-gray-500">
-                    Lifetime
-                  </span>
-=======
                 {userRole === "PRO" && (
                   <span className="text-xs text-gray-500">Lifetime</span>
->>>>>>> upstream/master-2
                 )}
               </div>
             </div>
@@ -482,7 +469,6 @@ export default function Profile() {
             </div>
           </div>
 
-<<<<<<< HEAD
           {/* Right Column */}
           <div className="md:col-span-8 space-y-4">
             {/* PRO Features Section - Only show if user is PRO */}
@@ -533,19 +519,6 @@ export default function Profile() {
                 session={session}
               />
             )}
-=======
-          {/* PRO Features Section - Only show if user is PRO */}
-          {userRole === "PRO" && (
-            <ProFeaturesSection items={proMenuItems} router={router} />
-          )}
-
-          {/* Show PRO Benefits Teaser for non-PRO users */}
-          {userRole !== "PRO" && (
-            <ProBenefitsTeaser
-              onUpgrade={() => router.push("/account/plans")}
-            />
-          )}
->>>>>>> upstream/master-2
 
             {/* Preferences Section */}
             <div className="mb-4">
@@ -587,10 +560,5 @@ export default function Profile() {
       </div>
       <AppVersion />
     </div>
-<<<<<<< HEAD
   )
 }
-=======
-  );
-}
->>>>>>> upstream/master-2
