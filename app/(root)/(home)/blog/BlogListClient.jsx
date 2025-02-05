@@ -19,7 +19,7 @@ export default function BlogListClient({ allPostsData }) {
             
           <div key={post.id} className="border rounded-lg overflow-hidden shadow-lg">
             <Link
-            href={`/blog/${post.id}`}
+            href={`/blog/${encodeURIComponent(post.id)}`}
             
           >
             <img 

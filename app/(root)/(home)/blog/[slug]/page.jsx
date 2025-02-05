@@ -2,7 +2,7 @@ import { getPostData, getSortedPostsData } from "@/libs/blogposts";
 import BlogContent from "./client";
 export async function generateStaticParams() {
   const posts = await getSortedPostsData();
-  return posts.map((post) => ({ slug: post.id }));
+  return posts.map((post) => ({ slug: encodeURIComponent(post.id) }));
 }
 
 export async function generateMetadata({ params }) {

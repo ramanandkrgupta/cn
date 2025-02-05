@@ -40,7 +40,8 @@ export async function getSortedPostsData() {
       const formattedDate = format(new Date(matterResult.data.date), 'MMMM dd, yyyy');
 
       return {
-        id,
+        id: matterResult.data.slug || id, // Use explicit slug
+
         
         ...matterResult.data,
         formattedDate,
@@ -52,7 +53,8 @@ export async function getSortedPostsData() {
 }
 
 export async function getPostData(id) {
-  const fullPath = `posts/${id}.md`
+  const decodedId = decodeURIComponent(id);
+  const fullPath = `posts/${decodedId}.md`;
   // const fullPath = path.join(postsDirectory, `${id}.md`);
   const fileContents = fs.readFileSync(fullPath, "utf-8")
   // const fileContents = await fs.readFile(fullPath, 'utf8');
