@@ -28,12 +28,12 @@ export default function FAQ() {
         <h2 className="text-4xl font-extrabold text-center mb-8">Frequently Asked Questions</h2>
         <div className="space-y-6">
           {faqs.map((faq, index) => (
-            <details key={index} className="p-5 border border-gray-300 rounded-lg bg-gray-50 shadow-md transition-all duration-300 hover:shadow-lg">
+            <details key={index} className="p-5 border border-secondary rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
               <summary className="font-semibold text-lg cursor-pointer flex justify-between items-center">
                 {faq.question}
-                <span className="text-gray-600">▼</span>
+                <span className="text-secondary">▼</span>
               </summary>
-              <p className="mt-3 text-gray-700 leading-relaxed">{faq.answer}</p>
+              <p className="mt-3 text-base-300/85 leading-relaxed">{faq.answer}</p>
             </details>
           ))}
         </div>

@@ -44,7 +44,7 @@ export default function Home() {
             style="md:grid-cols-5 mt-4 gap-1.5 justify-between md:justify-start"
           />
         </div>
-      <Blog/>
+      {/* <Blog/> */}
       </section>
       <FAQ/>
       <Footer />

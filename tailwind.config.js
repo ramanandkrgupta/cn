@@ -8,6 +8,45 @@ module.exports = {
 
   theme: {
     extend: {
+      // Add the typography configuration
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            'h1, h2, h3': {
+              fontWeight: '700',
+              scrollMarginTop: '100px'
+            },
+            h1: { 
+              fontSize: '2.5rem', 
+              margin: '2rem 0' 
+            },
+            h2: { 
+              fontSize: '2rem', 
+              margin: '1.5rem 0' 
+            },
+            h3: { 
+              fontSize: '1.5rem', 
+              margin: '1rem 0' 
+            },
+            img: { 
+              borderRadius: '0.5rem', 
+              margin: '2rem auto' 
+            },
+            code: {
+              backgroundColor: theme('colors.gray.100'),
+              padding: '0.2em 0.4em',
+              borderRadius: '0.25rem'
+            },
+            pre: {
+              backgroundColor: theme('colors.gray.900'),
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              overflowX: 'auto'
+            }
+          }
+        }
+      }),
 
       transitionTimingFunction: {
         'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -62,6 +101,7 @@ module.exports = {
   plugins: [
     require('daisyui'),
     require('tailwind-scrollbar'),
+    require('@tailwindcss/typography'), // Add typography plugin
   ],
   daisyui: {
     darkTheme: 'mydark',

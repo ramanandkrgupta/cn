@@ -1,28 +1,26 @@
-"use client"
-import { useParams } from "next/navigation";
+import { getPostData, getSortedPostsData } from "@/libs/blogposts";
+import BlogContent from "./client";
+export async function generateStaticParams() {
+  const posts = await getSortedPostsData();
+  return posts.map((post) => ({ slug: post.id }));
+}
 
-const blogPosts = {
-  "adsense-approval-guide": {
-    title: "How to Get AdSense Approval for Your Educational Blog",
-    content: "Detailed guide on improving content quality, SEO, and increasing engagement."
-  },
-  "study-techniques-engineering": {
-    title: "Top 10 Study Techniques for Engineering Students",
-    content: "Effective strategies for better study habits, focus, and retention."
-  }
-};
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const postData = await getPostData(slug);
 
-export default function BlogPost() {
-  const params = useParams();
-  const { slug } = params || {};
-  const post = blogPosts[slug];
+  return {
+    title: postData.title,
+    description: postData.excerpt,
+    openGraph: {
+      images: [postData.coverImage],
+    },
+  };
+}
 
-  if (!post) return <p>Loading...</p>;
+export default async function PostPage({ params }) {
+  const { slug } = await params;
+  const postData = await getPostData(slug);
 
-  return (
-    <section className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold">{post.title}</h1>
-      <p className="mt-4 text-gray-700">{post.content}</p>
-    </section>
-  );
+  return <BlogContent postData={postData} />;
 }
