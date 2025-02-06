@@ -119,6 +119,7 @@ From your command line:
   # <Create .env appropriately>
 
 # This is needed if you are planning to run Notes Mates locally
+  $npx prisma generate
   $npx prisma db push
 
 # Start the app in development mode with hot-code reloading by running:
