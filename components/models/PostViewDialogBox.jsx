@@ -27,6 +27,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
  
 
   // Check user's interaction when dialog opens
@@ -134,6 +135,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
         );
         return;
       }
+      setIsDownloading(true); // Start downloading
 
       const response = await fetch("/api/v1/members/posts/secure-file", {
         method: "POST",
@@ -170,6 +172,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     } catch (error) {
       console.error("Download error:", error);
       toast.error(error.message || "Error downloading file");
+    }
+    finally {
+      setIsDownloading(false); // Stop downloading regardless of success/failure
     }
   };
 
@@ -330,32 +335,58 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   </div>
                   
                   <div className="flex w-full gap-2">
-                    <button
-                      type="button"
-                      className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300"
-                      onClick={() => {
-                        if (!session?.user) {
-                          toast.error("Please login to download files");
-                          return;
-                        }
-                        handleDownload(data.id, data.title);
-                      }}
-                    >
-                      {!session?.user ? (
-                        <span className="flex items-center justify-center gap-1 text-sm">
-                          <Lock className="w-4 h-4" />
-                          Login to Download
-                        </span>
-                      ) : data.premium ? (
-                        session.user.userRole === "PRO" ? (
-                          "Premium File - Download"
-                        ) : (
-                          "Premium File - Upgrade to Download"
-                        )
-                      ) : (
-                        "Download"
-                      )}
-                    </button>
+                  <button
+  type="button"
+  className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+  onClick={() => {
+    if (!session?.user) {
+      toast.error("Please login to download files");
+      return;
+    }
+    handleDownload(data.id, data.title);
+  }}
+  disabled={isDownloading || (data.premium && session?.user?.userRole !== "PRO")}
+>
+  {isDownloading ? (
+    // Loading spinner animation
+    <div className="flex items-center justify-center gap-2">
+      <svg
+        className="animate-spin h-5 w-5 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+      <span>Downloading...</span>
+    </div>
+  ) : !session?.user ? (
+    <span className="flex items-center justify-center gap-1 text-sm">
+      <Lock className="w-4 h-4" />
+      Login to Download
+    </span>
+  ) : data.premium ? (
+    session.user.userRole === "PRO" ? (
+      "Premium File - Download"
+    ) : (
+      "Premium File - Upgrade to Download"
+    )
+  ) : (
+    "Download"
+  )}
+</button>
 
                     <button
                       onClick={() => {
