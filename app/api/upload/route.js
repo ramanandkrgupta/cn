@@ -23,15 +23,17 @@ export async function POST(req) {
     const formData = await req.formData();
     const file = formData.get("file");
     const fileId = formData.get("fileId");
-    const branch = formData.get("branch") || "general"; // Get branch from form data
-
+  
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    const subjectCode = formData.get("subject_code");
+    const title = formData.get("title");
+    const key = `${subjectCode}/${fileId}-${title}.pdf`; // Include subject_code in the key and format the file name
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const key = `${branch}/${fileId}-${file.name}`; // Include branch in the key
+  
 
     // Upload to R2
     const putCommand = new PutObjectCommand({
@@ -44,7 +46,7 @@ export async function POST(req) {
     await s3Client.send(putCommand);
 
     // Use the public dev URL
-    const publicUrl = `https://pub-3af4d35ad24746e0bcce7e5745ffc016.r2.dev/${key}`;
+    const publicUrl = `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`;
 
     return NextResponse.json({
       success: true,

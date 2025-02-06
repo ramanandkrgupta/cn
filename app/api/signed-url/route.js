@@ -20,8 +20,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fileName, fileType } = await req.json();
-    const key = `${session.user.id}/${fileName}`;
+    const { fileName, fileType, subject, course} = await req.json();
+    const key = `${course}-${subject}/${session.user.id}/${fileName}`;
+    console.log("Generating signed URL for key:", key);
 
     const command = new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,

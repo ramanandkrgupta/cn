@@ -316,3 +316,50 @@ body {
 .message.assistant .prose p {
   margin-bottom: 1rem;
 }
+
+
+
+/* blogpost */
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Anchor link styling */
+.anchor-link {
+  position: absolute;
+  left: -1em;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.8em;
+}
+
+.anchor-link svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+h2:hover .anchor-link,
+h3:hover .anchor-link {
+  opacity: 1;
+}
+
+/* Responsive images */
+.prose img {
+  width: 100%;
+  height: auto;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+/* Code block styling */
+.prose pre {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.prose code::before,
+.prose code::after {
+  content: '';
+}

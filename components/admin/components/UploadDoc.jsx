@@ -126,6 +126,7 @@ const UploadDoc = ({
         [processedPdfBytes], 
         details.originalName || file.name,
         { type: 'application/pdf' }
+
       );
 
       // Show toast for getting signed URL
@@ -141,6 +142,8 @@ const UploadDoc = ({
         body: JSON.stringify({
           fileName: processedFile.name,
           fileType: processedFile.type,
+          subject: details.subject?.subject_name,
+          course: details.course
         }),
       });
 
@@ -338,7 +341,7 @@ const UploadDoc = ({
                 <span className="font-semibold">Click to upload</span> or drag and
                 drop
               </p>
-              <p className="text-xs text-gray-400">PDF (MAX. 10MB)</p>
+              <p className="text-xs text-gray-400">PDF (MAX. 100MB)</p>
               <p className="text-sm md:text-xs text-gray-400">
                 Please note that you are allowed to upload a maximum of 3 files.
               </p>

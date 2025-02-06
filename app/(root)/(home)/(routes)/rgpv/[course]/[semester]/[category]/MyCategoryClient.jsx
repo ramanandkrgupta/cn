@@ -1,5 +1,6 @@
 "use client";
 
+
 import DataCard from "@/components/cards/DataCard";
 import { category } from "@/constants";
 import { ArrowLeft } from "lucide-react";
@@ -26,6 +27,7 @@ const MyCategoryClient = ({ course, semester, subId }) => {
 
       </small>
       <div className="item-center">
+
         <div className="grid grid-cols-2 mt-[18px] gap-[18px]">
           {category.map((category, index) => (
             <DataCard
@@ -46,6 +48,7 @@ const MyCategoryClient = ({ course, semester, subId }) => {
             />
           ))}
         </div>
+        
       </div>
     </div>
   );

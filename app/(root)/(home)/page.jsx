@@ -6,6 +6,8 @@ import Banner from "@/components/Banner";
 import Notification from "@/components/Notification";
 import Feed from "@/components/Feed";
 import Footer from "./(routes)/about/components/Footer";
+import FAQ from './(faq)/faq';
+import Blog from './blog/page';
 
 
 
@@ -42,7 +44,9 @@ export default function Home() {
             style="md:grid-cols-5 mt-4 gap-1.5 justify-between md:justify-start"
           />
         </div>
+      {/* <Blog/> */}
       </section>
+      <FAQ/>
       <Footer />
     </>
   );

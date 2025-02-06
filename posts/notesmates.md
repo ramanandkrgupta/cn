@@ -1,4 +1,9 @@
-
+---
+title: " Welcome to NotesMates 📚 Website"
+date: "2025-02-05T00:00:00Z"
+excerpt: "Learn how to build modern web applications with Next.js 14"
+coverImage: "https://i.postimg.cc/Hxb7NbgW/Screenshot-2024-12-09-at-9-51-05-PM.png"
+---
 # Welcome to NotesMates 📚 Website 
 
 ![App Screenshot](https://i.postimg.cc/Hxb7NbgW/Screenshot-2024-12-09-at-9-51-05-PM.png)
@@ -119,7 +124,6 @@ From your command line:
   # <Create .env appropriately>
 
 # This is needed if you are planning to run Notes Mates locally
-  $npx prisma generate
   $npx prisma db push
 
 # Start the app in development mode with hot-code reloading by running:

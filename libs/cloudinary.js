@@ -7,11 +7,6 @@ const config = {
   api_secret: process.env.CLOUDINARY_API_SECRET,
 };
 
-console.log("Cloudinary configuration:", {
-  cloud_name: config.cloud_name,
-  api_key: config.api_key ? "present" : "missing",
-  api_secret: config.api_secret ? "present" : "missing"
-});
 
 cloudinary.config(config);
 

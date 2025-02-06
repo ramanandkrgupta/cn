@@ -9,6 +9,7 @@ import { filterSyllabus } from "@/libs/hooks/usefilter";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+
 // Dynamically import components that aren't needed immediately
 const DataCard = dynamic(() => import("@/components/cards/DataCard"), {
   loading: () => <div className="animate-pulse bg-base-300 rounded-lg h-32"></div>
@@ -85,6 +86,7 @@ const UserSemester = ({ course }) => {
         ) : (
           SemesterGrid
         )}
+        
       </div>
 
       {isPostOpen && data && (
