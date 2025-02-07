@@ -21,7 +21,89 @@ import Link from 'next/link'
 import PostViewDialogBox from '../models/PostViewDialogBox'
 import AddToCollection from '../collections/AddToCollection'
 
-// Default onUpdate to a no-op if not provided
+// Import the category constant from your constants.
+import { category } from '@/constants/index'
+
+// ----------------------------
+// EditDocForm: Only allows editing Title, Category, and Description.
+// ----------------------------
+const EditDocForm = ({ initialData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    title: initialData.title || '',
+    category: initialData.category || '',
+    description: initialData.description || '',
+  })
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    // Validate required fields: title and category.
+    if (!formData.title || !formData.category) {
+      toast.error('Please fill in both Title and Category.')
+      return
+    }
+    onSave(formData)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Title</label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => handleInputChange('title', e.target.value)}
+          className="input input-bordered w-full"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Category
+        </label>
+        <select
+          value={formData.category}
+          onChange={(e) => handleInputChange('category', e.target.value)}
+          className="select select-bordered w-full"
+          required
+        >
+          <option value="">Select Category</option>
+          {category.map((cat) => (
+            <option key={cat.id} value={cat.name}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Description
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => handleInputChange('description', e.target.value)}
+          className="textarea textarea-bordered w-full"
+          placeholder="Enter description (optional)"
+        />
+      </div>
+      <div className="flex justify-end space-x-4">
+        <button type="button" onClick={onCancel} className="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" className="btn btn-primary">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  )
+}
+
+// ----------------------------
+// PostCard Component
+// ----------------------------
 const PostCard = ({ data, onUpdate = () => {} }) => {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
@@ -37,6 +119,7 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
   })
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   // Check if the user has already liked the post.
   useEffect(() => {
@@ -60,13 +143,11 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     })
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const pages = pdfDoc.getPages()
-
     pages.forEach((page) => {
       const { width } = page.getSize()
       const fontSize = 10
       const userDetails = `${userName} - ${userEmail}`
       const textWidth = helveticaFont.widthOfTextAtSize(userDetails, fontSize)
-
       page.drawText(userDetails, {
         x: width - textWidth - 10,
         y: 10,
@@ -76,77 +157,56 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         opacity: 0.5,
       })
     })
-
     return await pdfDoc.save()
   }
 
   const handleDownload = async (e) => {
     e.stopPropagation()
-
-    if (downloadInProgress.has(data.id)) {
-      return
-    }
-
+    if (downloadInProgress.has(data.id)) return
     try {
       if (!session?.user) {
         toast.error('Please login to download files')
         return
       }
-
       if (data.premium && session.user.role !== 'PRO') {
         toast.error(
           'This is a premium file. You need a premium membership to download it.'
         )
         return
       }
-
       setIsDownloading(true)
       setDownloadInProgress((prev) => new Set(prev).add(data.id))
-
       const response = await fetch('/api/v1/members/posts/secure-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId: data.id }),
       })
-
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to get file access')
       }
-
       const { fileUrl } = await response.json()
       const fileResponse = await fetch(fileUrl)
       const existingPdfBytes = await fileResponse.arrayBuffer()
-
       const modifiedPdfBytes = await addUserDetailsToPdf(
         existingPdfBytes,
         session.user.name,
         session.user.email
       )
-
       const modifiedBlob = new Blob([modifiedPdfBytes], {
         type: 'application/pdf',
       })
       saveAs(modifiedBlob, `cn-${data.title}`)
-
       const metricsResponse = await fetch('/api/v1/members/posts/metrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          postId: data.id,
-          metricType: 'downloads',
-        }),
+        body: JSON.stringify({ postId: data.id, metricType: 'downloads' }),
       })
-
       if (metricsResponse.ok) {
         const updatedMetrics = await metricsResponse.json()
-        setMetrics((prev) => ({
-          ...prev,
-          ...updatedMetrics,
-        }))
+        setMetrics((prev) => ({ ...prev, ...updatedMetrics }))
         onUpdate({ ...data, ...updatedMetrics })
       }
-
       toast.success('File downloaded successfully!')
     } catch (error) {
       console.error('Download error:', error)
@@ -163,21 +223,17 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
 
   const handleLike = async (e) => {
     e.stopPropagation()
-
     if (!session?.user) {
       toast.error('Please login to like/unlike posts')
       return
     }
-
     const previousLikedState = hasLiked
     const newLikedState = !hasLiked
-
     setHasLiked(newLikedState)
     setMetrics((prev) => ({
       ...prev,
       likes: newLikedState ? prev.likes + 1 : Math.max(prev.likes - 1, 0),
     }))
-
     try {
       const response = await fetch('/api/v1/members/posts/metrics', {
         method: 'POST',
@@ -188,7 +244,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
           action: newLikedState ? 'like' : 'unlike',
         }),
       })
-
       if (!response.ok) {
         setHasLiked(previousLikedState)
         setMetrics((prev) => ({
@@ -198,13 +253,11 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         const result = await response.json()
         throw new Error(result.error || 'Failed to update like status')
       }
-
       const result = await response.json()
       if (result.likes !== undefined) {
         setMetrics((prev) => ({ ...prev, likes: result.likes }))
         onUpdate({ ...data, likes: result.likes })
       }
-
       toast.success(newLikedState ? 'Post liked!' : 'Post unliked!')
     } catch (error) {
       console.error('Like/Unlike error:', error)
@@ -214,7 +267,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
 
   const handleShare = async (e) => {
     e.stopPropagation()
-
     const SharePost = {
       title: data.title || '',
       content: `Hey! Check out these notes for your best result in exams.\n\n🛂Course Name🛂\n ${
@@ -227,7 +279,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         data.id
       }/${data.title.replace(/\s+/g, '-')}`,
     }
-
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
@@ -241,16 +292,11 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         )
         toast.success('Link copied to clipboard!')
       }
-
       const response = await fetch('/api/v1/members/posts/metrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          postId: data.id,
-          metricType: 'shares',
-        }),
+        body: JSON.stringify({ postId: data.id, metricType: 'shares' }),
       })
-
       if (response.ok) {
         const updatedMetrics = await response.json()
         setMetrics((prev) => ({ ...prev, ...updatedMetrics }))
@@ -274,7 +320,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         throw new Error(result.error || 'Failed to delete post')
       }
       toast.success('Post deleted successfully!')
-      // Signal deletion by calling onUpdate with null.
       onUpdate(null)
     } catch (error) {
       console.error('Delete error:', error)
@@ -355,7 +400,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
               unoptimized
             />
           </div>
-
           {/* Hover Overlay */}
           <div
             className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center ${
@@ -364,7 +408,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
           >
             <Eye className="w-8 h-8 text-white" />
           </div>
-
           {/* Title and Category Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3 text-white bg-gradient-to-t from-black/60 to-transparent">
             <h3 className="font-semibold text-sm line-clamp-2">{data.title}</h3>
@@ -414,12 +457,15 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
           (session.user.id === data.userId ||
             session.user.role === 'ADMIN') && (
             <div className="mt-3 flex gap-2">
-              <Link
-                href={`/posts/edit/${data.id}`}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowEditModal(true)
+                }}
                 className="btn btn-secondary btn-sm"
               >
                 Edit
-              </Link>
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -463,6 +509,50 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
                 {isDeleting ? 'Deleting...' : 'Yes'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {showEditModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Edit Post</h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                Close
+              </button>
+            </div>
+            {/* EditDocForm allows editing only Title, Description, and Category */}
+            <EditDocForm
+              initialData={data}
+              onSave={async (updatedFields) => {
+                try {
+                  // Send a PUT request to update the post metadata.
+                  const response = await fetch(
+                    `/api/v1/members/posts/${data.id}`,
+                    {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(updatedFields),
+                    }
+                  )
+                  if (!response.ok) {
+                    const result = await response.json()
+                    throw new Error(result.error || 'Failed to update post')
+                  }
+                  const updatedPost = await response.json()
+                  toast.success('Post updated successfully!')
+                  onUpdate(updatedPost)
+                  setShowEditModal(false)
+                } catch (error) {
+                  console.error('Update error:', error)
+                  toast.error(error.message || 'Failed to update post')
+                }
+              }}
+              onCancel={() => setShowEditModal(false)}
+            />
           </div>
         </div>
       )}

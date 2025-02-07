@@ -1,41 +1,46 @@
+// File: /app/api/v1/members/posts/[id]/route.js (or .ts)
 import prisma from '@/libs/prisma'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth.config'
 
-export async function DELETE(req, context) {
+export async function PUT(req, context) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Directly extract id from context.params (no need for await)
     const { id } = context.params
 
-    // Find the post by id
-    const post = await prisma.post.findUnique({ where: { id } })
-    if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    // Parse the request body as JSON.
+    const body = await req.json()
+
+    // Basic validation (adjust as needed)
+    if (!body.title || !body.category) {
+      return NextResponse.json(
+        { error: 'Missing required fields: title and category are required.' },
+        { status: 400 }
+      )
     }
 
-    // Only allow deletion if the user is the post owner or an admin
-    if (session.user.id !== post.userId && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Not allowed' }, { status: 403 })
-    }
+    // Update the post in the database
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: {
+        title: body.title,
+        category: body.category,
+        description: body.description, // include description (optional)
+        // Add any other fields you need to update
+      },
+    })
 
-    // Delete related UserLike and UserDownload records
-    await prisma.userLike.deleteMany({ where: { postId: id } })
-    await prisma.userDownload.deleteMany({ where: { postId: id } })
-
-    // Delete the post
-    await prisma.post.delete({ where: { id } })
-
-    return NextResponse.json({ message: 'Post deleted successfully' })
+    // Return the updated post as JSON
+    return NextResponse.json(updatedPost)
   } catch (error) {
-    console.error('Error deleting post:', error)
+    console.error('Error updating post:', error)
     return NextResponse.json(
-      { error: error.message || 'Error deleting post' },
+      { error: error.message || 'Error updating post' },
       { status: 500 }
     )
   }
