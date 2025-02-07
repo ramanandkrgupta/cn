@@ -1,7 +1,9 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { signIn } from 'next-auth/react'
+import toast from 'react-hot-toast'
 import {
   Download,
   Heart,
@@ -13,15 +15,14 @@ import {
   Lock,
   Loader2,
 } from 'lucide-react'
-import toast from 'react-hot-toast'
 import { saveAs } from 'file-saver'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import Link from 'next/link'
-
 import PostViewDialogBox from '../models/PostViewDialogBox'
 import AddToCollection from '../collections/AddToCollection'
 
-const PostCard = ({ data, onUpdate }) => {
+// Default onUpdate to a no-op if not provided
+const PostCard = ({ data, onUpdate = () => {} }) => {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -34,8 +35,10 @@ const PostCard = ({ data, onUpdate }) => {
     likes: data.likes || 0,
     shares: data.shares || 0,
   })
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  // On mount, check if the user has already liked the post
+  // Check if the user has already liked the post.
   useEffect(() => {
     const checkUserInteraction = async () => {
       if (session?.user) {
@@ -48,7 +51,6 @@ const PostCard = ({ data, onUpdate }) => {
         }
       }
     }
-
     checkUserInteraction()
   }, [data.id, session])
 
@@ -91,7 +93,7 @@ const PostCard = ({ data, onUpdate }) => {
         return
       }
 
-      if (data.premium && session.user.userRole !== 'PRO') {
+      if (data.premium && session.user.role !== 'PRO') {
         toast.error(
           'This is a premium file. You need a premium membership to download it.'
         )
@@ -142,6 +144,7 @@ const PostCard = ({ data, onUpdate }) => {
           ...prev,
           ...updatedMetrics,
         }))
+        onUpdate({ ...data, ...updatedMetrics })
       }
 
       toast.success('File downloaded successfully!')
@@ -158,7 +161,6 @@ const PostCard = ({ data, onUpdate }) => {
     }
   }
 
-  // Optimistic toggle for like/unlike so the user can switch anytime
   const handleLike = async (e) => {
     e.stopPropagation()
 
@@ -167,11 +169,9 @@ const PostCard = ({ data, onUpdate }) => {
       return
     }
 
-    // Save the current state so we can revert if the API fails
     const previousLikedState = hasLiked
     const newLikedState = !hasLiked
 
-    // Optimistically update the UI
     setHasLiked(newLikedState)
     setMetrics((prev) => ({
       ...prev,
@@ -190,7 +190,6 @@ const PostCard = ({ data, onUpdate }) => {
       })
 
       if (!response.ok) {
-        // Revert the optimistic update if the API call fails
         setHasLiked(previousLikedState)
         setMetrics((prev) => ({
           ...prev,
@@ -200,10 +199,10 @@ const PostCard = ({ data, onUpdate }) => {
         throw new Error(result.error || 'Failed to update like status')
       }
 
-      // Optionally update with server response if provided
       const result = await response.json()
       if (result.likes !== undefined) {
         setMetrics((prev) => ({ ...prev, likes: result.likes }))
+        onUpdate({ ...data, likes: result.likes })
       }
 
       toast.success(newLikedState ? 'Post liked!' : 'Post unliked!')
@@ -216,20 +215,20 @@ const PostCard = ({ data, onUpdate }) => {
   const handleShare = async (e) => {
     e.stopPropagation()
 
-    try {
-      const SharePost = {
-        title: data.title || '',
-        content: `Hey! Check out these notes for your best result in exams.\n\n🛂Course Name🛂\n ${
-          data.course_name
-        }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
-          /\s/g,
-          ''
-        )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
-          data.id
-        }/${data.title.replace(/\s+/g, '-')}`,
-      }
+    const SharePost = {
+      title: data.title || '',
+      content: `Hey! Check out these notes for your best result in exams.\n\n🛂Course Name🛂\n ${
+        data.course_name
+      }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
+        /\s/g,
+        ''
+      )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
+        data.id
+      }/${data.title.replace(/\s+/g, '-')}`,
+    }
 
+    try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: SharePost.title,
@@ -254,15 +253,35 @@ const PostCard = ({ data, onUpdate }) => {
 
       if (response.ok) {
         const updatedMetrics = await response.json()
-        setMetrics((prev) => ({
-          ...prev,
-          ...updatedMetrics,
-        }))
+        setMetrics((prev) => ({ ...prev, ...updatedMetrics }))
+        onUpdate({ ...data, ...updatedMetrics })
       }
     } catch (error) {
       console.error('Share error:', error)
       if (error.name === 'AbortError') return
       toast.error('Error sharing post')
+    }
+  }
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/v1/members/posts/${data.id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        const result = await response.json()
+        throw new Error(result.error || 'Failed to delete post')
+      }
+      toast.success('Post deleted successfully!')
+      // Signal deletion by calling onUpdate with null.
+      onUpdate(null)
+    } catch (error) {
+      console.error('Delete error:', error)
+      toast.error(error.message || 'Error deleting post')
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -274,7 +293,9 @@ const PostCard = ({ data, onUpdate }) => {
 
   return (
     <div
-      className="relative group bg-base-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg"
+      className={`relative group bg-base-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg ${
+        isDeleting ? 'opacity-0 transition-opacity duration-500' : ''
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -354,7 +375,7 @@ const PostCard = ({ data, onUpdate }) => {
 
       {/* Bottom Action Bar */}
       <div className="p-3 border-t border-base-300 bg-base-100">
-        <div className="flex items-center justify-between">
+        <div className="flex md:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1">
               <Heart className="w-4 h-4" />
@@ -374,7 +395,7 @@ const PostCard = ({ data, onUpdate }) => {
               disabled={
                 downloadInProgress.has(data.id) ||
                 (data.premium &&
-                  (!session?.user || session.user.userRole !== 'PRO'))
+                  (!session?.user || session.user.role !== 'PRO'))
               }
               className="btn btn-primary btn-sm"
             >
@@ -388,6 +409,28 @@ const PostCard = ({ data, onUpdate }) => {
             </button>
           </div>
         </div>
+        {/* Extra Admin / Owner Buttons */}
+        {session?.user &&
+          (session.user.id === data.userId ||
+            session.user.role === 'ADMIN') && (
+            <div className="mt-3 flex gap-2">
+              <Link
+                href={`/posts/edit/${data.id}`}
+                className="btn btn-secondary btn-sm"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowDeleteModal(true)
+                }}
+                className="btn btn-error btn-sm"
+              >
+                Delete
+              </button>
+            </div>
+          )}
       </div>
 
       {/* Modals */}
@@ -399,6 +442,29 @@ const PostCard = ({ data, onUpdate }) => {
       )}
       {isOpen && (
         <PostViewDialogBox isOpen={isOpen} setIsOpen={setIsOpen} data={data} />
+      )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">Confirm Deletion</h2>
+            <p className="mb-4">Do you really want to delete this post?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="btn btn-secondary"
+              >
+                No
+              </button>
+              <button
+                onClick={handleDelete}
+                className="btn btn-error"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Yes'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
