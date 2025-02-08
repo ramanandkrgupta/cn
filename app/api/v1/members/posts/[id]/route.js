@@ -46,37 +46,41 @@ export async function PUT(req, context) {
   }
 }
 
+   export async function DELETE(req, { params }) {
+     try {
+       const session = await getServerSession(authOptions)
+       if (!session?.user) {
+         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+       }
 
-// DELETE handler for deleting a post.
+       const { id } = params
 
-export async function DELETE(req, context) {
-  try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+       // First, delete all related likes for the post
+       await prisma.userLike.deleteMany({
+         where: { postId: id },
+       })
 
-    const { id } = context.params
+       // Then, delete all related downloads for the post
+       await prisma.userDownload.deleteMany({
+         where: { postId: id },
+       })
 
-    // First, manually delete all dependent records (e.g., likes)
-    await prisma.userLike.deleteMany({
-      where: { postId: id },
-    })
+       // Finally, delete the post itself
+       const deletedPost = await prisma.post.delete({
+         where: { id },
+       })
 
-    // Then, delete the post itself
-    const deletedPost = await prisma.post.delete({
-      where: { id },
-    })
+       return NextResponse.json(
+         { message: 'Post deleted successfully', deletedPost },
+         { status: 200 }
+       )
+     } catch (error) {
+       console.error('Error deleting post:', error)
 
-    return NextResponse.json(
-      { message: 'Post deleted successfully', deletedPost },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Error deleting post:', error)
-    return NextResponse.json(
-      { error: error.message || 'Error deleting post' },
-      { status: 500 }
-    )
-  }
-}
+       return NextResponse.json(
+         { error: error.message || 'Error deleting post' },
+         { status: 500 }
+       )
+
+     }
+   }
