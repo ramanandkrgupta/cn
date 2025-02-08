@@ -1,36 +1,37 @@
 // app/(root)/(home)/(routes)/view-doc/page.jsx
 
-"use client";
-import toast from "react-hot-toast";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import PostCard from "@/components/cards/PostCard";
-import NoDataFound from "@/components/ui/NoDataFound";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+'use client'
+import toast from 'react-hot-toast'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import PostCard from '@/components/cards/PostCard'
+import NoDataFound from '@/components/ui/NoDataFound'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion' // Import framer-motion
 
 // Format subject code (BT101 -> BT-101)
 const formatSubjectCode = (code) => {
-  if (!code) return "";
-  const match = code.match(/([A-Za-z]+)(\d+)/);
-  return match ? `${match[1]}-${match[2]}` : code;
-};
+  if (!code) return ''
+  const match = code.match(/([A-Za-z]+)(\d+)/)
+  return match ? `${match[1]}-${match[2]}` : code
+}
 
 // Format semester (one -> First)
 const formatSemester = (sem) => {
-  if (!sem) return "";
+  if (!sem) return ''
   const semesterMap = {
-    one: "First",
-    two: "Second",
-    three: "Third",
-    four: "Fourth",
-    five: "Fifth",
-    six: "Sixth",
-    seven: "Seventh",
-    eight: "Eighth",
-  };
-  return semesterMap[sem.toLowerCase()] || sem;
-};
+    one: 'First',
+    two: 'Second',
+    three: 'Third',
+    four: 'Fourth',
+    five: 'Fifth',
+    six: 'Sixth',
+    seven: 'Seventh',
+    eight: 'Eighth',
+  }
+  return semesterMap[sem.toLowerCase()] || sem
+}
 
 // Skeleton loading component
 const SkeletonLoading = () => (
@@ -41,36 +42,36 @@ const SkeletonLoading = () => (
       ))}
     </div>
   </div>
-);
+)
 
 const ViewDoc = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const course = searchParams.get("name");
-  const semester = searchParams.get("sem");
-  const category = searchParams.get("category");
-  const subId = searchParams.get("subId");
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const course = searchParams.get('name')
+  const semester = searchParams.get('sem')
+  const category = searchParams.get('category')
+  const subId = searchParams.get('subId')
 
-  const [posts, setPosts] = useState([]);
-  const [metadata, setMetadata] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [posts, setPosts] = useState([])
+  const [metadata, setMetadata] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   // Update the filter state and options
   const [filters, setFilters] = useState({
-    sort: "newest",
-    type: "all",
-  });
+    sort: 'newest',
+    type: 'all',
+  })
 
-  // Modified fetch function
+  // Fetch posts based on URL parameters and filters
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         const params = new URLSearchParams({
           sort: filters.sort,
           type: filters.type,
-        });
+        })
 
         const response = await fetch(
           `/api/v1/public/posts/filter/${encodeURIComponent(
@@ -78,86 +79,85 @@ const ViewDoc = () => {
           )}/${encodeURIComponent(semester)}/${encodeURIComponent(
             category
           )}/${encodeURIComponent(subId)}?${params}`
-        );
-        const data = await response.json();
+        )
+        const data = await response.json()
 
         if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch posts");
+          throw new Error(data.error || 'Failed to fetch posts')
         }
 
         // Filter posts based on type
         const filteredPosts = data.posts.filter((post) => {
           switch (filters.type) {
-            case "free":
-              return !post.premium;
-            case "premium":
-              return post.premium;
+            case 'free':
+              return !post.premium
+            case 'premium':
+              return post.premium
             default:
-              return true;
+              return true
           }
-        });
+        })
 
-        setPosts(filteredPosts);
+        setPosts(filteredPosts)
         setMetadata({
           ...data.meta,
           total: filteredPosts.length,
-        });
+        })
       } catch (error) {
-        console.error("Error fetching posts:", error);
-        setError(error.message);
-        toast.error("Failed to load posts");
+        console.error('Error fetching posts:', error)
+        setError(error.message)
+        toast.error('Failed to load posts')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     if (course && semester && category && subId) {
-      fetchPosts();
+      fetchPosts()
     }
-  }, [course, semester, category, subId, filters]);
+  }, [course, semester, category, subId, filters])
 
-  // Update document title and meta tags
+  // Update document title and meta tags for SEO
   useEffect(() => {
     const title = `${category} - ${formatSubjectCode(
       subId
     )} - ${course?.toUpperCase()} - ${formatSemester(
       semester
-    )} Semester | RGPV Notes`;
+    )} Semester | RGPV Notes`
     const description = `Access free ${category?.toLowerCase()} for ${formatSubjectCode(
       subId
     )} (${course?.toUpperCase()}) ${formatSemester(
       semester
-    )} Semester at RGPV University. Download lecture notes, previous year question papers, syllabus, and video lectures.`;
+    )} Semester at RGPV University. Download lecture notes, previous year question papers, syllabus, and video lectures.`
 
-    document.title = title;
+    document.title = title
 
-    // Update meta tags
+    // Function to update or create meta tags
     const updateMetaTag = (name, content) => {
-      let tag = document.querySelector(`meta[name="${name}"]`);
+      let tag = document.querySelector(`meta[name="${name}"]`)
       if (!tag) {
-        tag = document.createElement("meta");
-        tag.name = name;
-        document.head.appendChild(tag);
+        tag = document.createElement('meta')
+        tag.name = name
+        document.head.appendChild(tag)
       }
-      tag.content = content;
-    };
+      tag.content = content
+    }
 
-    updateMetaTag("description", description);
-    updateMetaTag("og:title", title);
-    updateMetaTag("og:description", description);
-    updateMetaTag("og:type", "website");
-    updateMetaTag("og:site_name", "RGPV Notes");
-  }, [course, semester, category, subId]);
+    updateMetaTag('description', description)
+    updateMetaTag('og:title', title)
+    updateMetaTag('og:description', description)
+    updateMetaTag('og:type', 'website')
+    updateMetaTag('og:site_name', 'RGPV Notes')
+  }, [course, semester, category, subId])
 
   return (
     <div className="container">
       {/* Header Section */}
-      {/* nn */}
-      <div className=" mb-6">
+      <div className="mb-6">
         <div className="flex items-center gap-2" onClick={() => router.back()}>
           <button
             aria-label="Go Back"
-            className="hover:bg-base-300  rounded-full transition-colors"
+            className="hover:bg-base-300 rounded-full transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -250,19 +250,37 @@ const ViewDoc = () => {
           <NoDataFound />
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                data={post}
-                onUpdate={(updatedPost) => {
-                  setPosts((currentPosts) =>
-                    currentPosts.map((p) =>
-                      p.id === updatedPost.id ? updatedPost : p
-                    )
-                  );
-                }}
-              />
-            ))}
+            <AnimatePresence>
+              {posts.map((post) => (
+                <motion.div
+                  key={post.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <PostCard
+                    data={post}
+                    onUpdate={(updatedPost) => {
+                      if (updatedPost === null) {
+                        // Post was deleted; remove it from the list.
+                        setPosts((currentPosts) =>
+                          currentPosts.filter((p) => p.id !== post.id)
+                        )
+                      } else {
+                        // Otherwise, update the specific post.
+                        setPosts((currentPosts) =>
+                          currentPosts.map((p) =>
+                            p.id === updatedPost.id ? updatedPost : p
+                          )
+                        )
+                      }
+                    }}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 
@@ -274,7 +292,7 @@ const ViewDoc = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ViewDoc;
+export default ViewDoc
