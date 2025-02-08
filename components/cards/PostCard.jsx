@@ -317,30 +317,39 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
      })
 
      if (!response.ok) {
-       // Attempt to get error details from the response
        let errorMessage = 'Failed to delete post'
        try {
-         // Try to parse as JSON first
          const result = await response.json()
          errorMessage = result.error || errorMessage
        } catch (jsonError) {
-         // If JSON parsing fails, try reading as text
          const text = await response.text()
          if (text) {
            errorMessage = text
          }
        }
-       console.error('Delete response error:', response.status, errorMessage)
+
+       // If the error is "Record not found", we'll treat it as a successful deletion
+       // since the post is already gone
+       if (errorMessage.includes('Record to delete does not exist')) {
+         toast.success('Post removed successfully')
+         await new Promise((resolve) => setTimeout(resolve, 300))
+         onUpdate(null)
+         return
+       }
+
        throw new Error(errorMessage)
      }
+
+     // Add a small delay for the fade-out animation
+     await new Promise((resolve) => setTimeout(resolve, 300))
 
      toast.success('Post deleted successfully!')
      onUpdate(null)
    } catch (error) {
      console.error('Delete error:', error)
      toast.error(error.message || 'Error deleting post')
-   } finally {
      setIsDeleting(false)
+   } finally {
      setShowDeleteModal(false)
    }
  }
@@ -521,23 +530,33 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         <PostViewDialogBox isOpen={isOpen} setIsOpen={setIsOpen} data={data} />
       )}
       {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Confirm Deletion</h2>
-            <p className="mb-4">Do you really want to delete this post?</p>
-            <div className="flex justify-end gap-2">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h2 className="text-xl font-semibold mb-4">Delete Post</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this post? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="btn btn-secondary"
+                className="btn btn-ghost"
               >
-                No
+                Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="btn btn-error"
                 disabled={isDeleting}
+                className="btn btn-error"
               >
-                {isDeleting ? 'Deleting...' : 'Yes'}
+                {isDeleting ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
               </button>
             </div>
           </div>

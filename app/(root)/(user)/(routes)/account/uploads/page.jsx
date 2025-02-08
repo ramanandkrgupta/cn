@@ -1,13 +1,13 @@
+// UserUploads.jsx
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Upload, Trash2, Edit, ArrowLeft } from 'lucide-react'
+import { Upload, ArrowLeft } from 'lucide-react'
 import PostCard from '@/components/cards/PostCard'
 import NoDataFound from '@/components/ui/NoDataFound'
 
-// Skeleton loading component
-
+// Skeleton loading component remains unchanged
 const SkeletonLoading = () => (
   <div className="animate-pulse">
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -16,13 +16,17 @@ const SkeletonLoading = () => (
       ))}
     </div>
   </div>
-);
+)
 
 export default function UserUploads() {
   const router = useRouter()
   const [uploads, setUploads] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // Refs for FLIP animation
+  const itemRefs = useRef({})
+  const prevPositions = useRef(new Map())
 
   useEffect(() => {
     fetchUserUploads()
@@ -37,32 +41,75 @@ export default function UserUploads() {
       } else {
         throw new Error('Failed to fetch uploads')
       }
-    } catch (error) {
-      console.error('Error fetching uploads:', error)
-      setError(error.message)
+    } catch (err) {
+      console.error('Error fetching uploads:', err)
+      setError(err.message)
       toast.error('Failed to load uploads')
     } finally {
       setLoading(false)
     }
   }
 
+  // Record positions before layout changes
+  const recordPositions = () => {
+    uploads.forEach((item) => {
+      const el = itemRefs.current[item.id]
+      if (el) {
+        prevPositions.current.set(item.id, el.getBoundingClientRect())
+      }
+    })
+  }
+
+  // Handle deletion with animation
   const handleDelete = async (postId) => {
+    recordPositions()
+
     try {
       const response = await fetch(`/api/v1/members/posts/${postId}`, {
         method: 'DELETE',
       })
 
-      if (response.ok) {
-        setUploads((prev) => prev.filter((upload) => upload.id !== postId))
-        toast.success('Post deleted successfully')
-      } else {
-        throw new Error('Failed to delete post')
+      if (!response.ok) {
+        const errorData = await response.json()
+        // toast.error(errorData.error || 'Failed to delete post')
+        return
       }
-    } catch (error) {
-      console.error('Error deleting post:', error)
-      toast.error('Failed to delete post')
+
+      setUploads((prev) => prev.filter((upload) => upload.id !== postId))
+      toast.success('Post deleted successfully')
+    } catch (err) {
+      console.error('Error deleting post:', err)
+      // toast.error('Failed to delete post')
     }
   }
+
+  // FLIP animation after state updates
+  useLayoutEffect(() => {
+    uploads.forEach((item) => {
+      const el = itemRefs.current[item.id]
+      const oldRect = prevPositions.current.get(item.id)
+
+      if (el && oldRect) {
+        const newRect = el.getBoundingClientRect()
+        const deltaX = oldRect.left - newRect.left
+        const deltaY = oldRect.top - newRect.top
+
+        if (deltaX || deltaY) {
+          // Apply inverse transform
+          el.style.transition = 'none'
+          el.style.transform = `translate(${deltaX}px, ${deltaY}px)`
+
+          // Force reflow
+          el.getBoundingClientRect()
+
+          // Animate to final position
+          el.style.transition = 'transform 300ms ease'
+          el.style.transform = ''
+        }
+      }
+    })
+    prevPositions.current.clear()
+  }, [uploads])
 
   return (
     <div className="container">
@@ -101,24 +148,30 @@ export default function UserUploads() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {uploads.map((post) => (
-              <div key={post.id} className="relative">
-                <PostCard data={post} className="w-full aspect-square" />
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <button
-                    onClick={() => router.push(`/edit/${post.id}`)}
-                    className="btn btn-circle btn-xs sm:btn-sm btn-ghost bg-base-100/80 hover:bg-base-200/90"
-                    aria-label="Edit post"
-                  >
-                    <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="btn btn-circle btn-xs sm:btn-sm btn-ghost bg-error/20 hover:bg-error/30"
-                    aria-label="Delete post"
-                  >
-                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-error" />
-                  </button>
-                </div>
+              <div
+                key={post.id}
+                className="relative transform-gpu"
+                ref={(el) => {
+                  itemRefs.current[post.id] = el
+                }}
+              >
+                <PostCard
+                  data={post}
+                  className="w-full aspect-square"
+                  onUpdate={(updatedPost) => {
+                    if (!updatedPost) {
+                      // Handle deletion
+                      handleDelete(post.id)
+                    } else {
+                      // Handle other updates
+                      setUploads((prev) =>
+                        prev.map((p) =>
+                          p.id === updatedPost.id ? updatedPost : p
+                        )
+                      )
+                    }
+                  }}
+                />
               </div>
             ))}
           </div>
