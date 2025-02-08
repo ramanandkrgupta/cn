@@ -45,3 +45,38 @@ export async function PUT(req, context) {
     )
   }
 }
+
+
+// DELETE handler for deleting a post.
+
+export async function DELETE(req, context) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = context.params
+
+    // First, manually delete all dependent records (e.g., likes)
+    await prisma.userLike.deleteMany({
+      where: { postId: id },
+    })
+
+    // Then, delete the post itself
+    const deletedPost = await prisma.post.delete({
+      where: { id },
+    })
+
+    return NextResponse.json(
+      { message: 'Post deleted successfully', deletedPost },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('Error deleting post:', error)
+    return NextResponse.json(
+      { error: error.message || 'Error deleting post' },
+      { status: 500 }
+    )
+  }
+}

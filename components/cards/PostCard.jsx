@@ -309,32 +309,51 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     }
   }
 
-  const handleDelete = async () => {
-    setIsDeleting(true)
-    try {
-      const response = await fetch(`/api/v1/members/posts/${data.id}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) {
-        const result = await response.json()
-        throw new Error(result.error || 'Failed to delete post')
-      }
-      toast.success('Post deleted successfully!')
-      onUpdate(null)
-    } catch (error) {
-      console.error('Delete error:', error)
-      toast.error(error.message || 'Error deleting post')
-    } finally {
-      setIsDeleting(false)
-      setShowDeleteModal(false)
-    }
-  }
+ const handleDelete = async () => {
+   setIsDeleting(true)
+   try {
+     const response = await fetch(`/api/v1/members/posts/${data.id}`, {
+       method: 'DELETE',
+     })
+
+     if (!response.ok) {
+       // Attempt to get error details from the response
+       let errorMessage = 'Failed to delete post'
+       try {
+         // Try to parse as JSON first
+         const result = await response.json()
+         errorMessage = result.error || errorMessage
+       } catch (jsonError) {
+         // If JSON parsing fails, try reading as text
+         const text = await response.text()
+         if (text) {
+           errorMessage = text
+         }
+       }
+       console.error('Delete response error:', response.status, errorMessage)
+       throw new Error(errorMessage)
+     }
+
+     toast.success('Post deleted successfully!')
+     onUpdate(null)
+   } catch (error) {
+     console.error('Delete error:', error)
+     toast.error(error.message || 'Error deleting post')
+   } finally {
+     setIsDeleting(false)
+     setShowDeleteModal(false)
+   }
+ }
+
+
 
   const getPlaceholderImage = () => {
     return `https://placehold.co/600x800/222222/ffffff?text=${encodeURIComponent(
       data.title || 'No Title'
     )}`
   }
+  console.log('User avatar URL:', data.user?.avatar)
+
 
   return (
     <div
@@ -408,10 +427,22 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
           >
             <Eye className="w-8 h-8 text-white" />
           </div>
-          {/* Title and Category Overlay */}
+          {/* Title and Uploader Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3 text-white bg-gradient-to-t from-black/60 to-transparent">
             <h3 className="font-semibold text-sm line-clamp-2">{data.title}</h3>
-            <p className="text-xs opacity-75 mt-1">{data.category}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <Image
+                src={
+                  data.user?.avatar || 'https://placehold.co/40x40?text=User'
+                }
+                alt={data.user?.name || 'Uploader'}
+                width={20}
+                height={20}
+                className="rounded-full"
+                unoptimized
+              />
+              <p className="text-xs opacity-75">{data.user?.name}</p>
+            </div>
           </div>
         </div>
       </div>
