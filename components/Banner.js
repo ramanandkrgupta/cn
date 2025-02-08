@@ -7,8 +7,8 @@ import { banner, resume ,assignment,creative} from '@/public/assets/index.js'
 
 const bannerData = [
   {
-    src: banner,
-    srcLight: resume,
+    src: 'https://res.cloudinary.com/dk6p24i8q/image/upload/e_improve:outdoor/banner.10c5996a_w7vbbg',
+    srcLight: '',
     link: '',
     title: 'Notes Mates',
     description: 'Download web app now if not installed',
@@ -16,8 +16,8 @@ const bannerData = [
     buttonName: 'Download',
   },
   {
-    src: resume,
-    srcLight: resume,
+    src: 'https://res.cloudinary.com/dk6p24i8q/image/upload/e_improve:outdoor/resume.2a737650-min_zlxrtv',
+    srcLight: '',
     link: 'https://resume-builder-404b5.web.app',
     title: 'Resume Maker',
     description:
@@ -26,8 +26,8 @@ const bannerData = [
     buttonName: 'Click here',
   },
   {
-    src: creative,
-    srcLight: resume,
+    src: 'https://res.cloudinary.com/dk6p24i8q/image/upload/e_improve:outdoor/Creative.63256caa-min_ixtifb',
+    srcLight: '',
     link: 'https://chat.whatsapp.com/KBHOXfCGB9DJPGsHUKpMRs',
     title: 'Assignment Help',
     description:
