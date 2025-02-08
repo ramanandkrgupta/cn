@@ -12,15 +12,17 @@ export default function Notifications() {
   const router = useRouter()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
   const [newNotificationsCount, setNewNotificationsCount] = useState(0)
   const [hasLeftPage, setHasLeftPage] = useState(false)
 
-  // Fetch notifications on component mount
+  // Initial load: only notifications from the past 2 days.
   useEffect(() => {
-    fetchNotifications()
+    fetchNotifications({ isInitial: true })
   }, [])
 
-  // Handle page visibility and unload
+  // Handle page visibility and unload to mark notifications as read in background.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && !hasLeftPage) {
@@ -46,23 +48,59 @@ export default function Notifications() {
     }
   }, [hasLeftPage, notifications])
 
-  const fetchNotifications = async () => {
+  // Fetch notifications with support for pagination.
+  // If "isInitial" is true, we load notifications from the past 2 days.
+  // If a "before" date is provided, we load notifications older than that.
+  const fetchNotifications = async ({ isInitial, before } = {}) => {
     try {
-      const response = await fetch('/api/v1/members/users/notifications')
+      let url = '/api/v1/members/users/notifications?limit=20'
+      if (isInitial) {
+        // Get only notifications from the past 2 days for the initial load.
+        url += '&recent=true'
+      }
+      if (before) {
+        url += `&before=${encodeURIComponent(before)}`
+      }
+      const response = await fetch(url)
       if (!response.ok) throw new Error('Failed to fetch notifications')
       const data = await response.json()
-      const unreadCount = data.filter((n) => !n.read).length
 
-      setNewNotificationsCount(unreadCount)
-      setNotifications(data)
+      // On the initial load, update the unread notifications count.
+      if (isInitial) {
+        const unreadCount = data.filter((n) => !n.read).length
+        setNewNotificationsCount(unreadCount)
+      }
+
+      // If fewer notifications than requested were returned, assume there are no more to load.
+      if (data.length < 20) {
+        setHasMore(false)
+      }
+
+      // Append notifications if this is a paginated request; otherwise, replace the list.
+      if (before) {
+        setNotifications((prev) => [...prev, ...data])
+      } else {
+        setNotifications(data)
+      }
     } catch (error) {
       console.error('Error fetching notifications:', error)
       toast.error('Failed to load notifications')
     } finally {
-      setLoading(false)
+      if (isInitial) setLoading(false)
+      setLoadingMore(false)
     }
   }
 
+  // Load more notifications when "Show More" is clicked.
+  const loadMore = () => {
+    if (!notifications.length) return
+    setLoadingMore(true)
+    // Use the createdAt date of the last (oldest) notification as the cursor.
+    const oldestNotification = notifications[notifications.length - 1]
+    fetchNotifications({ before: oldestNotification.createdAt })
+  }
+
+  // Mark a single notification as read.
   const markAsRead = async (id) => {
     try {
       const response = await fetch('/api/v1/members/users/notifications', {
@@ -87,18 +125,25 @@ export default function Notifications() {
     }
   }
 
+  // Mark all notifications as read using the batch endpoint.
   const markAllAsRead = async () => {
     try {
       const unreadNotifications = notifications.filter((n) => !n.read)
-      await Promise.all(
-        unreadNotifications.map((notification) =>
-          fetch('/api/v1/members/users/notifications', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notificationId: notification.id }),
-          })
-        )
+      const ids = unreadNotifications.map((notification) => notification.id)
+      if (ids.length === 0) return
+
+      const response = await fetch(
+        '/api/v1/members/users/notifications/batch',
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notificationIds: ids }),
+        }
       )
+
+      if (!response.ok) {
+        throw new Error('Failed to update notifications')
+      }
 
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, read: true }))
@@ -111,32 +156,29 @@ export default function Notifications() {
     }
   }
 
+  // Mark all unread notifications as read in the background using the batch endpoint.
   const markAllUnreadInBackground = async () => {
     try {
       const unreadNotifications = notifications.filter((n) => !n.read)
-      if (unreadNotifications.length === 0) return
+      const ids = unreadNotifications.map((notification) => notification.id)
+      if (ids.length === 0) return
 
-      await Promise.all(
-        unreadNotifications.map((notification) =>
-          fetch('/api/v1/members/users/notifications', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notificationId: notification.id }),
-          })
-        )
-      )
+      await fetch('/api/v1/members/users/notifications/batch', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationIds: ids }),
+      })
     } catch (error) {
-      console.error('Error marking notifications as read:', error)
+      console.error('Error marking notifications as read in background:', error)
     }
   }
 
-  const groupNotificationsByDate = () => {
+  // Group notifications by their creation date.
+  const groupNotificationsByDate = (notifications) => {
     const groups = {}
     notifications.forEach((notification) => {
       const date = new Date(notification.createdAt).toDateString()
-      if (!groups[date]) {
-        groups[date] = []
-      }
+      if (!groups[date]) groups[date] = []
       groups[date].push(notification)
     })
 
@@ -156,7 +198,7 @@ export default function Notifications() {
     )
   }
 
-  const groupedNotifications = groupNotificationsByDate()
+  const groupedNotifications = groupNotificationsByDate(notifications)
   const hasUnread = notifications.some((n) => !n.read)
 
   return (
@@ -185,6 +227,18 @@ export default function Notifications() {
           ))
         )}
       </div>
+
+      {hasMore && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          >
+            {loadingMore ? 'Loading...' : 'Show More'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
