@@ -461,6 +461,17 @@ model Follows {
 
   @@unique([followerId, followingId])
 }
+model SubscriptionPlan {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  planId    String   @unique // e.g., "free" or "pro"
+  name      String
+  price     Float
+  offer     Float    // New field for the offer number
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
 
 
 
