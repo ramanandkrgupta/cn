@@ -1,7 +1,10 @@
 import Razorpay from 'razorpay';
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 
 export async function POST(req) {
   const { amount, currency = 'INR' } = await req.json();
+  const session = await getServerSession(authOptions);
+
   
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -12,6 +15,12 @@ export async function POST(req) {
     amount: amount * 100, // Convert to paise
     currency,
     receipt: `receipt_${Date.now()}`,
+    prefill: {
+      name: session.user.name,
+      email: session.user.email,
+      
+      
+    }
   };
 
   try {

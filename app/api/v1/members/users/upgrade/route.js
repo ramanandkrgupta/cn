@@ -19,7 +19,7 @@ export async function POST(req) {
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        userRole: plan.toUpperCase()
+        userRole : plan.toUpperCase()
       },
       select: {
         id: true,

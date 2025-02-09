@@ -29,8 +29,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
+    console.log("chhhhh", session)
     // Additional check for premium content
-    if (post.premium && session.user.userRole !== "PRO") {
+    if (post.premium && session.user.role !== "PRO") {
       return NextResponse.json(
         { error: "Premium content requires PRO membership" },
         { status: 403 }

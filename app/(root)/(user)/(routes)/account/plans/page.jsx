@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import {
@@ -112,6 +112,9 @@ export default function PlansPage() {
         userRole: updatedUser.userRole,
         role: updatedUser.userRole, // for consistency
       })
+      console.log("sssss, ",  updatedUser.userRole,
+        "hhhh",updatedUser.userRole)
+
       await updateSession({
         ...session,
         user: {
@@ -120,6 +123,9 @@ export default function PlansPage() {
           userRole: updatedUser.userRole,
         },
       })
+        // 🔥 Force a fresh session fetch
+    const newSession = await getSession();
+    console.log("Updated Session:", newSession);
       toast.success('Successfully upgraded to PRO!')
       router.refresh()
       router.push('/account')
@@ -141,7 +147,7 @@ export default function PlansPage() {
       const plan = plans.find((p) => p.id === planId)
       const amount = planId === 'pro' ? plan.discountedPrice : plan.price
 
-      // Create order using the dynamic price
+      // Create order using the dynamic price and prefill userdata
       const orderResponse = await fetch('/api/user/payment/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,6 +155,9 @@ export default function PlansPage() {
           amount: amount,
           currency: 'INR',
           receipt: `plan_${planId}_${Date.now()}`,
+          //prefill user data
+          
+          
         }),
       })
 
@@ -167,6 +176,11 @@ export default function PlansPage() {
         name: 'Notes Mates',
         description: `Upgrade to ${planId.toUpperCase()} Plan`,
         order_id: orderData.id,
+        prefill: {
+          name: session.user.nmae,
+          email: session.user.email,
+
+        },
         handler: async (response) => {
           try {
             const verifyResponse = await fetch('/api/user/payment/verify', {
@@ -192,6 +206,7 @@ export default function PlansPage() {
                 throw new Error('Failed to upgrade plan')
               }
               const { user } = await updateResponse.json()
+              console.log("sessssiion  ", user)
               await handleUpgradeSuccess(user)
             }
           } catch (error) {
