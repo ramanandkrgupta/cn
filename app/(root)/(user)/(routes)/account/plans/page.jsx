@@ -271,18 +271,14 @@ export default function PlansPage() {
             <div className="flex gap-11">
               <div className="mb-4">
                 {plan.id === 'pro' ? (
-                  <div className="relative inline-block">
-                    <span className="text-3xl font-bold text-primary">
-                      ₹{plan.discountedPrice.toFixed(2)}
-                    </span>
-                    <span className="absolute -top-2 -right-3 bg-white px-1 text-xs text-gray-500 line-through">
-                      ₹{plan.originalPrice.toFixed(2)}
-                    </span>
-                    <span className="text-base-content/60 ml-1">/year</span>
-                    <span className="ml-2 badge badge-info">
-                      {plan.discountPercentage}% OFF
-                    </span>
-                  </div>
+                   <div className="relative inline-flex items-center gap-2">
+                   <span className="text-3xl font-bold text-primary">₹{plan.discountedPrice.toFixed(2)}</span>
+                   <span className="text-gray-200 text-lg line-through opacity-75">₹{plan.originalPrice.toFixed(2)}</span>
+                   <span className="bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
+                     {plan.discountPercentage}% OFF
+                   </span>
+                   <span className="text-base-content/60 ml-1">/year</span>
+                 </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <span className="text-3xl font-bold">₹{plan.price}</span>
@@ -355,7 +351,7 @@ export default function PlansPage() {
                     Downloads
                   </div>
                 </td>
-                <td>Limited (5/day)</td>
+                <td>Limited (5/days)</td>
                 <td>Unlimited</td>
               </tr>
               <tr>

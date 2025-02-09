@@ -1,3 +1,5 @@
+import { use } from 'react';
+
 //https://www.w3schools.com/jsref/jsref_obj_regexp.asp
 
 const filterPosts = (searchText, postData) => {
@@ -13,7 +15,8 @@ const filterPosts = (searchText, postData) => {
   );
 };
 
-const filterUrl = (params, postData) => {
+const filterUrl = (paramsPromise, postData) => {
+  const params = use(paramsPromise);
   if (params && params.post && params.post.length === 2) {
     const [postId, postTitle] = params.post;
     const regexId = new RegExp(postId, "i");

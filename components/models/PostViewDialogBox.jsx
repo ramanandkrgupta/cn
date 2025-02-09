@@ -275,7 +275,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       ""
     )} #${data.course_name.replace(/\s/g, "")}\n\n 🚀 Download Link 🚀 \n`,
     url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
-      data.id
+      data.id.slice(15)
     }/${data.title.replace(/\s+/g, "-")}`,
   };
 
@@ -461,7 +461,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                             premium content.
                           </p>
                           <Link
-                            href="/plans"
+                            href="/account/plans"
                             className="btn btn-warning btn-sm"
                           >
                             Upgrade to PRO

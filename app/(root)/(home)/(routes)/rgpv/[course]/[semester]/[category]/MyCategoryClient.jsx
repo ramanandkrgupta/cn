@@ -48,6 +48,17 @@ const MyCategoryClient = ({ course, semester, subId }) => {
             />
           ))}
         </div>
+{/* Pro Plan Banner Below Categories */}
+<div className="flex justify-center mt-6">
+  <Link href="/account/plans" className="text-blue-500 hover:underline">
+  <img
+    src="https://res.cloudinary.com/dk6p24i8q/image/upload/f_auto,q_auto/v1/Banner/pro-banner"
+    alt="Pro Plan Banner"
+    className="w-full max-w-[500px] h-auto rounded-lg shadow-lg mx-auto"
+  />
+  </Link>
+</div>
+
         
       </div>
     </div>
