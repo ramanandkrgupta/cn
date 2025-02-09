@@ -292,13 +292,13 @@ export default function PlansPage() {
                    <span className="bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
                      {plan.discountPercentage}% OFF
                    </span>
-                   <span className="text-base-content/60 ml-1">/year</span>
+                   <span className="text-base-content/60 ml-1">/month</span>
                  </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <span className="text-3xl font-bold">₹{plan.price}</span>
                     {plan.price > 0 && (
-                      <span className="text-base-content/60">/year</span>
+                      <span className="text-base-content/60">/month</span>
                     )}
                   </div>
                 )}

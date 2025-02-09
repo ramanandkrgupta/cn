@@ -3,6 +3,8 @@ import { generatePDFThumbnail } from "@/libs/cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 
+// MAX header = 100000
+
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);

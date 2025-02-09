@@ -472,6 +472,17 @@ model SubscriptionPlan {
 }
 
 
+model SiteSetting {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  planPrice  Float    @default(0)    // e.g., current Pro plan price
+  ads        Json?                // Array of ad objects.
+  banners    Json?                // Array of banner objects.
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+
 
 
 
