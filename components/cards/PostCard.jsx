@@ -20,6 +20,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import Link from 'next/link'
 import PostViewDialogBox from '../models/PostViewDialogBox'
 import AddToCollection from '../collections/AddToCollection'
+import Modal from '@/components/Modal' // Import the new Modal component
 
 // Import the category constant from your constants.
 import { category } from '@/constants/index'
@@ -309,52 +310,50 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     }
   }
 
- const handleDelete = async () => {
-   setIsDeleting(true)
-   try {
-     const response = await fetch(`/api/v1/members/posts/${data.id}`, {
-       method: 'DELETE',
-     })
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/v1/members/posts/${data.id}`, {
+        method: 'DELETE',
+      })
 
-     if (!response.ok) {
-       let errorMessage = 'Failed to delete post'
-       try {
-         const result = await response.json()
-         errorMessage = result.error || errorMessage
-       } catch (jsonError) {
-         const text = await response.text()
-         if (text) {
-           errorMessage = text
-         }
-       }
+      if (!response.ok) {
+        let errorMessage = 'Failed to delete post'
+        try {
+          const result = await response.json()
+          errorMessage = result.error || errorMessage
+        } catch (jsonError) {
+          const text = await response.text()
+          if (text) {
+            errorMessage = text
+          }
+        }
 
-       // If the error is "Record not found", we'll treat it as a successful deletion
-       // since the post is already gone
-       if (errorMessage.includes('Record to delete does not exist')) {
-         toast.success('Post removed successfully')
-         await new Promise((resolve) => setTimeout(resolve, 300))
-         onUpdate(null)
-         return
-       }
+        // If the error is "Record not found", we'll treat it as a successful deletion
+        // since the post is already gone
+        if (errorMessage.includes('Record to delete does not exist')) {
+          toast.success('Post removed successfully')
+          await new Promise((resolve) => setTimeout(resolve, 300))
+          onUpdate(null)
+          return
+        }
 
-       throw new Error(errorMessage)
-     }
+        throw new Error(errorMessage)
+      }
 
-     // Add a small delay for the fade-out animation
-     await new Promise((resolve) => setTimeout(resolve, 300))
+      // Add a small delay for the fade-out animation
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
-     toast.success('Post deleted successfully!')
-     onUpdate(null)
-   } catch (error) {
-     console.error('Delete error:', error)
-     toast.error(error.message || 'Error deleting post')
-     setIsDeleting(false)
-   } finally {
-     setShowDeleteModal(false)
-   }
- }
-
-
+      toast.success('Post deleted successfully!')
+      onUpdate(null)
+    } catch (error) {
+      console.error('Delete error:', error)
+      toast.error(error.message || 'Error deleting post')
+      setIsDeleting(false)
+    } finally {
+      setShowDeleteModal(false)
+    }
+  }
 
   const getPlaceholderImage = () => {
     return `https://placehold.co/600x800/222222/ffffff?text=${encodeURIComponent(
@@ -362,7 +361,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     )}`
   }
   console.log('User avatar URL:', data.user?.avatar)
-
 
   return (
     <div
@@ -428,7 +426,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
               unoptimized
             />
           </div>
-          {/* Hover Overlay */}
           <div
             className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center ${
               isHovered ? 'opacity-100' : 'opacity-0'
@@ -436,7 +433,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
           >
             <Eye className="w-8 h-8 text-white" />
           </div>
-          {/* Title and Uploader Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3 text-white bg-gradient-to-t from-black/60 to-transparent">
             <h3 className="font-semibold text-sm line-clamp-2">{data.title}</h3>
             <div className="flex items-center gap-2 mt-1">
@@ -492,7 +488,6 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
             </button>
           </div>
         </div>
-        {/* Extra Admin / Owner Buttons */}
         {session?.user &&
           (session.user.id === data.userId ||
             session.user.role === 'ADMIN') && (
@@ -530,10 +525,12 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         <PostViewDialogBox isOpen={isOpen} setIsOpen={setIsOpen} data={data} />
       )}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+        <Modal>
           <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold mb-4">Delete Post</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Delete Post
+            </h2>
+            <p className="text-gray-600 mb-6 text-center">
               Are you sure you want to delete this post? This action cannot be
               undone.
             </p>
@@ -560,11 +557,11 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
               </button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
       {showEditModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
+        <Modal>
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full mx-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Edit Post</h2>
               <button
@@ -574,12 +571,10 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
                 Close
               </button>
             </div>
-            {/* EditDocForm allows editing only Title, Description, and Category */}
             <EditDocForm
               initialData={data}
               onSave={async (updatedFields) => {
                 try {
-                  // Send a PUT request to update the post metadata.
                   const response = await fetch(
                     `/api/v1/members/posts/${data.id}`,
                     {
@@ -604,7 +599,7 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
               onCancel={() => setShowEditModal(false)}
             />
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )
