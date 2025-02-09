@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import PostCard from '@/components/cards/PostCard'
 import NoDataFound from '@/components/ui/NoDataFound'
@@ -16,6 +18,25 @@ const SkeletonLoading = () => (
 )
 
 const SearchPage = () => {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  // Redirect to /login if the user is unauthenticated.
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/login')
+    }
+  }, [status, router])
+
+  // While the session is loading, show a skeleton.
+  if (status === 'loading') {
+    return (
+      <div className="container mx-auto p-2">
+        <SkeletonLoading />
+      </div>
+    )
+  }
+
   // Filters: Course, Semester, Category, Sort, and Type
   const [filters, setFilters] = useState({
     course: '',
@@ -30,7 +51,7 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch posts from the API endpoint based on current filters
+  // Function to fetch posts based on current filters
   const fetchPosts = async () => {
     try {
       setLoading(true)
@@ -51,7 +72,7 @@ const SearchPage = () => {
         throw new Error(data.error || 'Failed to fetch posts')
       }
 
-      // Optionally filter posts by content type if not already handled on the server
+      // Optionally filter posts by content type if not handled on the server
       let filteredPosts = data.posts
       if (filters.type === 'free') {
         filteredPosts = data.posts.filter((post) => !post.premium)
@@ -80,9 +101,9 @@ const SearchPage = () => {
     <div className="container mx-auto p-2">
       {/* Filters & Post Count in a compact container */}
       <div className="bg-base-200 p-2 rounded-md mb-3">
-        {/* This outer container is a flex column on mobile and row on desktop */}
+        {/* Two groups: Left and Right. On mobile they stack into two rows */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-          {/* Left Group: Force one line using flex-nowrap */}
+          {/* Left Group: Course, Semester, Category */}
           <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
             <input
               type="text"
@@ -117,7 +138,7 @@ const SearchPage = () => {
               className="input input-bordered input-xs flex-shrink-0"
             />
           </div>
-          {/* Right Group: Force one line using flex-nowrap */}
+          {/* Right Group: Sort, Type, Apply Button, Post Count */}
           <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
             <select
               value={filters.sort}
