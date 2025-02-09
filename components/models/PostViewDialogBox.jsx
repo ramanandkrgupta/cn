@@ -129,7 +129,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       }
 
       // Additional check for premium content
-      if (data.premium && session.user.userRole !== "PRO") {
+      if (data.premium && session.user.role !== "PRO") {
         toast.error(
           "This is a premium file. You need a premium membership to download it."
         );
@@ -345,7 +345,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     }
     handleDownload(data.id, data.title);
   }}
-  disabled={isDownloading || (data.premium && session?.user?.userRole !== "PRO")}
+  disabled={isDownloading || (data.premium && session?.user?.role !== "PRO")}
 >
   {isDownloading ? (
     // Loading spinner animation
@@ -378,7 +378,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
       Login to Download
     </span>
   ) : data.premium ? (
-    session.user.userRole === "PRO" ? (
+    session.user.role === "PRO" ? (
       "Premium File - Download"
     ) : (
       "Premium File - Upgrade to Download"
@@ -450,7 +450,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   )}
                   {data.premium &&
                     session?.user &&
-                    session.user.userRole !== "PRO" && (
+                    session.user.role !== "PRO" && (
                       <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
                         <div className="text-center">
                           <h4 className="font-semibold text-amber-900 mb-2">
