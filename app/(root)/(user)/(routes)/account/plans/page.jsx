@@ -1,8 +1,9 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import {
   Crown,
   Check,
@@ -11,78 +12,106 @@ import {
   FileText,
   Share2,
   Shield,
-} from "lucide-react";
-import useUserStore from "@/store/useUserStore";
-
-const plans = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    description: "Basic access to study materials",
-    features: [
-      "Access to free study materials",
-      "Limited downloads per day",
-      "Basic search functionality",
-      "Community support",
-    ],
-    limitations: [
-      "No access to premium content",
-      "Limited download speed",
-      "Ads supported",
-    ],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 1,
-    description: "Full access to all features",
-    features: [
-      "Access to all study materials",
-      "Unlimited downloads",
-      "Priority support",
-      "Ad-free experience",
-      "Premium content access",
-      "High-speed downloads",
-      "Early access to new materials",
-    ],
-  },
-];
+} from 'lucide-react'
+import useUserStore from '@/store/useUserStore'
 
 export default function PlansPage() {
-  const router = useRouter();
-  const { data: session, update: updateSession } = useSession();
-  const { updateUser } = useUserStore();
-  const [loading, setLoading] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState("free");
+  const router = useRouter()
+  const { data: session, update: updateSession } = useSession()
+  const { updateUser } = useUserStore()
+  const [loading, setLoading] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState('free')
+  // Set initial values – these will be updated from the API
+  const [proPlanSettings, setProPlanSettings] = useState({
+    discountedPrice: 49,
+    originalPrice: 99,
+    discountPercentage: 50,
+  })
 
+  // Fetch dynamic Pro plan settings from your public API
+  useEffect(() => {
+    async function fetchProPlan() {
+      try {
+        const res = await fetch('/api/v1/members/settings/subscription')
+        if (res.ok) {
+          const data = await res.json()
+          // Expected data: { discountedPrice, originalPrice, discountPercentage }
+          setProPlanSettings(data)
+        } else {
+          throw new Error('Failed to fetch pro plan settings')
+        }
+      } catch (error) {
+        console.error('Error fetching pro plan settings:', error)
+      }
+    }
+    fetchProPlan()
+  }, [])
+
+  // Determine current plan based on session
   useEffect(() => {
     if (session?.user) {
       const isPro =
-        session.user.role === "PRO" || session.user.userRole === "PRO";
-      setCurrentPlan(isPro ? "pro" : "free");
+        session.user.role === 'PRO' || session.user.userRole === 'PRO'
+      setCurrentPlan(isPro ? 'pro' : 'free')
     }
-  }, [session]);
+  }, [session])
 
+  // Define your plans – note that for the Pro plan we now include the new pricing fields
+  const plans = [
+    {
+      id: 'free',
+      name: 'Free',
+      price: 0,
+      description: 'Basic access to study materials',
+      features: [
+        'Access to free study materials',
+        'Limited downloads per day',
+        'Basic search functionality',
+        'Community support',
+      ],
+      limitations: [
+        'No access to premium content',
+        'Limited download speed',
+        'Ads supported',
+      ],
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      discountedPrice: proPlanSettings.discountedPrice,
+      originalPrice: proPlanSettings.originalPrice,
+      discountPercentage: proPlanSettings.discountPercentage,
+      description: 'Full access to all features',
+      features: [
+        'Access to all study materials',
+        'Unlimited downloads',
+        'Priority support',
+        'Ad-free experience',
+        'Premium content access',
+        'High-speed downloads',
+        'Early access to new materials',
+      ],
+    },
+  ]
+
+  // Dummy Razorpay integration (adjust with your actual integration)
   const loadRazorpay = () => {
     return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+  }
 
   const handleUpgradeSuccess = async (updatedUser) => {
     try {
-      // Update Zustand store
+      // Update your Zustand store and NextAuth session
       updateUser({
         userRole: updatedUser.userRole,
-        role: updatedUser.userRole, // Keep both for consistency
-      });
-
-      // Update NextAuth session
+        role: updatedUser.userRole, // for consistency
+      })
       await updateSession({
         ...session,
         user: {
@@ -90,103 +119,97 @@ export default function PlansPage() {
           role: updatedUser.userRole,
           userRole: updatedUser.userRole,
         },
-      });
-
-      toast.success("Successfully upgraded to PRO!");
-      router.refresh();
-      router.push("/account");
+      })
+      toast.success('Successfully upgraded to PRO!')
+      router.refresh()
+      router.push('/account')
     } catch (error) {
-      console.error("Error updating user data:", error);
-      toast.error("Error updating user status");
+      console.error('Error updating user data:', error)
+      toast.error('Error updating user status')
     }
-  };
+  }
 
   const handleUpgrade = async (planId) => {
     try {
-      setLoading(true);
-
-      // Load Razorpay SDK
-      const isLoaded = await loadRazorpay();
+      setLoading(true)
+      const isLoaded = await loadRazorpay()
       if (!isLoaded) {
-        throw new Error("Razorpay SDK failed to load");
+        throw new Error('Razorpay SDK failed to load')
       }
 
-      // Create order
-      const orderResponse = await fetch("/api/user/payment/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      // For the Pro plan, use discountedPrice (for free, it remains 0)
+      const plan = plans.find((p) => p.id === planId)
+      const amount = planId === 'pro' ? plan.discountedPrice : plan.price
+
+      // Create order using the dynamic price
+      const orderResponse = await fetch('/api/user/payment/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: plans.find((p) => p.id === planId).price,
-          currency: "INR",
+          amount: amount,
+          currency: 'INR',
           receipt: `plan_${planId}_${Date.now()}`,
         }),
-      });
+      })
 
       if (!orderResponse.ok) {
-        const error = await orderResponse.json();
-        throw new Error(error.error || "Failed to create order");
+        const errorData = await orderResponse.json()
+        throw new Error(errorData.error || 'Failed to create order')
       }
 
-      const orderData = await orderResponse.json();
-      if (!orderData.id) throw new Error("Failed to create order");
+      const orderData = await orderResponse.json()
+      if (!orderData.id) throw new Error('Failed to create order')
 
-      // Initialize Razorpay
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "Notes Mates",
+        name: 'Notes Mates',
         description: `Upgrade to ${planId.toUpperCase()} Plan`,
         order_id: orderData.id,
         handler: async (response) => {
           try {
-            // Verify payment
-            const verifyResponse = await fetch("/api/user/payment/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+            const verifyResponse = await fetch('/api/user/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               }),
-            });
-
-            const verifyData = await verifyResponse.json();
-
-            if (verifyData.status === "success") {
-              // Update user role
+            })
+            const verifyData = await verifyResponse.json()
+            if (verifyData.status === 'success') {
               const updateResponse = await fetch(
-                "/api/v1/members/users/upgrade",
+                '/api/v1/members/users/upgrade',
                 {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ plan: planId }),
                 }
-              );
-
+              )
               if (!updateResponse.ok) {
-                throw new Error("Failed to upgrade plan");
+                throw new Error('Failed to upgrade plan')
               }
-
-              const { user } = await updateResponse.json();
-              await handleUpgradeSuccess(user);
+              const { user } = await updateResponse.json()
+              await handleUpgradeSuccess(user)
             }
           } catch (error) {
-            console.error("Error handling payment:", error);
-            toast.error("Failed to process upgrade");
+            console.error('Error handling payment:', error)
+            toast.error('Failed to process upgrade')
           }
         },
-      };
+      }
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      const razorpay = new window.Razorpay(options)
+      razorpay.open()
     } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Failed to process payment");
+      console.error('Payment error:', error)
+      toast.error('Failed to process payment')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-6xl">
@@ -218,7 +241,7 @@ export default function PlansPage() {
               You are currently on the {currentPlan.toUpperCase()} plan
             </p>
           </div>
-          {currentPlan === "pro" && (
+          {currentPlan === 'pro' && (
             <div className="badge badge-primary gap-2">
               <Crown className="w-4 h-4" />
               PRO
@@ -232,27 +255,43 @@ export default function PlansPage() {
         {plans.map((plan) => (
           <div
             key={plan.id}
-            className={`
-              relative overflow-hidden rounded-lg border-2 p-6
-              ${
-                plan.id === "pro"
-                  ? "border-primary bg-primary/5"
-                  : "border-base-300 bg-base-200"
-              }
-            `}
+            className={`relative overflow-hidden rounded-lg border-2 p-6 ${
+              plan.id === 'pro'
+                ? 'border-primary bg-primary/5'
+                : 'border-base-300 bg-base-200'
+            }`}
           >
-            {plan.id === "pro" && (
+            {plan.id === 'pro' && (
               <div className="absolute top-4 right-4">
                 <Crown className="w-6 h-6 text-primary animate-pulse" />
               </div>
             )}
 
             <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-            <div className="mb-4">
-              <span className="text-3xl font-bold">₹{plan.price}</span>
-              {plan.price > 0 && (
-                <span className="text-base-content/60">/year</span>
-              )}
+            <div className="flex gap-11">
+              <div className="mb-4">
+                {plan.id === 'pro' ? (
+                  <div className="relative inline-block">
+                    <span className="text-3xl font-bold text-primary">
+                      ₹{plan.discountedPrice.toFixed(2)}
+                    </span>
+                    <span className="absolute -top-2 -right-3 bg-white px-1 text-xs text-gray-500 line-through">
+                      ₹{plan.originalPrice.toFixed(2)}
+                    </span>
+                    <span className="text-base-content/60 ml-1">/year</span>
+                    <span className="ml-2 badge badge-info">
+                      {plan.discountPercentage}% OFF
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl font-bold">₹{plan.price}</span>
+                    {plan.price > 0 && (
+                      <span className="text-base-content/60">/year</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <p className="text-base-content/70 mb-6">{plan.description}</p>
@@ -280,18 +319,17 @@ export default function PlansPage() {
             <button
               onClick={() => handleUpgrade(plan.id)}
               disabled={loading || currentPlan === plan.id}
-              className={`
-                btn w-full
-                ${plan.id === "pro" ? "btn-primary" : "btn-outline"}
-              `}
+              className={`btn w-full ${
+                plan.id === 'pro' ? 'btn-primary' : 'btn-outline'
+              }`}
             >
               {loading
-                ? "Processing..."
+                ? 'Processing...'
                 : currentPlan === plan.id
-                ? "Current Plan"
-                : plan.id === "pro"
-                ? "Upgrade to PRO"
-                : "Stay Free"}
+                ? 'Current Plan'
+                : plan.id === 'pro'
+                ? 'Upgrade to PRO'
+                : 'Stay Free'}
             </button>
           </div>
         ))}
@@ -355,5 +393,5 @@ export default function PlansPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
