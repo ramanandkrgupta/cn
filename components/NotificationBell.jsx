@@ -2,11 +2,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 export const NotificationBell = () => {
+  const { data: session, status } = useSession()
   const [unreadCount, setUnreadCount] = useState(0)
 
   const fetchUnreadCount = async () => {
+    // Only fetch notifications if the user is authenticated.
+    if (!session) return
+
     try {
       const response = await fetch('/api/v1/members/users/notifications')
       if (!response.ok) throw new Error('Failed to fetch notifications')
@@ -19,11 +24,16 @@ export const NotificationBell = () => {
   }
 
   useEffect(() => {
-    fetchUnreadCount()
-    // Set up polling for new notifications
-    // const interval = setInterval(fetchUnreadCount) // Poll every 30 seconds
-    // return () => clearInterval(interval)
-  }, [])
+    // Fetch notifications only when the user is authenticated.
+    if (status === 'authenticated') {
+      fetchUnreadCount()
+    }
+  }, [session, status])
+
+  // If the user is not authenticated, don't show the notification bell.
+  if (status !== 'authenticated') {
+    return null
+  }
 
   return (
     <Link
