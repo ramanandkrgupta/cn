@@ -1,12 +1,31 @@
 // app/privacy/page.jsx
-//today date
+import Head from 'next/head';  // Importing the Head component for SEO
+
 const today = new Date();
+
 export default function PrivacyPolicy() {
-    return (
+  return (
+    <>
+      {/* SEO Meta Tags */}
+      <Head>
+        <title>Privacy Policy | Notes Mates</title>
+        <meta name="description" content="Read the privacy policy of Notes Mates, detailing how we collect, use, and protect your personal data." />
+        <meta name="keywords" content="privacy policy, data protection, Notes Mates, GDPR, CCPA, cookies" />
+        <meta property="og:title" content="Privacy Policy | Notes Mates" />
+        <meta property="og:description" content="Read the privacy policy of Notes Mates, detailing how we collect, use, and protect your personal data." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://notesmates.in/privacy" />
+        <meta property="og:image" content="/img/privacy-policy-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy | Notes Mates" />
+        <meta name="twitter:description" content="Read the privacy policy of Notes Mates, detailing how we collect, use, and protect your personal data." />
+        <meta name="twitter:image" content="/img/privacy-policy-image.png" />
+      </Head>
+
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
         <p className="mb-6">Effective Date: {today.toDateString()}</p>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">1. Information We Collect</h2>
           <p className="mb-4">
@@ -29,7 +48,7 @@ export default function PrivacyPolicy() {
             We use cookies and similar technologies to enhance user experience and for analytics.
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">2. How We Use Your Information</h2>
           <p>
@@ -43,7 +62,7 @@ export default function PrivacyPolicy() {
             <li>Comply with legal obligations and resolve disputes.</li>
           </ul>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">3. Your Rights</h2>
           <p className="mb-4">
@@ -64,7 +83,7 @@ export default function PrivacyPolicy() {
             <li>Non-discrimination for exercising privacy rights.</li>
           </ul>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">4. Sharing of Information</h2>
           <p>
@@ -79,7 +98,7 @@ export default function PrivacyPolicy() {
             <li>Legal authorities, if required by law.</li>
           </ul>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">5. Cookies and Tracking Technologies</h2>
           <p>
@@ -98,7 +117,7 @@ export default function PrivacyPolicy() {
             .
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">6. Data Retention</h2>
           <p>
@@ -106,7 +125,7 @@ export default function PrivacyPolicy() {
             law.
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">7. Security of Your Data</h2>
           <p>
@@ -114,7 +133,7 @@ export default function PrivacyPolicy() {
             unauthorized access.
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">8. Third-Party Links</h2>
           <p>
@@ -122,7 +141,7 @@ export default function PrivacyPolicy() {
             recommend reviewing their privacy policies.
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">9. Children's Privacy</h2>
           <p>
@@ -130,7 +149,7 @@ export default function PrivacyPolicy() {
             such data, we will delete it promptly.
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">10. Changes to This Privacy Policy</h2>
           <p>
@@ -138,22 +157,22 @@ export default function PrivacyPolicy() {
             posted with a revised "Effective Date."
           </p>
         </section>
-  
+
         <section className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">11. Contact Us</h2>
           <p>
             If you have any questions or concerns about this Privacy Policy, please contact us at:
           </p>
           <ul className="list-disc pl-6">
-            <li>Email: <a href="mailto:[Insert Email Address]" className="text-blue-500 underline">[Insert Email Address]</a></li>
+            <li>Email: <a href="mailto:contact@notesmates.in" className="text-blue-500 underline">contact@notesmates.in</a></li>
             <li>Website: <a href="https://notesmates.in" className="text-blue-500 underline">https://notesmates.in</a></li>
           </ul>
         </section>
-  
+
         <p className="text-sm">
           By using Notes Mates.in, you agree to this Privacy Policy. Thank you for trusting us with your data.
         </p>
       </main>
-    );
-  }
-  
+    </>
+  );
+}

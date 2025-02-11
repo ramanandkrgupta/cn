@@ -22,7 +22,7 @@ const bannerData = [
     title: 'Resume Maker',
     description:
       'This is a free tool to create, preview, and export resumes easily.',
-    tag: 'Hot',
+    tag: 'Ads',
     buttonName: 'Click here',
   },
   {
@@ -32,7 +32,7 @@ const bannerData = [
     title: 'Assignment Help',
     description:
       'Feeling bored with assignments? Let us take the load and write them for you!',
-    tag: 'Ongoing',
+    tag: 'Ads',
     buttonName: 'Join Us',
   },
 ]
