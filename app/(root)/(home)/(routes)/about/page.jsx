@@ -7,6 +7,13 @@ import {
   Team,
 } from "./components";
 
+//generate metadata 
+import { Metadata } from 'next';
+ 
+export const metadata = {
+  title: 'Invoices | Acme Dashboard',
+  description: 'Acme Dashboard',
+};
 const About = () => {
   return (
     <div className="flex justify-center items-start px-2 w-full">

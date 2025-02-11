@@ -6,11 +6,14 @@ import toast from "react-hot-toast";
 import { LoadingState } from "@/components/ui/LoadingState";
 import Image from "next/image";
 
+
 export default function CollectionView() {
   const params = useParams();
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+
 
   useEffect(() => {
     fetchCollection();
@@ -25,6 +28,7 @@ export default function CollectionView() {
       }
       const data = await response.json();
       setCollection(data);
+      
     } catch (error) {
       setError(error.message);
       toast.error(error.message);

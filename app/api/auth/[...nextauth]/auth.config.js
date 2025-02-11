@@ -131,12 +131,20 @@ export const authOptions = {
         token = { ...token, ...fullUser }
       }
 
-      if (trigger === 'update' && session?.user) {
-        token.avatar = session.user.avatar
-      }
+    //   if (trigger === 'update' && session?.user) {
+    //     token.avatar = session.user.avatar
 
-      return token
-    },
+
+    //   }
+
+    //   return token
+    // },
+
+    if (trigger === "update") {
+      return { ...token, ...session.user };
+    }
+    return { ...token, ...user};
+  },
 
     async session({ token, session }) {
       if (token) {

@@ -3,7 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEdgeStore } from "@/libs/edgestore";
+// import { useEdgeStore } from "@/libs/edgestore";
 import UploadDoc from "@/components/admin/components/UploadDoc";
 import DocDetails from "@/components/admin/components/DocDetails";
 import { processPDF } from "@/libs/pdf-processor";
@@ -12,7 +12,7 @@ import logoImg from "@/public/icons/icon.png";
 export default function UploadPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const { edgestore } = useEdgeStore();
+  // const { edgestore } = useEdgeStore();
 
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -66,20 +66,20 @@ export default function UploadPage() {
             toast.success(`PDF processed successfully`, { id: `process-${detail.id}` });
           }
 
-          // Upload the processed file
-          toast.loading(`Uploading ${detail.file.name}...`, { id: `upload-${detail.id}` });
-          const res = await edgestore.publicFiles.upload({
-            file: fileToUpload,
-            options: {
-              temporary: false,
-            },
-            onProgressChange: (progress) => {
-              toast.loading(
-                `Uploading ${detail.file.name}: ${Math.round(progress)}%`,
-                { id: `upload-${detail.id}` }
-              );
-            },
-          });
+          // // Upload the processed file
+          // toast.loading(`Uploading ${detail.file.name}...`, { id: `upload-${detail.id}` });
+          // const res = await edgestore.publicFiles.upload({
+          //   file: fileToUpload,
+          //   options: {
+          //     temporary: false,
+          //   },
+          //   onProgressChange: (progress) => {
+          //     toast.loading(
+          //       `Uploading ${detail.file.name}: ${Math.round(progress)}%`,
+          //       { id: `upload-${detail.id}` }
+          //     );
+          //   },
+          // });
 
           toast.success(`${detail.file.name} uploaded successfully`, { id: `upload-${detail.id}` });
           return { ...res, hash: detail.hash };
