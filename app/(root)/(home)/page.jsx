@@ -8,6 +8,8 @@ import Feed from "@/components/Feed";
 import Footer from "./(routes)/about/components/Footer";
 import FAQ from './(faq)/faq';
 import Blog from './blog/page';
+import InstallPrompt from '@/components/InstallPrompt';
+import InstallButton from '@/components/InstallPrompt';
 
 
 
@@ -38,6 +40,7 @@ export default function Home() {
 
         {/* Feed Section */}
         <div className="w-full md:px-8 sm:mb-16">
+        <InstallButton />
           <Feed
             label="RGPV Courses"
             styleHead="mt-3"

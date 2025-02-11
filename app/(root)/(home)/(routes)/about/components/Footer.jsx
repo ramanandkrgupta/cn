@@ -38,6 +38,20 @@ const Footer = () => {
           >
             Terms and Conditions
           </Link>
+          <Link
+            href="/refund"
+            className="text-secondary hover:underline text-sm sm:text-base"
+            aria-label="Terms and Conditions"
+          >
+            Refund
+          </Link>
+          <Link
+            href="/contact"
+            className="text-secondary hover:underline text-sm sm:text-base"
+            aria-label="Terms and Conditions"
+          >
+            Contact
+          </Link>
         </nav>
 
         {/* Social Media Links */}

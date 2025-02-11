@@ -28,30 +28,49 @@ export async function generateMetadata({ params }) {
   const { course } = params;
   const courseDetails = courses.find(c => c.link === course);
   
+  // Dynamic Title and Description
   const title = courseDetails 
-    ? courseDetails.name
-    : course.toUpperCase();
+    ? `${courseDetails.name} - RGPV Engineering Study Materials`
+    : `${course.toUpperCase()} - Study Resources at RGPV University`;
 
   const description = courseDetails
-    ? `${courseDetails.description} Access comprehensive study materials, semester-wise resources, previous year papers, and more for ${courseDetails.name} at RGPV University. Free educational content for engineering students.`
-    : `Access study materials and resources for ${course.toUpperCase()} at RGPV University`;
+    ? `${courseDetails.description} Access semester-wise study materials, important question papers (PYQs), syllabus, and more for ${courseDetails.name} at RGPV University. Improve your exam preparation with Notes Mates.`
+    : `Access study resources, PYQs, semester-wise notes, and syllabus for ${course.toUpperCase()} at RGPV University. Free educational content for engineering students.`;
+
+  // SEO Keywords: Optimized for RGPV, engineering, exams, study materials
+  const keywords = [
+    course.toUpperCase(),
+    "RGPV",
+    "Engineering",
+    "Study Materials",
+    "RGPV Question Papers",
+    "RGPV Previous Year Questions",
+    "Syllabus",
+    "Video Lectures",
+    "Exam Preparation",
+    "RGPV Important Questions",
+    "RGPV Notes Mates",
+    "Engineering Exam Resources",
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return {
     title,
     description,
-    keywords: [
-      course.toUpperCase(),
-      "RGPV",
-      "Engineering",
-      "Study Materials",
-      "Question Papers",
-      "Syllabus",
-      "Video Lectures"
-    ].filter(Boolean).join(", "),
+    keywords,
     openGraph: {
       title,
       description,
       type: 'website',
+      url: `https://www.notesmates.in/${course}`,
+      image: courseDetails ? courseDetails.image : 'https://www.notesmates.in/default-course-image.jpg',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      image: courseDetails ? courseDetails.image : 'https://www.notesmates.in/default-course-image.jpg',
     },
   };
 }
@@ -65,4 +84,3 @@ const MySemsterPage = ({ params }) => {
 };
 
 export default MySemsterPage;
-

@@ -24,7 +24,7 @@ const SkeletonLoading = () => (
 // AdCard component now uses the ad properties from the site settings.
 const AdCard = ({ ad }) => (
   <a href={ad.url} target="_blank" rel="noopener noreferrer">
-    <div className="bg-blue-500 text-white rounded-lg aspect-[3/4] flex flex-col items-center justify-center p-4">
+    <div className=" text-white rounded-lg  flex flex-col items-center justify-center p-1">
       {ad.img && (
         <img src={ad.img} alt={ad.title || 'Sponsored Ad'} className="object-contain h-2/3 w-full mb-2" />
       )}
