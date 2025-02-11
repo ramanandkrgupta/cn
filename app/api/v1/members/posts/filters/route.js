@@ -1,25 +1,29 @@
 // app/api/v1/members/posts/filters/route.js
 import { PrismaClient } from '@prisma/client'
+import { NextResponse } from 'next/server'
 
+// Ideally, reuse the same Prisma instance throughout your app.
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request) {
   try {
-    // Get distinct course names (only those with a value)
-    const coursesData = await prisma.post.findMany({
-      select: { course_name: true },
-      distinct: ['course_name'],
-    })
-    const semestersData = await prisma.post.findMany({
-      select: { semester_code: true },
-      distinct: ['semester_code'],
-    })
-    const categoriesData = await prisma.post.findMany({
-      select: { category: true },
-      distinct: ['category'],
-    })
+    // Run the queries concurrently for better performance.
+    const [coursesData, semestersData, categoriesData] = await Promise.all([
+      prisma.post.findMany({
+        select: { course_name: true },
+        distinct: ['course_name'],
+      }),
+      prisma.post.findMany({
+        select: { semester_code: true },
+        distinct: ['semester_code'],
+      }),
+      prisma.post.findMany({
+        select: { category: true },
+        distinct: ['category'],
+      }),
+    ])
 
-    // Extract and filter out null/empty values
+    // Extract and filter out null/empty values.
     const courses = coursesData
       .map((c) => c.course_name)
       .filter((val) => Boolean(val) && val.trim() !== '')
@@ -30,15 +34,12 @@ export async function GET() {
       .map((c) => c.category)
       .filter((val) => Boolean(val) && val.trim() !== '')
 
-    return new Response(JSON.stringify({ courses, semesters, categories }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return NextResponse.json({ courses, semesters, categories })
   } catch (error) {
     console.error('Error fetching filter options:', error)
-    return new Response(
-      JSON.stringify({ error: 'Error fetching filter options' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Error fetching filter options' },
+      { status: 500 }
     )
   }
 }

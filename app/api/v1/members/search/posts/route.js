@@ -6,7 +6,6 @@ const prisma = new PrismaClient()
 // GET handler for fetching posts
 export async function GET(req) {
   try {
-    // Get URL search params from the request
     const { searchParams } = new URL(req.url)
     const searchTerm = searchParams.get('searchTerm')
     const category = searchParams.get('category')
@@ -17,9 +16,14 @@ export async function GET(req) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
+    // Pagination parameters: load 10 posts at once
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = 10
+    const skip = (page - 1) * limit
+
     // Build the filter object
     const filter = {
-      isLatestVersion: true, // always fetch only the latest version
+      isLatestVersion: true, // Always fetch only the latest version
     }
 
     if (searchTerm) {
@@ -34,7 +38,7 @@ export async function GET(req) {
     }
 
     if (premium !== null && premium !== '') {
-      // Expecting a string "true" or "false"
+      // Expecting "true" or "false" as a string
       filter.premium = premium === 'true'
     }
 
@@ -60,26 +64,21 @@ export async function GET(req) {
       }
     }
 
-    // Determine if no extra filters were applied (only default filter exists)
-    const isEmptyFilter = Object.keys(filter).length === 1 // only isLatestVersion
+    // Order posts by createdAt descending for stable pagination
+    const orderBy = { createdAt: 'desc' }
 
-    // Fetch posts from Prisma
-    let posts = await prisma.post.findMany({
+    // Fetch posts with pagination
+    const posts = await prisma.post.findMany({
       where: filter,
+      skip,
+      take: limit,
+      orderBy,
       include: {
         user: {
           select: { name: true, avatar: true },
         },
       },
     })
-
-    // If no extra filter, randomize the posts array
-    if (isEmptyFilter) {
-      posts.sort(() => Math.random() - 0.5)
-    } else {
-      // Otherwise, sort descending by creation date
-      posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    }
 
     return new Response(JSON.stringify({ posts }), {
       status: 200,
