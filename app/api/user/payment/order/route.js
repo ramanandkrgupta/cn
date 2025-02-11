@@ -9,7 +9,7 @@ const razorpay = new Razorpay({
 
 export const POST = async (req) => {
   try {
-    const { amount, currency, receipt } = await req.json();
+    const { amount, currency, receipt , notes} = await req.json();
     
 
     if (!amount || !currency || !receipt ) {
@@ -20,6 +20,7 @@ export const POST = async (req) => {
       amount: amount * 100, // amount in the smallest currency unit
       currency,
       receipt,
+      notes,
       payment_capture: 1, // auto capture
       
     
@@ -27,6 +28,8 @@ export const POST = async (req) => {
     };
     const order = await razorpay.orders.create(options);
     return NextResponse.json(order, { status: 200 });
+    
+
 
   } catch (error) {
     console.error('Error creating order:', error);
