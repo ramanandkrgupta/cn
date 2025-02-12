@@ -1,15 +1,16 @@
-import { NextResponse } from "next/server";
-import prisma from "@/libs/prisma";
+import { NextResponse } from 'next/server'
+import prisma from '@/libs/prisma'
 
 export async function GET(req, { params }) {
   try {
-    const [courseName, semester, category, subjectCode] = params.filtered;
+    const [courseName, semester, category, subjectCode] = params.filtered
 
     // Validate parameters
     if (!courseName || !semester || !category || !subjectCode) {
-      return NextResponse.json({ 
-        error: "Missing required parameters" 
-      }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required parameters' },
+        { status: 400 }
+      )
     }
 
     // Get filtered posts with related data
@@ -38,20 +39,21 @@ export async function GET(req, { params }) {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+            avatar: true, // <-- Added avatar field here
+          },
         },
         _count: {
           select: {
             userDownloads: true,
-            userLikes: true
-          }
-        }
+            userLikes: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
-    });
+        createdAt: 'desc',
+      },
+    })
 
     // Get total counts
     const totalCounts = await prisma.post.aggregate({
@@ -62,23 +64,23 @@ export async function GET(req, { params }) {
         subject_code: decodeURIComponent(subjectCode),
       },
       _count: {
-        _all: true
+        _all: true,
       },
       _sum: {
         downloads: true,
         likes: true,
-        shares: true
-      }
-    });
+        shares: true,
+      },
+    })
 
     // Transform posts to include counts
-    const transformedPosts = posts.map(post => ({
+    const transformedPosts = posts.map((post) => ({
       ...post,
       downloads: post._count.userDownloads,
       likes: post._count.userLikes,
       shares: 0, // You can update this if you track shares
-      _count: undefined // Remove the _count object from response
-    }));
+      _count: undefined, // Remove the _count object from the response
+    }))
 
     return NextResponse.json({
       posts: transformedPosts,
@@ -87,23 +89,25 @@ export async function GET(req, { params }) {
         stats: {
           downloads: totalCounts._sum.downloads || 0,
           likes: totalCounts._sum.likes || 0,
-          shares: totalCounts._sum.shares || 0
+          shares: totalCounts._sum.shares || 0,
         },
         filters: {
           course: decodeURIComponent(courseName),
           semester: decodeURIComponent(semester),
           category: decodeURIComponent(category),
-          subjectCode: decodeURIComponent(subjectCode)
-        }
-      }
-    });
-
+          subjectCode: decodeURIComponent(subjectCode),
+        },
+      },
+    })
   } catch (error) {
-    console.error("Error filtering posts:", error);
-    return NextResponse.json({
-      error: "Error filtering posts",
-      details: error.message
-    }, { status: 500 });
+    console.error('Error filtering posts:', error)
+    return NextResponse.json(
+      {
+        error: 'Error filtering posts',
+        details: error.message,
+      },
+      { status: 500 }
+    )
   }
 }
 
@@ -115,5 +119,5 @@ export async function HEAD() {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, HEAD',
     },
-  });
+  })
 }

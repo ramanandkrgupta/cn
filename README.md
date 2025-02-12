@@ -8,6 +8,7 @@
 
  # 🌟 Where Learning Meets Simplicity 🌟
 
+
  NotesMates.in is a completely free and ad-free platform designed to revolutionize the way students and teachers interact with study materials. Whether you're a student from any college, course, branch, semester, or subject, or a teacher managing academic content, NotesMates makes it seamless and stress-free!
 
  ## What Makes NotesMates Special?
