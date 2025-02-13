@@ -10,7 +10,7 @@ export const NotificationBell = () => {
 
   const fetchUnreadCount = async () => {
     // Only fetch notifications if the user is authenticated.
-    if (!session) return
+    if (status !== 'authenticated') return
 
     try {
       const response = await fetch('/api/v1/members/users/notifications')

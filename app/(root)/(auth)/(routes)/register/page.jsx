@@ -135,6 +135,7 @@ const RegisterPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Password"
                   value={password}
+                  autoComplete="on"
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button

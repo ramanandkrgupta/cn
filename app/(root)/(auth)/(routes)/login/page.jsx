@@ -104,7 +104,8 @@ const LoginPage = () => {
                     icon={Lock}
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
-                    value={password}
+                  value={password}
+                  autoComplete="on"
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
