@@ -17,6 +17,7 @@ export default function NotificationsPage() {
   const { data: session } = useSession()
   const router = useRouter()
 
+  // Main states for notifications and pagination
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState([])
   const [pagination, setPagination] = useState({
@@ -35,22 +36,32 @@ export default function NotificationsPage() {
     type: 'info', // info, success, warning, error
   })
 
-  // Users list (for recipient selection)
+  // Users list & search/filter states for recipient selection
   const [users, setUsers] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [roleFilter, setRoleFilter] = useState('all') // "all", "ADMIN", "FREE", "PRO"
+  const [showAllUsers, setShowAllUsers] = useState(false)
+  const [usersPagination, setUsersPagination] = useState({
+    total: 0,
+    limit: 10,
+  })
 
-  // State for delete confirmation modal
+  // Delete modal state
   const [deleteModal, setDeleteModal] = useState({ show: false, id: null })
 
+  // ---------------------------
+  // Effects & API calls
+  // ---------------------------
   useEffect(() => {
     if (session?.user?.role !== 'ADMIN') {
       router.push('/')
       return
     }
     fetchNotifications()
-    fetchUsers()
+    fetchUsers() // Fetch recipients based on search/filter
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, router, pagination.page])
+  }, [session, router, pagination.page, searchQuery, roleFilter, showAllUsers])
 
   const fetchNotifications = async () => {
     try {
@@ -74,16 +85,30 @@ export default function NotificationsPage() {
     }
   }
 
+  // Fetch users with search & role filter.
+  // When "Show All" is false, only fetch the first 10; otherwise, fetch all matching users.
   const fetchUsers = async () => {
     try {
       setLoadingUsers(true)
-      const response = await fetch('/api/v1/admin/users')
+      const limit = showAllUsers ? 1000 : usersPagination.limit // if show all, get a high limit
+      const params = new URLSearchParams({
+        search: searchQuery,
+        role: roleFilter,
+        page: '1',
+        limit: String(limit),
+      })
+      const response = await fetch(`/api/v1/admin/users?${params}`)
       if (response.ok) {
         const data = await response.json()
         setUsers(data.users)
+        setUsersPagination({
+          total: data.pagination.total,
+          limit: usersPagination.limit,
+        })
       }
     } catch (error) {
       console.error('Error fetching users:', error)
+      toast.error('Failed to load users')
     } finally {
       setLoadingUsers(false)
     }
@@ -106,6 +131,7 @@ export default function NotificationsPage() {
       })
       if (!response.ok) throw new Error('Failed to send notification')
       toast.success('Notification sent successfully')
+      // Clear the form
       setNotification({ message: '', image: '', link: '', type: 'info' })
       setSelectedUsers([])
       fetchNotifications()
@@ -115,8 +141,8 @@ export default function NotificationsPage() {
     }
   }
 
-  // Modified handleDelete: No confirm(), deletion happens directly.
-  const handleDelete = async (id) => {
+  // Instead of browser confirm(), show custom modal.
+  const handleConfirmDelete = async (id) => {
     try {
       const response = await fetch(`/api/v1/admin/notifications?id=${id}`, {
         method: 'DELETE',
@@ -129,6 +155,20 @@ export default function NotificationsPage() {
       toast.error('Failed to delete notification')
     }
   }
+
+  // Group notifications by message, type, image, link so that if the same notification was sent to multiple users, we display a summary.
+  const groupedNotifications = notifications.reduce((acc, notif) => {
+    const key = `${notif.message}-${notif.type}-${notif.image || ''}-${
+      notif.link || ''
+    }`
+    if (!acc[key]) {
+      acc[key] = { ...notif, count: 1 }
+    } else {
+      acc[key].count++
+    }
+    return acc
+  }, {})
+  const notificationsGroups = Object.values(groupedNotifications)
 
   if (loading) {
     return (
@@ -251,32 +291,46 @@ export default function NotificationsPage() {
                 </div>
               </div>
 
-              {/* Recipients Selection */}
+              {/* Recipients Search & Filters */}
               <div>
                 <label className="block text-xs sm:text-sm mb-1">
-                  Select Recipients
+                  Search Recipients
                 </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs sm:text-sm"
+                    placeholder="Search by name or email..."
+                  />
+                  <button
+                    type="button"
+                    onClick={fetchUsers}
+                    className="btn btn-xs bg-orange-500 text-black"
+                  >
+                    Search
+                  </button>
+                </div>
+                <label className="block text-xs sm:text-sm mb-1">
+                  Filter by Role
+                </label>
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs sm:text-sm mb-2"
+                >
+                  <option value="all">All</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="FREE">Free User</option>
+                  <option value="PRO">Pro User</option>
+                </select>
+                {/* Users List */}
                 <div className="bg-gray-800 rounded p-2 max-h-48 overflow-y-auto">
-                  <div className="flex gap-2 mb-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedUsers(users.map((u) => u.id))}
-                      className="btn btn-xs bg-orange-500 text-black"
-                    >
-                      Select All
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedUsers([])}
-                      className="btn btn-xs bg-orange-500 text-black"
-                    >
-                      Clear All
-                    </button>
-                  </div>
-                  {users.map((user) => (
+                  {users.slice(0, usersPagination.limit).map((user) => (
                     <label
                       key={user.id}
-                      className="flex items-center p-1 hover:bg-gray-700 rounded text-[11px]"
+                      className="flex items-center p-1 hover:bg-gray-700 rounded text-[7px]"
                     >
                       <input
                         type="checkbox"
@@ -294,12 +348,54 @@ export default function NotificationsPage() {
                       />
                       <span>
                         {user.name || user.email}{' '}
-                        <span className="text-[7px] text-gray-400">
+                        <span className="text-[6px] text-gray-400">
                           ({user.userRole})
                         </span>
                       </span>
                     </label>
                   ))}
+                  {usersPagination.total > usersPagination.limit && (
+                    <div className="text-[7px] text-gray-400 mt-1">
+                      And {usersPagination.total - usersPagination.limit}{' '}
+                      more...
+                      <button
+                        type="button"
+                        onClick={() => setShowAllUsers(true)}
+                        className="btn btn-xs ml-2 bg-orange-500 text-black"
+                      >
+                        Show All
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      // When selecting all, fetch all matching users
+                      try {
+                        const params = new URLSearchParams({
+                          search: searchQuery,
+                          role: roleFilter,
+                          page: '1',
+                          limit: '1000',
+                        })
+                        const response = await fetch(
+                          `/api/v1/admin/users?${params}`
+                        )
+                        if (response.ok) {
+                          const data = await response.json()
+                          const allIds = data.users.map((u) => u.id)
+                          setSelectedUsers(allIds)
+                        }
+                      } catch (error) {
+                        console.error('Error selecting all:', error)
+                      }
+                    }}
+                    className="btn btn-xs bg-orange-500 text-black"
+                  >
+                    Select All Matching
+                  </button>
                 </div>
               </div>
 
@@ -321,50 +417,56 @@ export default function NotificationsPage() {
               Recent Notifications
             </h2>
             <div className="space-y-3 flex-1 overflow-y-auto">
-              {notifications.map((notif) => (
-                <div key={notif.id} className="bg-gray-800 rounded-lg p-3">
+              {notificationsGroups.map((group, index) => (
+                <div key={index} className="bg-gray-800 rounded-lg p-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      {notif.type === 'info' && (
+                      {group.type === 'info' && (
                         <Info className="w-4 h-4 text-blue-500" />
                       )}
-                      {notif.type === 'success' && (
+                      {group.type === 'success' && (
                         <CheckCircle className="w-4 h-4 text-green-500" />
                       )}
-                      {notif.type === 'warning' && (
+                      {group.type === 'warning' && (
                         <AlertCircle className="w-4 h-4 text-yellow-500" />
                       )}
-                      {notif.type === 'error' && (
+                      {group.type === 'error' && (
                         <AlertCircle className="w-4 h-4 text-red-500" />
                       )}
                       <div className="flex flex-col">
                         <p className="font-medium text-[7px] sm:text-sm break-words">
-                          {notif.message}
+                          {group.message}
                         </p>
-                        <p className="text-[6px] sm:text-xs text-gray-400 break-words">
-                          {new Date(notif.createdAt).toLocaleString()}
-                        </p>
+                        {group.count > 1 ? (
+                          <p className="text-[6px] sm:text-xs text-gray-400">
+                            Sent to {group.count} users
+                          </p>
+                        ) : (
+                          <p className="text-[6px] sm:text-xs text-gray-400 break-words">
+                            {new Date(group.createdAt).toLocaleString()}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <button
                       onClick={() =>
-                        setDeleteModal({ show: true, id: notif.id })
+                        setDeleteModal({ show: true, id: group.id })
                       }
                       className="btn btn-ghost btn-xs text-red-500 self-start"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
-                  {notif.image && (
+                  {group.image && (
                     <img
-                      src={notif.image}
+                      src={group.image}
                       alt="Notification"
                       className="mt-2 rounded w-full object-contain"
                     />
                   )}
-                  {notif.link && (
+                  {group.link && (
                     <a
-                      href={notif.link}
+                      href={group.link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline text-[7px] sm:text-xs mt-2 inline-block"

@@ -3,7 +3,6 @@ import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 
-// Get all notifications
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +15,6 @@ export async function GET(req) {
     const limit = parseInt(searchParams.get('limit')) || 10;
     const skip = (page - 1) * limit;
 
-    // Get notifications with pagination
     const [notifications, total] = await Promise.all([
       prisma.notification.findMany({
         orderBy: { createdAt: 'desc' },
@@ -34,7 +32,7 @@ export async function GET(req) {
       prisma.notification.count()
     ]);
 
-    // Get stats
+
     const stats = await prisma.notification.groupBy({
       by: ['type'],
       _count: {
@@ -61,7 +59,6 @@ export async function GET(req) {
   }
 }
 
-// Send new notification
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -77,7 +74,6 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // Create notifications for all selected users
     const notifications = await Promise.all(
       userIds.map(userId =>
         prisma.notification.create({
@@ -102,7 +98,6 @@ export async function POST(req) {
   }
 }
 
-// Delete notification
 export async function DELETE(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -125,4 +120,4 @@ export async function DELETE(req) {
       details: error.message
     }, { status: 500 });
   }
-} 
+}
