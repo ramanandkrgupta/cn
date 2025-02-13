@@ -9,11 +9,13 @@ import { useSession, signIn } from "next-auth/react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Lock } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { handlesharebtn } from "@/libs/utils";
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     // console.log("Session in component:", session); // Debug log
@@ -28,7 +30,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
- 
+
 
   // Check user's interaction when dialog opens
   useEffect(() => {
@@ -324,7 +326,11 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <li>Course : {data.course_name}</li>
                     <li>Semester : {data.semester_code}</li>
                     <li>Category : {data.category}</li>
-                    <li>File Size : {(data.file_size / (1024 * 1024)).toFixed(2)} MB</li> {/* Display file size */}
+                    <li>
+                      File Size : {(data.file_size / (1024 * 1024)).toFixed(2)}{' '}
+                      MB
+                    </li>{' '}
+                    {/* Display file size */}
                   </ul>
                 </div>
                 <div className="mt-4 flex flex-col gap-2">
@@ -333,84 +339,87 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     <span>{metrics.likes} ❤️</span>
                     <span>{metrics.shares} 📢</span>
                   </div>
-                  
+
                   <div className="flex w-full gap-2">
-                  <button
-  type="button"
-  className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
-  onClick={() => {
-    if (!session?.user) {
-      toast.error("Please login to download files");
-      return;
-    }
-    handleDownload(data.id, data.title);
-  }}
-  disabled={isDownloading || (data.premium && session?.user?.role !== "PRO")}
->
-  {isDownloading ? (
-    // Loading spinner animation
-    <div className="flex items-center justify-center gap-2">
-      <svg
-        className="animate-spin h-5 w-5 text-white"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
-      </svg>
-      <span>Downloading...</span>
-    </div>
-  ) : !session?.user ? (
-    <span className="flex items-center justify-center gap-1 text-sm">
-      <Lock className="w-4 h-4" />
-      Login to Download
-    </span>
-  ) : data.premium ? (
-    session.user.role === "PRO" ? (
-      "Premium File - Download"
-    ) : (
-      "Premium File - Upgrade to Download"
-    )
-  ) : (
-    "Download"
-  )}
-</button>
+                    <button
+                      type="button"
+                      className="rounded-full items-center justify-center text-white bg-black hover:bg-gray-700 py-2.5 px-2 capitalize mt-4 flex-1 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        if (!session?.user) {
+                          toast.error('Please login to download files')
+                          return
+                        }
+                        handleDownload(data.id, data.title)
+                      }}
+                      disabled={
+                        isDownloading ||
+                        (data.premium && session?.user?.role !== 'PRO')
+                      }
+                    >
+                      {isDownloading ? (
+                        // Loading spinner animation
+                        <div className="flex items-center justify-center gap-2">
+                          <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          <span>Downloading...</span>
+                        </div>
+                      ) : !session?.user ? (
+                        <span className="flex items-center justify-center gap-1 text-sm">
+                          <Lock className="w-4 h-4" />
+                          Login to Download
+                        </span>
+                      ) : data.premium ? (
+                        session.user.role === 'PRO' ? (
+                          'Premium File - Download'
+                        ) : (
+                          'Premium File - Upgrade to Download'
+                        )
+                      ) : (
+                        'Download'
+                      )}
+                    </button>
 
                     <button
                       onClick={() => {
                         if (!session?.user) {
-                          toast.error("Please login to like posts");
-                          return;
+                          toast.error('Please login to like posts')
+                          return
                         }
-                        handleLike();
+                        handleLike()
                       }}
                       disabled={hasLiked}
                       className={`mt-4 p-2.5 rounded-full transition-all duration-300 ${
-                        hasLiked ? "bg-red-500" : "bg-black hover:bg-gray-700"
+                        hasLiked ? 'bg-red-500' : 'bg-black hover:bg-gray-700'
                       }`}
                       title={
                         !session?.user
-                          ? "Login to Like"
+                          ? 'Login to Like'
                           : hasLiked
-                          ? "Already Liked"
-                          : "Like"
+                          ? 'Already Liked'
+                          : 'Like'
                       }
                     >
                       <HeartIcon
                         className={`h-6 w-6 ${
-                          hasLiked ? "text-white" : "text-gray-300"
+                          hasLiked ? 'text-white' : 'text-gray-300'
                         }`}
                       />
                     </button>
@@ -423,6 +432,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                       <ShareIcon className="h-6 w-6" />
                     </button>
                   </div>
+
                   {!session?.user && (
                     <div className="mt-4 p-4 bg-base-200 rounded-lg border border-base-300">
                       <div className="text-center">
@@ -432,10 +442,8 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                           and takes less than a minute.
                         </p>
                         <div className="flex gap-2 justify-center">
-                          <Link
-                            href="/login"
-                            className="btn btn-primary btn-sm"
-                          >
+                          {/* // i want when user click on login then it should redirect to login page with callback to cuurent url */}
+                          <Link href="/login?callbackUrl=${router.asPath}" className="btn btn-primary btn-sm">
                             Login
                           </Link>
                           <Link
@@ -450,7 +458,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                   )}
                   {data.premium &&
                     session?.user &&
-                    session.user.role !== "PRO" && (
+                    session.user.role !== 'PRO' && (
                       <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
                         <div className="text-center">
                           <h4 className="font-semibold text-amber-900 mb-2">
@@ -476,7 +484,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
         </div>
       </Dialog>
     </Transition>
-  );
+  )
 };
 
 export default PostViewDialogBox;
