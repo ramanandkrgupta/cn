@@ -53,9 +53,9 @@ export const navlinks = [
     link: "/about",
   },
   {
-    name: "Join Us",
+    name: "Chat",
     icon: MessageCircle,
-    link: "https://chat.whatsapp.com/JotgzAmp62YLOwQScP29iD"
+    link: "/chat"
   },
   {
     name: "Search",
