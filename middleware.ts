@@ -27,7 +27,7 @@ export async function middleware(request) {
     if (!token || token.role !== 'ADMIN') {
       return new NextResponse(
         JSON.stringify({ error: 'Unauthorized' }),
-        { 
+        {
           status: 401,
           headers: {
             'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export async function middleware(request) {
     if (!token) {
       return new NextResponse(
         JSON.stringify({ error: 'Authentication required' }),
-        { 
+        {
           status: 401,
           headers: {
             'Content-Type': 'application/json'
@@ -62,6 +62,8 @@ export const config = {
     // Include all API routes except AI training
     '/api/v1/admin/((?!ai/train).)*',
     '/api/v1/members/:path*',
-    '/login'
+    '/login',
+    '/account',
+    '/dashboard',
   ]
 };

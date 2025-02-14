@@ -129,18 +129,8 @@ const InstallPrompt = () => {
   return (
     <button
       onClick={handleInstall}
-      style={{
-        position: "fixed",
-        bottom: "16px",
-        right: "16px",
-        backgroundColor: "#2563EB",
-        color: "#fff",
-        padding: "10px 16px",
-        borderRadius: "8px",
-        border: "none",
-        cursor: "pointer",
-        zIndex: 1000,
-      }}
+      className="bg-orange-500
+       hover:bg-orange-700 text-white font-bold py-2 px-4 rounded"
     >
       Install App
     </button>

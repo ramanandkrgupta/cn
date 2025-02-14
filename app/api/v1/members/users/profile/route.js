@@ -105,7 +105,8 @@ export async function GET(req) {
         verifiedUploads: true,
         reputationScore: true,
         links: true,
-      }
+        // downloads: true
+      },
     })
 
     if (!user) {
@@ -115,24 +116,39 @@ export async function GET(req) {
     // Get follower and following counts
     const followData = await prisma.follows.findMany({
       where: {
-        OR: [
-          { followingId: userId },
-          { followerId: userId }
-        ]
-      }
+        OR: [{ followingId: userId }, { followerId: userId }],
+      },
     })
 
     // Calculate followers and following
-    const followers = followData.filter(f => f.followingId === userId).length
-    const following = followData.filter(f => f.followerId === userId).length
+    const followers = followData.filter((f) => f.followingId === userId).length
+    const following = followData.filter((f) => f.followerId === userId).length
+
+    // Calculate downloads count for user in count query
+    const downloadsCount = await prisma.UserDownload.count({
+      where: {
+        userId,
+      },
+    })
+
+    const uploadsCount = await prisma.Quiz.count({
+      where: {
+        userId,
+      },
+    })
 
     return NextResponse.json({
       ...user,
       followers,
-      following
+      following,
+      downloadsCount,
+      uploadsCount,
     })
   } catch (error) {
     console.error('Error fetching user profile:', error)
-    return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to fetch user data' },
+      { status: 500 }
+    )
   }
 }

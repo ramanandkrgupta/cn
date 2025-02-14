@@ -76,7 +76,7 @@ const LoginPage = () => {
   };
   return (
     <>
-     <div className="container items-center justify-center">
+     {/* <div className="container items-center justify-center"> */}
         <div className="container items-center justify-center px-6 py-28 mx-auto md:h-screen lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -104,7 +104,8 @@ const LoginPage = () => {
                     icon={Lock}
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
-                    value={password}
+                  value={password}
+                  autoComplete="on"
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
@@ -176,7 +177,7 @@ const LoginPage = () => {
             </div>
           </motion.div>
         </div>
-      </div>
+      {/* </div> */}
     </>
   );
 };

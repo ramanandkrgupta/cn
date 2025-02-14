@@ -22,10 +22,10 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false); 
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(true); // Default to true
 
-  const router = useRouter(); 
+  const router = useRouter();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -70,7 +70,7 @@ const RegisterPage = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsGoogleLoading(true);
-      console.log("Initiating Google signup...");
+      //console.log("Initiating Google signup...");
 
       await signIn("google", {
         callbackUrl: "/account",
@@ -95,129 +95,131 @@ const RegisterPage = () => {
         />
       </Head>
 
-      <div className="container items-center justify-center">
-        <div className="container items-center justify-center md:h-screen lg:py-0">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
-          >
-            <div className="p-8">
-              <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
-                Create Account
-              </h2>
+      <div className="container items-center justify-center   mx-auto md:h-screen lg:py-0">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+        >
+          <div className="p-8">
+            <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+              Create Account
+            </h2>
 
-              <form onSubmit={handleSignUp}>
+            <form onSubmit={handleSignUp}>
+              <Input
+                icon={User}
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                icon={Mail}
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                icon={Phone}
+                type="tel"
+                placeholder="WhatsApp Number"
+                value={RawPhoneNumber}
+                onChange={(e) => setRawPhoneNumber(e.target.value)}
+              />
+              <div className="relative">
                 <Input
-                  icon={User}
-                  type="text"
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  icon={Lock}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  value={password}
+                  autoComplete="on"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-                <Input
-                  icon={Mail}
-                  type="email"
-                  placeholder="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {error && (
+                <p className="text-red-500 font-semibold mt-2">{error}</p>
+              )}
+              <PasswordStrengthMeter password={password} />
+              <div className="flex items-center mb-6">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="mr-2"
                 />
-                <Input
-                  icon={Phone}
-                  type="tel"
-                  placeholder="WhatsApp Number"
-                  value={RawPhoneNumber}
-                  onChange={(e) => setRawPhoneNumber(e.target.value)}
-                />
-                <div className="relative">
-                  <Input
-                    icon={Lock}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                <label htmlFor="terms" className="text-sm text-gray-400">
+                  I accept the{' '}
+                  <Link
+                    href="/terms"
+                    className="text-green-400 hover:underline"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5 text-gray-400" />
-                    ) : (
-                      <Eye className="w-5 h-5 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-                {error && (
-                  <p className="text-red-500 font-semibold mt-2">{error}</p>
-                )}
-                <PasswordStrengthMeter password={password} />
-                <div className="flex items-center mb-6">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mr-2"
-                  />
-                  <label htmlFor="terms" className="text-sm text-gray-400">
-                    I accept the{" "}
-                    <Link href="/terms" className="text-green-400 hover:underline">
-                      terms and conditions
-                    </Link>
-                  </label>
-                </div>
-                <motion.button
-                  className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
-              font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 
+                    terms and conditions
+                  </Link>
+                </label>
+              </div>
+              <motion.button
+                className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white
+              font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700
               focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
               focus:ring-offset-gray-900 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader className="animate-spin mx-auto" size={24} />
-                  ) : (
-                    "Sign Up"
-                  )}
-                </motion.button>
-              </form>
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader className="animate-spin mx-auto" size={24} />
+                ) : (
+                  'Sign Up'
+                )}
+              </motion.button>
+            </form>
 
-              <div className="mt-4">
-                <button
-                  onClick={handleGoogleLogin}
-                  disabled={isGoogleLoading}
-                  className="w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 flex items-center justify-center gap-2 relative"
-                >
-                  {isGoogleLoading ? (
-                    <Loader className="w-5 h-5 animate-spin text-gray-600" />
-                  ) : (
-                    <FcGoogle className="w-5 h-5" />
-                  )}
-                  <span>
-                    {isGoogleLoading ? "Signing up..." : "Continue with Google"}
-                  </span>
-                </button>
-                {/* Add more Login OPtion Here */}
-              </div>
+            <div className="mt-4">
+              <button
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading}
+                className="w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 flex items-center justify-center gap-2 relative"
+              >
+                {isGoogleLoading ? (
+                  <Loader className="w-5 h-5 animate-spin text-gray-600" />
+                ) : (
+                  <FcGoogle className="w-5 h-5" />
+                )}
+                <span>
+                  {isGoogleLoading ? 'Signing up...' : 'Continue with Google'}
+                </span>
+              </button>
+              {/* Add more Login OPtion Here */}
             </div>
-            <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
-              <p className="text-sm text-gray-400">
-                Already have an account?{" "}
-                <Link href="/login" className="text-green-400 hover:underline">
-                  Login Here
-                </Link>
-              </p>
-            </div>
-          </motion.div>
-        </div>
+          </div>
+          <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+            <p className="text-sm text-gray-400">
+              Already have an account?{' '}
+              <Link href="/login" className="text-green-400 hover:underline">
+                Login Here
+              </Link>
+            </p>
+          </div>
+        </motion.div>
       </div>
     </>
-  );
+  )
 };
 
 export default RegisterPage;

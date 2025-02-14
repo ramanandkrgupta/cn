@@ -36,10 +36,11 @@ import useUserStore from "@/store/useUserStore";
 
 // Add stats for the profile
 const getProfileStats = (userData) => ({
-  uploads: userData?.uploads || 0,
-  downloads: userData?.downloads || 0,
-  reputation: userData?.reputation || 0,
-});
+  uploads: userData?.uploadsCount || 0,
+  downloads: userData?.downloadsCount || 0,
+
+  reputation: userData?.reputation || "A+",
+})
 
 // Enhanced menu items with badges and descriptions
 const getMenuItems = (router, userRole, session) => {

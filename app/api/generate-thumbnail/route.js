@@ -20,7 +20,7 @@ export async function POST(req) {
     }
 
     // Convert the file URL to the public access link
-    
+
 
     console.log('Generating thumbnail for:', { url, key });
     const thumbnailUrl = await generatePDFThumbnail(url, key);
