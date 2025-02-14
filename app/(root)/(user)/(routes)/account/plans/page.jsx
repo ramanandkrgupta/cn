@@ -147,7 +147,6 @@ export default function PlansPage() {
         throw new Error("Razorpay SDK failed to load");
       }
 
-      // For the Pro plan, use discountedPrice (for free, it remains 0)
       const plan = plans.find((p) => p.id === planId);
       const amount = planId === "pro" ? plan.discountedPrice : plan.price;
 
@@ -160,9 +159,8 @@ export default function PlansPage() {
           currency: "INR",
           receipt: `plan_${planId}_${Date.now()}`,
           notes: {
-            k1:"NM"
+            k1: "NM",
           },
-          //prefill user data
         }),
       });
 
@@ -174,21 +172,21 @@ export default function PlansPage() {
       const orderData = await orderResponse.json();
       if (!orderData.id) throw new Error("Failed to create order");
 
+      // Proceed to open Razorpay payment modal
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Notes Mates",
         description: `${orderData.id}`,
-        
-
         order_id: orderData.id,
         prefill: {
-          name: session.user.nmae,
+          name: session.user.name,
           email: session.user.email,
         },
         handler: async (response) => {
           try {
+            // Verify payment on the server
             const verifyResponse = await fetch("/api/user/payment/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -196,23 +194,21 @@ export default function PlansPage() {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
+                userId: session.user.id, // Ensure this is included
               }),
             });
             const verifyData = await verifyResponse.json();
             if (verifyData.status === "success") {
-              const updateResponse = await fetch(
-                "/api/v1/members/users/upgrade",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ plan: planId }),
-                }
-              );
+              // Handle successful upgrade
+              const updateResponse = await fetch("/api/v1/members/users/upgrade", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ plan: planId }),
+              });
               if (!updateResponse.ok) {
                 throw new Error("Failed to upgrade plan");
               }
               const { user } = await updateResponse.json();
-              console.log("sessssiion  ", user);
               await handleUpgradeSuccess(user);
             }
           } catch (error) {

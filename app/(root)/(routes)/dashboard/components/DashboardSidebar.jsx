@@ -1,61 +1,67 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
   BookOpen,
   Settings,
   Bell,
   ArrowLeft,
   LogOut,
-  ShieldCheck
-} from "lucide-react";
+  ShieldCheck,
+  CreditCard,
+} from 'lucide-react'
 import { signOut } from "next-auth/react";
 
 const menuItems = [
   {
-    title: "Dashboard",
+    title: 'Dashboard',
     icon: <LayoutDashboard className="w-5 h-5" />,
-    href: "/dashboard"
+    href: '/dashboard',
   },
   {
-    title: "Users",
+    title: 'Users',
     icon: <Users className="w-5 h-5" />,
-    href: "/dashboard/users"
+    href: '/dashboard/users',
   },
   {
-    title: "Documents",
+    title: 'Documents',
     icon: <FileText className="w-5 h-5" />,
-    href: "/dashboard/posts"
+    href: '/dashboard/posts',
   },
   {
-    title: "Subjects",
+    title: 'Subjects',
     icon: <BookOpen className="w-5 h-5" />,
-    href: "/dashboard/subjects"
+    href: '/dashboard/subjects',
   },
   {
-    title: "Notifications",
+    title: 'Notifications',
     icon: <Bell className="w-5 h-5" />,
-    href: "/dashboard/notifications"
+    href: '/dashboard/notifications',
   },
   {
-    title: "Moderation",
+    title: 'Moderation',
     icon: <ShieldCheck className="w-5 h-5" />,
-    href: "/dashboard/moderation"
+    href: '/dashboard/moderation',
   },
   {
-    title: "Settings",
+    title: 'Subscriptions',
+    icon: <CreditCard className="w-5 h-5" />,
+    href: '/dashboard/subscriptions',
+  },
+  {
+    title: 'Settings',
     icon: <Settings className="w-5 h-5" />,
-    href: "/dashboard/settings"
+    href: '/dashboard/settings',
   },
   {
-    title: "Back to Home",
+    title: 'Back to Home',
     icon: <ArrowLeft className="w-5 h-5" />,
-    href: "/"
-  }
-];
+    href: '/',
+  },
+]
 
 export default function DashboardSidebar({ user, collapsed = false }) {
   const pathname = usePathname();
@@ -83,8 +89,8 @@ export default function DashboardSidebar({ user, collapsed = false }) {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-lg transition-colors ${
-                    isActive 
-                      ? "bg-primary text-primary-content" 
+                    isActive
+                      ? "bg-primary text-primary-content"
                       : "hover:bg-base-300"
                   }`}
                 >
@@ -127,4 +133,4 @@ export default function DashboardSidebar({ user, collapsed = false }) {
       </div>
     </div>
   );
-} 
+}
