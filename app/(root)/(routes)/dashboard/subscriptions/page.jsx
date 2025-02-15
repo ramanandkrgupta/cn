@@ -9,6 +9,7 @@ import {
   Clock,
   XCircle,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const SubscriptionsPage = () => {
   const [subscriptions, setSubscriptions] = useState([])
@@ -18,10 +19,15 @@ const SubscriptionsPage = () => {
     const fetchSubscriptions = async () => {
       try {
         const response = await fetch('/api/v1/admin/subscriptions') // Create this API to fetch subscriptions
+        if (!response.ok) {
+          throw new Error('Failed to fetch subscriptions')
+        }
         const data = await response.json()
+        console.log('Fetched subscriptions:', data) // Log the fetched data
         setSubscriptions(data)
       } catch (error) {
         console.error('Error fetching subscriptions:', error)
+        toast.error('Failed to load subscriptions')
       }
     }
     fetchSubscriptions()
@@ -48,7 +54,7 @@ const SubscriptionsPage = () => {
       <div className="hidden md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-            <thead className="bg-gray-300">
+            <thead className="bg-gray-200">
               <tr>
                 <th className="border px-4 py-2 text-left text-black">
                   User Name
