@@ -19,32 +19,33 @@ export default function PlansPage() {
   const router = useRouter();
   const { data: session, update: updateSession } = useSession();
   const { updateUser } = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentPlan, setCurrentPlan] = useState("free");
-  // Set initial values – these will be updated from the API
-  const [proPlanSettings, setProPlanSettings] = useState({
-    discountedPrice: 49,
-    originalPrice: 99,
-    discountPercentage: 50,
-  });
+  const [proPlanSettings, setProPlanSettings] = useState(null);
 
-  // Fetch dynamic Pro plan settings from your public API
   useEffect(() => {
-    async function fetchProPlan() {
+    const loadPlan = async () => {
       try {
-        const res = await fetch("/api/v1/members/settings/subscription");
-        if (res.ok) {
-          const data = await res.json();
-          // Expected data: { discountedPrice, originalPrice, discountPercentage }
-          setProPlanSettings(data);
-        } else {
-          throw new Error("Failed to fetch pro plan settings");
+        const response = await fetch('/api/v1/members/settings/subscription');
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load pro plan');
         }
+
+        const planData = await response.json();
+        console.log('Plan Data:', planData); // Log the data to check its structure
+        setProPlanSettings(planData);
+
       } catch (error) {
-        console.error("Error fetching pro plan settings:", error);
+        console.error('Plan loading failed:', error);
+        toast.error(error.message); // Display the error message
+      } finally {
+        setLoading(false);
       }
-    }
-    fetchProPlan();
+    };
+
+    loadPlan();
   }, []);
 
   // Determine current plan based on session
@@ -78,9 +79,9 @@ export default function PlansPage() {
     {
       id: "pro",
       name: "Pro",
-      discountedPrice: proPlanSettings.discountedPrice,
-      originalPrice: proPlanSettings.originalPrice,
-      discountPercentage: proPlanSettings.discountPercentage,
+      discountedPrice: proPlanSettings?.discountedPrice,
+      originalPrice: proPlanSettings?.originalPrice,
+      discountPercentage: proPlanSettings?.discountPercentage,
       description: "Full access to all features",
       features: [
         "Access to all study materials",
@@ -147,6 +148,7 @@ export default function PlansPage() {
         throw new Error("Razorpay SDK failed to load");
       }
 
+      // For the Pro plan, use discountedPrice (for free, it remains 0)
       const plan = plans.find((p) => p.id === planId);
       const amount = planId === "pro" ? plan.discountedPrice : plan.price;
 
@@ -159,8 +161,9 @@ export default function PlansPage() {
           currency: "INR",
           receipt: `plan_${planId}_${Date.now()}`,
           notes: {
-            k1: "NM",
+            k1:"NM"
           },
+          //prefill user data
         }),
       });
 
@@ -172,21 +175,21 @@ export default function PlansPage() {
       const orderData = await orderResponse.json();
       if (!orderData.id) throw new Error("Failed to create order");
 
-      // Proceed to open Razorpay payment modal
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Notes Mates",
         description: `${orderData.id}`,
+
+
         order_id: orderData.id,
         prefill: {
-          name: session.user.name,
+          name: session.user.nmae,
           email: session.user.email,
         },
         handler: async (response) => {
           try {
-            // Verify payment on the server
             const verifyResponse = await fetch("/api/user/payment/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -194,21 +197,23 @@ export default function PlansPage() {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                userId: session.user.id, // Ensure this is included
               }),
             });
             const verifyData = await verifyResponse.json();
             if (verifyData.status === "success") {
-              // Handle successful upgrade
-              const updateResponse = await fetch("/api/v1/members/users/upgrade", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: planId }),
-              });
+              const updateResponse = await fetch(
+                "/api/v1/members/users/upgrade",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ plan: planId }),
+                }
+              );
               if (!updateResponse.ok) {
                 throw new Error("Failed to upgrade plan");
               }
               const { user } = await updateResponse.json();
+              console.log("sessssiion  ", user);
               await handleUpgradeSuccess(user);
             }
           } catch (error) {
@@ -227,6 +232,8 @@ export default function PlansPage() {
       setLoading(false);
     }
   };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-6xl">
@@ -290,13 +297,13 @@ export default function PlansPage() {
                 {plan.id === "pro" ? (
                   <div className="relative inline-flex items-center gap-2">
                     <span className="text-3xl font-bold text-primary">
-                      ₹{plan.discountedPrice.toFixed(2)}
+                      ₹{plan.discountedPrice ? plan.discountedPrice.toFixed(2) : 'N/A'}
                     </span>
                     <span className="text-gray-200 text-lg line-through opacity-75">
-                      ₹{plan.originalPrice.toFixed(2)}
+                      ₹{plan.originalPrice ? plan.originalPrice.toFixed(2) : 'N/A'}
                     </span>
                     <span className="bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
-                      {plan.discountPercentage}% OFF
+                      {plan.discountPercentage ? plan.discountPercentage.toFixed(2) + '% OFF' : 'N/A'}
                     </span>
                     <span className="text-base-content/60 ml-1">/month</span>
                   </div>
