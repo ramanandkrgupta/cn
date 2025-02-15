@@ -34,7 +34,7 @@ export async function PUT(req, context) {
 
         // include description (optional)
         // Add any other fields you need to update
-        premium: body.premium === 'true', //boolean
+        premium: body.premium, //boolean
       },
     })
 
