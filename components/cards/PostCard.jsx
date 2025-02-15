@@ -33,6 +33,7 @@ const EditDocForm = ({ initialData, onSave, onCancel }) => {
     title: initialData.title || '',
     category: initialData.category || '',
     description: initialData.description || '',
+    premium: initialData.premium || '',
   })
 
   const handleInputChange = (field, value) => {
@@ -77,6 +78,21 @@ const EditDocForm = ({ initialData, onSave, onCancel }) => {
               {cat.name}
             </option>
           ))}
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Premium
+        </label>
+        <select
+          value={formData.premium}
+          onChange={(e) => handleInputChange('premium', e.target.value === 'true')}
+          className="select select-bordered w-full"
+          required
+        >
+          <option value="">Select</option>
+          <option value="true">True</option>
+          <option value="false">False</option>
         </select>
       </div>
       <div>

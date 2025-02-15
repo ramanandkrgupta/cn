@@ -30,15 +30,18 @@ export async function PUT(req, context) {
       data: {
         title: body.title,
         category: body.category,
-        description: body.description, // include description (optional)
+        description: body.description,
+
+        // include description (optional)
         // Add any other fields you need to update
+        premium: body.premium === 'true', //boolean
       },
     })
 
     // Return the updated post as JSON
     return NextResponse.json(updatedPost)
   } catch (error) {
-    console.error('Error updating post:', error)
+    console.error('Error updating post:', error.message)
     return NextResponse.json(
       { error: error.message || 'Error updating post' },
       { status: 500 }
@@ -46,41 +49,40 @@ export async function PUT(req, context) {
   }
 }
 
-   export async function DELETE(req, { params }) {
-     try {
-       const session = await getServerSession(authOptions)
-       if (!session?.user) {
-         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-       }
+export async function DELETE(req, { params }) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-       const { id } = params
+    const { id } = params
 
-       // First, delete all related likes for the post
-       await prisma.userLike.deleteMany({
-         where: { postId: id },
-       })
+    // First, delete all related likes for the post
+    await prisma.userLike.deleteMany({
+      where: { postId: id },
+    })
 
-       // Then, delete all related downloads for the post
-       await prisma.userDownload.deleteMany({
-         where: { postId: id },
-       })
+    // Then, delete all related downloads for the post
+    await prisma.userDownload.deleteMany({
+      where: { postId: id },
+    })
 
-       // Finally, delete the post itself
-       const deletedPost = await prisma.post.delete({
-         where: { id },
-       })
+    // Finally, delete the post itself
+    const deletedPost = await prisma.post.delete({
+      where: { id },
+    })
 
-       return NextResponse.json(
-         { message: 'Post deleted successfully', deletedPost },
-         { status: 200 }
-       )
-     } catch (error) {
-       console.error('Error deleting post:', error)
+    return NextResponse.json(
+      { message: 'Post deleted successfully', deletedPost },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('Error deleting post:', error)
 
-       return NextResponse.json(
-         { error: error.message || 'Error deleting post' },
-         { status: 500 }
-       )
-
-     }
-   }
+    return NextResponse.json(
+      { error: error.message || 'Error deleting post' },
+      { status: 500 }
+    )
+  }
+}
