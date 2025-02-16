@@ -4,37 +4,38 @@ import prisma from '@/libs/prisma'
 
 export async function GET() {
   try {
-    // Find the subscription plan for "pro"
-    const plan = await prisma.subscriptionPlan.findUnique({
-      where: { planId: 'pro' },
+    const proPlan = await prisma.subscriptionPlan.findUnique({
+      where: {
+        planId: 'pro',
+      },
+      select: {
+        id: true,
+        planId: true,
+        name: true,
+        price: true,
+        offer: true,
+      },
     })
 
-    if (!plan) {
+    if (!proPlan) {
       return NextResponse.json({ error: 'Plan not found' }, { status: 404 })
     }
 
-    // Here, "price" is the discounted price and "offer" is the original price.
-    const discountedPrice = plan.price
-    const originalPrice = plan.offer
-    const discountPercentage =
-      originalPrice > 0
-        ? Number(
-            (((originalPrice - discountedPrice) / originalPrice) * 100).toFixed(
-              2
-            )
-          )
-        : 0
+    // Transform the data to match the client expectations
+    const transformedPlan = {
+      ...proPlan,
+      discountedPrice: proPlan.price, // or swap if needed
+      originalPrice: proPlan.offer,
+      discountPercentage: proPlan.offer
+        ? ((proPlan.offer - proPlan.price) / proPlan.offer) * 100
+        : 0,
+    }
 
-    // Return the detailed plan data
-    return NextResponse.json({
-      discountedPrice,
-      originalPrice,
-      discountPercentage,
-    })
+    return NextResponse.json(transformedPlan)
   } catch (error) {
-    console.error('Error in GET subscription route:', error)
+    console.error('Database error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch pro plan settings' },
       { status: 500 }
     )
   }

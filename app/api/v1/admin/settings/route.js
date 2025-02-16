@@ -48,39 +48,30 @@ export async function POST(req) {
 
     const { planPrice, ads, banners } = await req.json()
 
-    // Basic input validation
-    if (planPrice !== undefined && typeof planPrice !== 'number') {
-      return NextResponse.json({ error: 'Invalid planPrice value' }, { status: 400 })
-    }
-    if (ads !== undefined && !Array.isArray(ads)) {
-      return NextResponse.json({ error: 'ads must be an array' }, { status: 400 })
-    }
-    if (banners !== undefined && !Array.isArray(banners)) {
-      return NextResponse.json({ error: 'banners must be an array' }, { status: 400 })
+    // Validate input data
+    if (typeof planPrice !== 'number' || planPrice < 0) {
+      return NextResponse.json(
+        { error: 'Invalid plan price' },
+        { status: 400 }
+      )
     }
 
-    let settings = await prisma.siteSetting.findFirst()
-    if (!settings) {
-      settings = await prisma.siteSetting.create({
-        data: {
-          planPrice: planPrice ?? 0,
-          ads: ads ?? [],
-          banners: banners ?? [],
-        },
-      })
-    } else {
-      settings = await prisma.siteSetting.update({
-        where: { id: settings.id },
-        data: {
-          planPrice: planPrice !== undefined ? planPrice : settings.planPrice,
-          ads: ads !== undefined ? ads : settings.ads,
-          banners: banners !== undefined ? banners : settings.banners,
-        },
-      })
-    }
-    return NextResponse.json(settings)
+    // Update the plan in the database
+    const updatedPlan = await prisma.subscriptionPlan.update({
+      where: { planId: 'pro' }, // Ensure this matches the planId in your database
+      data: {
+        price: planPrice,
+        ads: ads || [], // Store ads as JSON
+        banners: banners || [], // Store banners as JSON
+      },
+    })
+
+    return NextResponse.json(updatedPlan)
   } catch (error) {
-    console.error("Error updating site settings:", error)
-    return NextResponse.json({ error: 'Error updating site settings' }, { status: 500 })
+    console.error('Error updating plan:', error)
+    return NextResponse.json(
+      { error: 'Failed to update settings: ' + error.message },
+      { status: 500 }
+    )
   }
 }

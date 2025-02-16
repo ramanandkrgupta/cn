@@ -8,17 +8,17 @@ datasource db {
 }
 
 model User {
-  id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  email            String  @unique
-  isEmailVerified  Boolean @default(false)
-  name             String?
-  password         String
-  phoneNumber      String?
-  isMobileVerified Boolean @default(false)
-  university       String?
-  college          String?
-  level            String?
-
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  email               String               @unique
+  isEmailVerified     Boolean              @default(false)
+  name                String?
+  password            String
+  phoneNumber         String?
+  isMobileVerified    Boolean              @default(false)
+  university          String?
+  college             String?
+  level               String?
+  subscriptions       SubscriptionDetail[] // Add this line to establish the relation
   stream              String?
   degree              String?
   specialization      String?
@@ -81,42 +81,42 @@ model subject {
 }
 
 model post {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  user          User?    @relation(fields: [userId], references: [id])
-  userId        String?  @db.ObjectId
-  course_name   String
-  semester_code String
-  subject_code  String
-  subject_name  String
-  title         String
-  description   String
-  category      String?
-  premium       Boolean  @default(false)
-  file_url      String?
-  thumbnail_url String?
-  file_name     String?
-  file_size     Int?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  downloads     Int      @default(0)
-  likes         Int      @default(0)
-  shares        Int      @default(0)
-  userLikes     UserLike[]
-  userDownloads UserDownload[]
-  fileHash      String?
-  status        String    @default("pending")
-  moderatedBy   String?   @db.ObjectId
-  moderator     User?     @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
-  moderatedAt   DateTime?
-  moderationNote String?
-  qualityScore  Float     @default(0.0)
-  reports       Report[]
-  version       Int       @default(1)
-  previousVersion String?  @db.ObjectId
-  isLatestVersion Boolean @default(true)
-  subject       subject?   @relation(fields: [subjectId], references: [id])
-  subjectId     String?    @db.ObjectId
-  collections   PostsInCollections[]
+  id              String               @id @default(auto()) @map("_id") @db.ObjectId
+  user            User?                @relation(fields: [userId], references: [id])
+  userId          String?              @db.ObjectId
+  course_name     String
+  semester_code   String
+  subject_code    String
+  subject_name    String
+  title           String
+  description     String
+  category        String?
+  premium         Boolean              @default(false)
+  file_url        String?
+  thumbnail_url   String?
+  file_name       String?
+  file_size       Int?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  downloads       Int                  @default(0)
+  likes           Int                  @default(0)
+  shares          Int                  @default(0)
+  userLikes       UserLike[]
+  userDownloads   UserDownload[]
+  fileHash        String?
+  status          String               @default("pending")
+  moderatedBy     String?              @db.ObjectId
+  moderator       User?                @relation("ModeratedPosts", fields: [moderatedBy], references: [id])
+  moderatedAt     DateTime?
+  moderationNote  String?
+  qualityScore    Float                @default(0.0)
+  reports         Report[]
+  version         Int                  @default(1)
+  previousVersion String?              @db.ObjectId
+  isLatestVersion Boolean              @default(true)
+  subject         subject?             @relation(fields: [subjectId], references: [id])
+  subjectId       String?              @db.ObjectId
+  collections     PostsInCollections[]
 }
 
 model video {
@@ -461,29 +461,34 @@ model Follows {
 
   @@unique([followerId, followingId])
 }
-model SubscriptionPlan {
+
+   model SubscriptionPlan {
+     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+     planId    String   @unique // e.g., "free" or "pro"
+     name      String
+     price     Float
+     offer     Float // New field for the offer number
+     ads       Json?    // Store ads as JSON
+     banners    Json?   // Store banners as JSON
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+   }
+
+model SiteSetting {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  planId    String   @unique // e.g., "free" or "pro"
-  name      String
-  price     Float
-  offer     Float    // New field for the offer number
+  planPrice Float    @default(0) // e.g., current Pro plan price
+  ads       Json? // Array of ad objects.
+  banners   Json? // Array of banner objects.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
-model SiteSetting {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  planPrice  Float    @default(0)    // e.g., current Pro plan price
-  ads        Json?                // Array of ad objects.
-  banners    Json?                // Array of banner objects.
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model SubscriptionDetail {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  paymentId       String
+  orderStatus     String // e.g., 'completed', 'pending', 'failed'
+  subscriptionEnd DateTime
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
 }
-
-
-
-
-
-
-
