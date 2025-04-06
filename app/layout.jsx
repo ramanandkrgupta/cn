@@ -41,6 +41,7 @@ export default function RootLayout({ children }) {
 
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7004515632237084"
      crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://botsailor.com/script/webchat-link.js?code=174395548136704"></script>
       </head>
       <body className={inter.className}>
         <AuthProvider>
