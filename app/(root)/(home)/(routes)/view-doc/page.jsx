@@ -9,6 +9,7 @@ import NoDataFound from '@/components/ui/NoDataFound'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion' // Import framer-motion
+import AdUnit from '../../../../../components/googleads/AdUnit'
 
 // Format subject code (BT101 -> BT-101)
 const formatSubjectCode = (code) => {
@@ -345,6 +346,12 @@ const ViewDoc = () => {
                           transition={{ duration: 0.3 }}
                         >
                           <AdCard ad={ad} />
+                          {/* Ad Unit */}
+                          <AdUnit
+                            adSlot="2575017820"
+                            adFormat="auto"
+                            fullWidth={true}
+                          />
                         </motion.div>
                       )
                     }

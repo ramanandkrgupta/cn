@@ -1,22 +1,20 @@
-"use client";
+'use client'
 
-import useUserStore from '@/store/useUserStore';
-import Greeting from "@/components/Greeting";
-import Banner from "@/components/Banner";
-import Notification from "@/components/Notification";
-import Feed from "@/components/Feed";
-import Footer from "./(routes)/about/components/Footer";
-import FAQ from './(faq)/faq';
-import Blog from './blog/page';
-import InstallPrompt from '@/components/InstallPrompt';
-import InstallButton from '@/components/InstallPrompt';
+import useUserStore from '@/store/useUserStore'
+import Greeting from '@/components/Greeting'
+import Banner from '@/components/Banner'
+import Notification from '@/components/Notification'
+import Feed from '@/components/Feed'
+import Footer from './(routes)/about/components/Footer'
+import FAQ from './(faq)/faq'
+import Blog from './blog/page'
+import InstallPrompt from '@/components/InstallPrompt'
+import InstallButton from '@/components/InstallPrompt'
 
-
+import AdUnit from '../../../components/googleads/AdUnit'
 
 export default function Home() {
-  const { userData } = useUserStore();
-
-  
+  const { userData } = useUserStore()
 
   return (
     <>
@@ -40,17 +38,26 @@ export default function Home() {
 
         {/* Feed Section */}
         <div className="w-full md:px-8 sm:mb-16">
-        <InstallButton />
+          <InstallButton />
           <Feed
             label="RGPV Courses"
             styleHead="mt-3"
             style="md:grid-cols-5 mt-4 gap-1.5 justify-between md:justify-start"
           />
         </div>
-      {/* <Blog/> */}
+        {/* <Blog/> */}
       </section>
-      <FAQ/>
+      <AdUnit adSlot="4693914708" adFormat="auto" fullWidth={true} />
+
+      {/* Or for in-article native ad */}
+      {/* <AdUnit
+        adSlot="4693914708"
+        adFormat="fluid"
+        // layout="in-article"
+        fullWidth={true}
+      /> */}
+      <FAQ />
       <Footer />
     </>
-  );
+  )
 }
