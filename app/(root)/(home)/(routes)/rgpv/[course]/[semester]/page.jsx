@@ -1,7 +1,8 @@
 import ViewSubjects from "./MySubject";
 import { courses, semester as semesters } from "@/constants";
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata(contextPromise) {
+  const { params } = await contextPromise;
   const { course, semester } = params;
   
   // Find course and semester details
@@ -53,9 +54,11 @@ export async function generateMetadata({ params }) {
   };
 }
 
-const MySemsterPage = ({ params }) => {
+const MySemesterPage = async ({ params: paramsPromise }) => {
+  const params = await paramsPromise;
   const { course, semester } = params;
+
   return <ViewSubjects course={course} semester={semester} />;
 };
 
-export default MySemsterPage;
+export default MySemesterPage;

@@ -24,7 +24,8 @@ const SemesterSkeleton = () => (
 );
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params: paramsPromise }) {
+  const params = await paramsPromise;
   const { course } = params;
   const courseDetails = courses.find(c => c.link === course);
   
