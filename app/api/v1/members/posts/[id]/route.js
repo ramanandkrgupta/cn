@@ -4,6 +4,35 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth.config'
 
+export async function GET(req, { params }) {
+  try {
+    const { id } = params;
+
+    const post = await prisma.post.findUnique({
+      where: { id },
+      select: {
+        title: true,
+        description: true,
+        subject_name: true,
+        course_name: true,
+        semester_code: true,
+        category: true,
+        file_size: true,
+        file_url: true,
+      },
+    });
+
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(post);
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 });
+  }
+}
+
 export async function PUT(req, context) {
   try {
     const session = await getServerSession(authOptions)

@@ -311,6 +311,7 @@ const ViewDoc = () => {
                     >
                       <PostCard
                         data={post}
+                        onClick={() => router.push(`/view-doc/pdf/${post.id}`)} // Navigate to PDF viewer route
                         onUpdate={(updatedPost) => {
                           if (updatedPost === null) {
                             setPosts((currentPosts) =>

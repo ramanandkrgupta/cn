@@ -7,11 +7,12 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ShareIcon, XMarkIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useSession, signIn } from "next-auth/react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { Lock } from "lucide-react";
+import { FileSpreadsheet, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { handlesharebtn } from "@/libs/utils";
+import PDFViewer from "../pdf/PDFViewer";
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
@@ -30,7 +31,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-
+  const [showPDFViewer, setShowPDFViewer] = useState(false);
 
   // Check user's interaction when dialog opens
   useEffect(() => {
@@ -49,8 +50,6 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
     checkUserInteraction();
   }, [data.id, session]);
-
-
 
   function closeModal() {
     setIsOpen(false);
@@ -174,8 +173,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     } catch (error) {
       console.error("Download error:", error);
       toast.error(error.message || "Error downloading file");
-    }
-    finally {
+    } finally {
       setIsDownloading(false); // Stop downloading regardless of success/failure
     }
   };
@@ -425,6 +423,20 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                     </button>
 
                     <button
+                      onClick={() => {
+                        if (!session?.user) {
+                          toast.error('Please login to view PDFs')
+                          return
+                        }
+                        router.push(`/view-doc/pdf/${data.id}`) // Navigate to PDF viewer route
+                      }}
+                      className="mt-4 p-2.5 rounded-full transition-all duration-300 bg-black hover:bg-gray-700"
+                      title="View PDF"
+                    >
+                      <FileSpreadsheet className="h-6 w-6 text-gray-300" />
+                    </button>
+
+                    <button
                       type="button"
                       className="rounded-full items-center mt-4 p-2.5 text-white bg-black hover:bg-gray-700 transition-all duration-300"
                       onClick={handleShare}
@@ -482,6 +494,10 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
             </Transition.Child>
           </div>
         </div>
+        <div className="mt-4">
+        {/* Conditionally render PDFViewer */}
+        {showPDFViewer && <PDFViewer />}
+      </div>
       </Dialog>
     </Transition>
   )
