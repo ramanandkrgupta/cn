@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/libs/prisma'
 
-export async function GET(req, { params }) {
+export async function GET(req, context) {
   try {
-    const [courseName, semester, category, subjectCode] = params.filtered
+    // Await params before destructuring
+    const params = await context.params;
+    const { filtered } = params;
+    const [courseName, semester, category, subjectCode] = filtered;
 
     // Validate parameters
     if (!courseName || !semester || !category || !subjectCode) {
