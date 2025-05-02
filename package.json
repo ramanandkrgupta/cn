@@ -24,6 +24,7 @@
     "@prisma/client": "^6.6.0",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
+    "@react-pdf-viewer/zoom": "^3.12.0",
     "@rehype-pretty/transformers": "^0.13.2",
     "@tabler/icons-react": "^2.45.0",
     "@tailwindcss/typography": "^0.5.16",
