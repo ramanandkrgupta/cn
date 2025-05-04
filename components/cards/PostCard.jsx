@@ -292,9 +292,9 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         /\s/g,
         ''
       )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/view-doc/pdf/${
         data.id
-      }/${data.title.replace(/\s+/g, '-')}`,
+      }`,
     }
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
