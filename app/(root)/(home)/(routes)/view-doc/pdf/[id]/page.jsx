@@ -3,12 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import PDFViewer from '@/components/pdf/PDFViewer'
-import { ArrowLeft, Heart, Share2, Download, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { ArrowLeft, Heart, Share2, Download, ChevronLeft, ChevronRight, Loader2, Info } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSession } from "next-auth/react"
 import { saveAs } from 'file-saver'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-
 
 const PDFView = ({ params: paramsPromise }) => {
   const router = useRouter()
@@ -19,8 +18,9 @@ const PDFView = ({ params: paramsPromise }) => {
   const [error, setError] = useState(null)
   const [documentInfo, setDocumentInfo] = useState(null)
   const [similarPDFs, setSimilarPDFs] = useState([])
-  const [activeTab, setActiveTab] = useState('information') // Tabs: 'information' or 'similar'
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false) // Sidebar state
+  const [activeTab, setActiveTab] = useState('information') // Tabs: 'information', 'similar', or 'view'
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false) // Desktop sidebar state
+  const [mobileSidebarExpanded, setMobileSidebarExpanded] = useState(false) // Mobile sidebar state
   const [hasLiked, setHasLiked] = useState(false)
   const [downloadInProgress, setDownloadInProgress] = useState(false)
   const [metrics, setMetrics] = useState({
@@ -29,6 +29,17 @@ const PDFView = ({ params: paramsPromise }) => {
     shares: 0,
     views: 0,
   })
+
+  // Close mobile sidebar when switching to a new tab
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setMobileSidebarExpanded(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     paramsPromise.then((params) => {
@@ -220,32 +231,31 @@ const PDFView = ({ params: paramsPromise }) => {
       toast.error('Error sharing document')
     }
   }
-   // Function to add user details to the PDF
-   const addUserDetailsToPdf = async (existingPdfBytes, userName, userEmail) => {
-      const pdfDoc = await PDFDocument.load(existingPdfBytes, {
-        ignoreEncryption: true,
-      })
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
-      const pages = pdfDoc.getPages()
-      pages.forEach((page) => {
-        const { width } = page.getSize()
-        const fontSize = 10
-        const userDetails = `${userName} - ${userEmail}`
-        const textWidth = helveticaFont.widthOfTextAtSize(userDetails, fontSize)
-        page.drawText(userDetails, {
-          x: width - textWidth - 10,
-          y: 10,
-          size: fontSize,
-          font: helveticaFont,
-          color: rgb(0.75, 0.75, 0.75),
-          opacity: 0.5,
-        })
-      })
-      return await pdfDoc.save()
-    }
-  
 
-  
+  // Function to add user details to the PDF
+  const addUserDetailsToPdf = async (existingPdfBytes, userName, userEmail) => {
+    const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+      ignoreEncryption: true,
+    })
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    const pages = pdfDoc.getPages()
+    pages.forEach((page) => {
+      const { width } = page.getSize()
+      const fontSize = 10
+      const userDetails = `${userName} - ${userEmail}`
+      const textWidth = helveticaFont.widthOfTextAtSize(userDetails, fontSize)
+      page.drawText(userDetails, {
+        x: width - textWidth - 10,
+        y: 10,
+        size: fontSize,
+        font: helveticaFont,
+        color: rgb(0.75, 0.75, 0.75),
+        opacity: 0.5,
+      })
+    })
+    return await pdfDoc.save()
+  }
+
   // Function to handle file download
   const handleDownload = async (e) => {
     if (e) e.preventDefault(); // Prevent any default behavior
@@ -345,18 +355,42 @@ const PDFView = ({ params: paramsPromise }) => {
     }
   };
 
+  // Handle tab change
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // If switching to view tab on mobile, close the mobile sidebar
+    if (tab === 'view' && window.innerWidth < 768) {
+      setMobileSidebarExpanded(false);
+    }
+  };
+
+  // Toggle mobile sidebar
+  const toggleMobileSidebar = () => {
+    setMobileSidebarExpanded(!mobileSidebarExpanded);
+  };
+
+  // Close mobile sidebar when switching to a new document
+  const handleSimilarPdfClick = (pdfId) => {
+    setMobileSidebarExpanded(false);
+    router.push(`/view-doc/pdf/${pdfId}`);
+  };
+
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-y-auto md:overflow-hidden">
-      {/* Sidebar - full width on mobile, side column on desktop */}
+    <div className="flex mt-3 flex-col md:flex-row h-screen overflow-hidden relative">
+      
+
+      {/* Information Sidebar - fullscreen overlay on mobile, side column on desktop */}
       <div
         className={`transition-all duration-300 ${
           sidebarCollapsed ? 'md:w-16 md:h-full' : 'md:w-1/4 md:h-full'
-        } w-full bg-base-200 p-4 ${
-          sidebarCollapsed ? 'md:max-h-16 max-h-16' : 'overflow-y-auto md:h-full'
-        } relative min-h-[60vh] md:min-h-0`}
+        } ${
+          mobileSidebarExpanded 
+            ? 'fixed inset-0 z-20 w-full h-full bg-base-200' 
+            : 'hidden md:block'
+        } bg-base-200 overflow-y-auto`}
       >
         {/* Top Section */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center p-4">
           {/* Back Button */}
           <button
             aria-label="Go Back"
@@ -366,95 +400,120 @@ const PDFView = ({ params: paramsPromise }) => {
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          {/* Toggle Sidebar Button */}
+          {/* Toggle Sidebar Button (desktop) / Close Button (mobile) */}
           <button
-            aria-label="Toggle Sidebar"
+            aria-label={mobileSidebarExpanded ? "Close Panel" : "Toggle Sidebar"}
             className="hover:bg-base-300 rounded-full p-2 transition-colors"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onClick={() => mobileSidebarExpanded ? setMobileSidebarExpanded(false) : setSidebarCollapsed(!sidebarCollapsed)}
           >
-            {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            {mobileSidebarExpanded ? (
+              <ChevronLeft className="w-5 h-5" />
+            ) : sidebarCollapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <ChevronLeft className="w-5 h-5" />
+            )}
           </button>
         </div>
 
         {/* Tabs Section */}
-        {!sidebarCollapsed && (
-          <div className="mt-2 pb-4">
+        {(!sidebarCollapsed || mobileSidebarExpanded) && (
+          <div className="mt-1 pb-4 px-4">
             <div className="tabs tabs-boxed bg-base-300 mb-4">
               <button
-                className={`tab ${activeTab === 'information' ? 'tab-active' : ''} flex-1`}
-                onClick={() => setActiveTab('information')}
+                className={`tab ${activeTab === 'information' ? 'tab-active' : ''} flex-1 text-sm`}
+                onClick={() => handleTabChange('information')}
               >
-                Information
+                Introduction
               </button>
               <button
-                className={`tab ${activeTab === 'similar' ? 'tab-active' : ''} flex-1`}
-                onClick={() => setActiveTab('similar')}
+                className={`tab ${activeTab === 'similar' ? 'tab-active' : ''} flex-1 text-sm`}
+                onClick={() => handleTabChange('similar')}
               >
-                Similar PDFs
+                Similar
+              </button>
+              <button
+                className={`tab ${activeTab === 'view' ? 'tab-active' : ''} flex-1 text-sm md:hidden`}
+                onClick={() => handleTabChange('view')}
+              >
+                View PDF
               </button>
             </div>
             
             {/* Content Section with Better Mobile Visibility */}
-            <div className="max-h-[70vh] md:max-h-none overflow-y-auto pb-2">
-              {activeTab === 'information' ? (
-                documentInfo ? (
-                  <div className="space-y-3 mt-2 mb-4">
+            <div className="overflow-y-auto pb-2" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+              {/* Introduction Tab */}
+              {activeTab === 'information' && documentInfo ? (
+                <div className="space-y-3 mt-2 mb-4">
+                  <div className="bg-base-100 p-3 rounded-lg shadow-sm">
+                    <p className="text-sm text-gray-500 mb-1">Title</p>
+                    <p className="font-medium">{documentInfo.title}</p>
+                  </div>
+                  
+                  <div className="bg-base-100 p-3 rounded-lg shadow-sm">
+                    <p className="text-sm text-gray-500 mb-1">Description</p>
+                    <p className="text-sm">{documentInfo.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                      <p className="text-sm text-gray-500 mb-1">Title</p>
-                      <p className="font-medium">{documentInfo.title}</p>
+                      <p className="text-sm text-gray-500 mb-1">Subject</p>
+                      <p className="font-medium">{documentInfo.subject_name}</p>
                     </div>
-                    
                     <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                      <p className="text-sm text-gray-500 mb-1">Description</p>
-                      <p className="text-sm">{documentInfo.description}</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-500 mb-1">Subject</p>
-                        <p className="font-medium">{documentInfo.subject_name}</p>
-                      </div>
-                      <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-500 mb-1">Course</p>
-                        <p className="font-medium">{documentInfo.course_name}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-500 mb-1">Semester</p>
-                        <p className="font-medium">{documentInfo.semester_code}</p>
-                      </div>
-                      <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-500 mb-1">Category</p>
-                        <p className="font-medium">{documentInfo.category}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-base-100 p-3 rounded-lg shadow-sm">
-                      <p className="text-sm text-gray-500 mb-1">File Size</p>
-                      <p className="font-medium">{(documentInfo.file_size / (1024 * 1024)).toFixed(2)} MB</p>
+                      <p className="text-sm text-gray-500 mb-1">Course</p>
+                      <p className="font-medium">{documentInfo.course_name}</p>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex justify-center items-center h-40">
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-base-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-sm text-gray-500 mb-1">Semester</p>
+                      <p className="font-medium">{documentInfo.semester_code}</p>
+                    </div>
+                    <div className="bg-base-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-sm text-gray-500 mb-1">Category</p>
+                      <p className="font-medium">{documentInfo.category}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-base-100 p-3 rounded-lg shadow-sm">
+                    <p className="text-sm text-gray-500 mb-1">File Size</p>
+                    <p className="font-medium">{(documentInfo.file_size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                  
+                  {/* Mobile-Only View Button */}
+                  <button
+                    className="btn btn-primary w-full md:hidden mt-3"
+                    onClick={() => handleTabChange('view')}
+                  >
+                    Read PDF
+                  </button>
+                </div>
+              ) : activeTab === 'information' && !documentInfo ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="flex flex-col items-center">
+                    <Loader2 className="w-5 h-5 animate-spin mb-2" />
                     <p className="text-gray-500">Loading document information...</p>
                   </div>
-                )
-              ) : (
+                </div>
+              ) : null}
+              
+              {/* Similar PDFs Tab */}
+              {activeTab === 'similar' && (
                 <div className="mb-4">
                   <h2 className="text-lg font-semibold mb-4">Similar PDFs</h2>
                   {similarPDFs.length > 0 ? (
-                    <div className="md:grid md:grid-cols-1 md:gap-4 w-full flex overflow-x-auto pb-3 space-x-4 md:space-x-0">
+                    <div className="space-y-4">
                       {similarPDFs.map((pdf) => (
                         <div
                           key={pdf.id}
-                          className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 min-w-[270px] md:w-full flex-shrink-0"
-                          onClick={() => router.push(`/view-doc/pdf/${pdf.id}`)}
+                          className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 w-full flex"
+                          onClick={() => handleSimilarPdfClick(pdf.id)}
                         >
                           <div className="flex w-full">
                             {/* PDF thumbnail */}
-                            <div className="w-24 h-32 bg-gray-100 flex-shrink-0 border-r border-gray-200">
+                            <div className="w-20 h-24 bg-gray-100 flex-shrink-0 border-r border-gray-200">
                               {pdf.thumbnail_url ? (
                                 <img 
                                   src={pdf.thumbnail_url} 
@@ -496,10 +555,6 @@ const PDFView = ({ params: paramsPromise }) => {
                                     <Heart className="w-3 h-3 mr-1" />
                                     <span>{typeof pdf.likes === 'number' ? pdf.likes : (pdf.metrics?.likes || 0)}</span>
                                   </div>
-                                  <div className="flex items-center text-xs text-gray-500">
-                                    <Share2 className="w-3 h-3 mr-1" />
-                                    <span>{typeof pdf.shares === 'number' ? pdf.shares : (pdf.metrics?.shares || 0)}</span>
-                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -512,6 +567,28 @@ const PDFView = ({ params: paramsPromise }) => {
                       <p className="text-gray-500">No similar PDFs found.</p>
                     </div>
                   )}
+                  
+                  {/* Mobile-Only View Button */}
+                  <button
+                    className="btn btn-primary w-full md:hidden mt-6"
+                    onClick={() => handleTabChange('view')}
+                  >
+                    Return to PDF
+                  </button>
+                </div>
+              )}
+              
+              {/* Mobile-only View Tab Content */}
+              {activeTab === 'view' && mobileSidebarExpanded && (
+                <div className="flex flex-col items-center justify-center h-[70vh]">
+                  <p className="text-lg font-semibold mb-4">Ready to Read</p>
+                  <p className="text-sm text-center mb-6">Tap the button below to view the document in full screen.</p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setMobileSidebarExpanded(false)}
+                  >
+                    View Full Screen
+                  </button>
                 </div>
               )}
             </div>
@@ -519,64 +596,99 @@ const PDFView = ({ params: paramsPromise }) => {
         )}
       </div>
 
-      {/* PDF Viewer Section - Adjusted height on mobile */}
-      <div className="flex-1 flex flex-col h-auto md:h-full">
+      {/* PDF Viewer Section - Maximized for reading */}
+      <div className={`flex-1 flex flex-col h-screen overflow-hidden ${
+        mobileSidebarExpanded && activeTab !== 'view' ? 'hidden' : ''
+      }`}>
         {/* Heading Bar */}
-        <div className="flex items-center justify-between bg-base-300 p-4 border-b sticky top-0 z-10">
-          <h1 className="text-lg font-semibold line-clamp-1">{documentInfo?.title || 'Document'}</h1>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between bg-base-300 p-2 md:p-4 border-b sticky top-0 z-10">
+          <h1 className="text-base md:text-lg font-semibold line-clamp-1 max-w-[50%]">{documentInfo?.title || 'Document'}</h1>
+          <div className="flex items-center gap-1 md:gap-2">
+            {/* Show a "Menu" button on mobile that opens the sidebar with info tab - Enhanced with icon */}
             <button
-              className={`btn btn-sm ${hasLiked ? 'btn-primary' : 'btn-outline'}`}
+              className="btn btn-xs md:hidden bg-primary text-info-content hover:bg-info/80 flex items-center gap-1 px-2"
+              onClick={() => {
+                setActiveTab('information');
+                setMobileSidebarExpanded(true);
+              }}
+            >
+              <Info className="w-3 h-3" />
+              <span>Info</span>
+            </button>
+            
+            {/* Action buttons */}
+            <button
+              className={`btn btn-xs md:btn-sm ${hasLiked ? 'btn-primary' : 'btn-outline'}`}
               onClick={handleLike}
               title={hasLiked ? "Unlike" : "Like"}
             >
               <Heart 
-                className="w-4 h-4" 
+                className="w-3 h-3 md:w-4 md:h-4" 
                 fill={hasLiked ? "currentColor" : "none"} 
               />
               <span className="ml-1 hidden sm:inline">{metrics.likes || 0}</span>
             </button>
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-xs md:btn-sm btn-outline"
               onClick={handleShare}
               title="Share"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className="w-3 h-3 md:w-4 md:h-4" />
               <span className="ml-1 hidden sm:inline">{metrics.shares || 0}</span>
             </button>
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-xs md:btn-sm btn-outline"
               onClick={handleDownload}
               disabled={downloadInProgress}
               title="Download"
             >
               {downloadInProgress ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
               ) : (
-                <Download className="w-4 h-4" />
+                <Download className="w-3 h-3 md:w-4 md:h-4" />
               )}
               <span className="ml-1 hidden sm:inline">{metrics.downloads || 0}</span>
             </button>
           </div>
         </div>
         
-        {/* PDF Viewer */}
-        <div className=" h-full flex flex-col">
+        {/* PDF Viewer - Full height for better reading experience */}
+        <div className="flex-1 h-full overflow-hidden bg-gray-100">
           {loading ? (
-            <div className="flex items-center justify-center flex-1">
-              <div className="text-center">Loading PDF...</div>
+            <div className="flex items-center justify-center h-full">
+              <div className="flex flex-col items-center">
+                <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                <div className="text-center">Loading PDF...</div>
+              </div>
             </div>
           ) : error && !pdfUrl ? (
-            <div className="flex items-center justify-center flex-1">
-              <div className="text-error text-center">{error}</div>
+            <div className="flex items-center justify-center h-full">
+              <div className="text-error text-center p-4">{error}</div>
             </div>
           ) : (
-            <div className="w-full h-auto overflow-y-auto" style={{ minHeight: '100%' }}>
+            <div className="w-full h-full" style={{ height: 'calc(100vh - 56px)' }}>
               <PDFViewer url={pdfUrl} />
             </div>
           )}
         </div>
       </div>
+
+      {/* Add custom animation for subtle pulse effect */}
+      <style jsx global>{`
+        .animate-pulse-subtle {
+          animation: pulse-subtle 2s infinite;
+        }
+        @keyframes pulse-subtle {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.9;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
     </div>
   );
 }
