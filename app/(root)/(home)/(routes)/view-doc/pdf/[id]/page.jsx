@@ -2,12 +2,18 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import PDFViewer from '@/components/pdf/PDFViewer'
+
 import { ArrowLeft, Heart, Share2, Download, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSession } from "next-auth/react"
 import { saveAs } from 'file-saver'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import dynamic from 'next/dynamic'
+
+const PDFViewer = dynamic(() => import('@/components/pdf/PDFViewer'), {
+  ssr: false,
+})
+
 
 
 const PDFView = ({ params: paramsPromise }) => {
