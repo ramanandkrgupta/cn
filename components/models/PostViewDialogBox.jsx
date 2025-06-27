@@ -121,62 +121,115 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
     }
   };
 
+  // // const handleDownload = async (postId, filename) => {
+  //   try {
+  //     // Check if user is logged in
+  //     if (!session?.user) {
+  //       toast.error("Please login to download files");
+  //       return;
+  //     }
+
+  //     // Additional check for premium content
+  //     if (data.premium && session.user.role !== "PRO") {
+  //       toast.error(
+  //         "This is a premium file. You need a premium membership to download it."
+  //       );
+  //       return;
+  //     }
+  //     setIsDownloading(true); // Start downloading
+
+  //     const response = await fetch("/api/v1/members/posts/secure-file", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ postId: data.id }),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || "Failed to get file access");
+  //     }
+
+  //     const { fileUrl } = await response.json();
+  //     const fileResponse = await fetch(fileUrl);
+  //     const existingPdfBytes = await fileResponse.arrayBuffer();
+
+  //     // Add user details to PDF
+  //     const modifiedPdfBytes = await addUserDetailsToPdf(
+  //       existingPdfBytes,
+  //       session.user.name,
+  //       session.user.email
+  //     );
+
+  //     const modifiedBlob = new Blob([modifiedPdfBytes], {
+  //       type: "application/pdf",
+  //     });
+  //     saveAs(modifiedBlob, `cn-${filename}`);
+
+  //     // Update download metrics
+  //     await updateMetric("downloads");
+  //     toast.success("File downloaded successfully!");
+  //   } catch (error) {
+  //     console.error("Download error:", error);
+  //     toast.error(error.message || "Error downloading file");
+  //   } finally {
+  //     setIsDownloading(false); // Stop downloading regardless of success/failure
+  //   }
+  // };
+
   const handleDownload = async (postId, filename) => {
-    try {
-      // Check if user is logged in
-      if (!session?.user) {
-        toast.error("Please login to download files");
-        return;
-      }
-
-      // Additional check for premium content
-      if (data.premium && session.user.role !== "PRO") {
-        toast.error(
-          "This is a premium file. You need a premium membership to download it."
-        );
-        return;
-      }
-      setIsDownloading(true); // Start downloading
-
-      const response = await fetch("/api/v1/members/posts/secure-file", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ postId: data.id }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to get file access");
-      }
-
-      const { fileUrl } = await response.json();
-      const fileResponse = await fetch(fileUrl);
-      const existingPdfBytes = await fileResponse.arrayBuffer();
-
-      // Add user details to PDF
-      const modifiedPdfBytes = await addUserDetailsToPdf(
-        existingPdfBytes,
-        session.user.name,
-        session.user.email
-      );
-
-      const modifiedBlob = new Blob([modifiedPdfBytes], {
-        type: "application/pdf",
-      });
-      saveAs(modifiedBlob, `cn-${filename}`);
-
-      // Update download metrics
-      await updateMetric("downloads");
-      toast.success("File downloaded successfully!");
-    } catch (error) {
-      console.error("Download error:", error);
-      toast.error(error.message || "Error downloading file");
-    } finally {
-      setIsDownloading(false); // Stop downloading regardless of success/failure
+  try {
+    // Check if user is logged in
+    if (!session?.user) {
+      toast.error("Please login to download files");
+      return;
     }
-  };
+
+    // Additional check for premium content
+    if (data.premium && session.user.role !== "PRO") {
+      toast.error(
+        "This is a premium file. You need a premium membership to download it."
+      );
+      return;
+    }
+
+    setIsDownloading(true); // Start downloading
+
+    const response = await fetch("/api/v1/members/posts/secure-file", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ postId: data.id }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to get file access");
+    }
+
+    const { fileUrl } = await response.json();
+
+    // Create a temporary anchor tag and trigger the download
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = `cn-${filename}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Update download metrics
+    await updateMetric("downloads");
+    toast.success("File downloaded successfully!");
+  } catch (error) {
+    console.error("Download error:", error);
+    toast.error(error.message || "Error downloading file");
+  } finally {
+    setIsDownloading(false); // Stop downloading regardless of success/failure
+  }
+};
+
 
   const handleLike = async () => {
     // Require login for likes
