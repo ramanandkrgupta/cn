@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { handlesharebtn } from "@/libs/utils";
-import PDFViewer from "../pdf/PDFViewer";
+
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
@@ -31,7 +31,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPDFViewer, setShowPDFViewer] = useState(false);
+
 
   // Check user's interaction when dialog opens
   useEffect(() => {
@@ -548,8 +548,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
           </div>
         </div>
         <div className="mt-4">
-        {/* Conditionally render PDFViewer */}
-        {showPDFViewer && <PDFViewer />}
+       
       </div>
       </Dialog>
     </Transition>
