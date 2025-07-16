@@ -20,7 +20,7 @@ const AdUnit = ({
     <ins
       className="adsbygoogle"
       style={{ display: 'block', textAlign: 'center' }}
-      data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+      data-ad-client="ca-pub-7004515632237084"
       data-ad-slot={adSlot}
       data-ad-format={adFormat}
       data-ad-layout={layout}
