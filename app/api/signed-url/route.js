@@ -26,7 +26,6 @@ export async function POST(req) {
     console.log("Generating signed URL for key:", key);
 
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
       ContentType: fileType,
     });
