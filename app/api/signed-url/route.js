@@ -39,5 +39,3 @@ export async function POST(req) {
     return NextResponse.json({ error: "Failed to generate signed URL" }, { status: 500 });
   }
 }
-
-is this correct
