@@ -7,8 +7,8 @@ import { getServerSession } from "next-auth";
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const key = `${course}-${subject}/${session.user.id}/${fileName}`;
 
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME!,
+      Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
       ContentType: fileType,
     });
