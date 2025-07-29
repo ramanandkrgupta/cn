@@ -5,27 +5,25 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
 import { getServerSession } from "next-auth";
 
 const s3Client = new S3Client({
-  region: `${process.env.AWS_REGION}`,
-  // endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  endpoint: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fileName, fileType, subject, course} = await req.json();
+    const { fileName, fileType, subject, course } = await req.json();
     const key = `${course}-${subject}/${session.user.id}/${fileName}`;
-    console.log("Generating signed URL for key:", key);
 
     const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME!,
       Key: key,
       ContentType: fileType,
     });
