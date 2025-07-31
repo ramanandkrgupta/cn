@@ -23,6 +23,10 @@ export async function GET(req, context) {
         semester_code: decodeURIComponent(semester),
         category: decodeURIComponent(category),
         subject_code: decodeURIComponent(subjectCode),
+        status: {
+  in: ['approved', 'pending'],
+},
+
       },
       select: {
         id: true,
