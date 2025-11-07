@@ -1,16 +1,17 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
   BookOpen,
   Settings,
   Bell,
   ArrowLeft,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  Briefcase
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -50,6 +51,12 @@ const menuItems = [
     icon: <Settings className="w-5 h-5" />,
     href: "/dashboard/settings"
   },
+  // inters
+  {
+    title: "Internships",
+    icon: <Briefcase className="w-5 h-5" />,
+    href: "/dashboard/internships"
+  },
   {
     title: "Back to Home",
     icon: <ArrowLeft className="w-5 h-5" />,
@@ -83,8 +90,8 @@ export default function DashboardSidebar({ user, collapsed = false }) {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-lg transition-colors ${
-                    isActive 
-                      ? "bg-primary text-primary-content" 
+                    isActive
+                      ? "bg-primary text-primary-content"
                       : "hover:bg-base-300"
                   }`}
                 >
@@ -127,4 +134,4 @@ export default function DashboardSidebar({ user, collapsed = false }) {
       </div>
     </div>
   );
-} 
+}

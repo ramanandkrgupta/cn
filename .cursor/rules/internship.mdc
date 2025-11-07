@@ -1,0 +1,13 @@
+this is a internship update  we have to give
+
+in http://localhost:3000/dashboard/internships  in this page you have to make a button (where admins can enter the start date and end date  , Name of Intern ,Stipend amount , role (manual enter) ,  after that it will be saved to the database  and will generate a qr code )
+in this page admin can see all the previous interns too okay
+
+
+the qr is too much important here  this qr will work as scanner
+after admin enters intern data   admin can download this intern qr code high quality
+
+if someone scans it he will be redirected to the notesmates/interns/id
+
+
+now in non protected route - http://localhost:3000/interns/some_id based on the qr
