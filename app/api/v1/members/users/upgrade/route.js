@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth.config";
+import crypto from 'crypto';
+import Razorpay from 'razorpay';
+
+// Define plan prices for validation
+// We will fetch from DB now
 
 export async function POST(req) {
   try {
@@ -10,16 +15,67 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { plan } = await req.json();
-    if (!plan) {
-      return NextResponse.json({ error: "Plan is required" }, { status: 400 });
+    const { plan: planName, paymentDetails } = await req.json();
+
+    if (!planName || !paymentDetails) {
+      return NextResponse.json({ error: "Missing plan or payment details" }, { status: 400 });
+    }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentDetails;
+
+    // 1. Signature Verification
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+    if (generated_signature !== razorpay_signature) {
+      return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
+    }
+
+    // 2. Amount Verification (Prevent manipulating amount)
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+
+    const order = await razorpay.orders.fetch(razorpay_order_id);
+
+    // Fetch plan price from DB
+    const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
+      where: { planId: planName.toLowerCase() }, // Assuming 'pro' is stored as lowercase based on subscription route
+    });
+
+    if (!subscriptionPlan) {
+      return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+    }
+
+    // Expected amount in paise (DB stores in rupees)
+    const expectedAmount = subscriptionPlan.price * 100;
+
+    // Check if paid amount matches the plan price
+    // We strictly check >= to allow for potential small rounding issues or overpayment (unlikely but safer than strict ===)
+    // Actually strict equality is better for security, but float math might be tricky.
+    // However, Razorpay returns integer paise. database price is likely integer or float.
+    // We'll use Math.round to safely convert DB price.
+
+    if (order.amount < Math.round(expectedAmount)) {
+      console.warn(`Payment mismatch: Order ${order.amount}, Expected ${expectedAmount}`);
+      return NextResponse.json({ error: "Payment amount mismatch" }, { status: 400 });
+    }
+
+    if (order.status !== 'paid' && order.status !== 'attempted') {
+      const payment = await razorpay.payments.fetch(razorpay_payment_id);
+      if (payment.status !== 'captured') {
+        return NextResponse.json({ error: "Payment not captured" }, { status: 400 });
+      }
     }
 
     // Update user with new role
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        userRole : plan.toUpperCase()
+        userRole: planName.toUpperCase()
       },
       select: {
         id: true,
@@ -27,7 +83,7 @@ export async function POST(req) {
         email: true,
         userRole: true,
         avatar: true,
-        // Add any other fields you need
+        isEmailVerified: true,
       }
     });
 

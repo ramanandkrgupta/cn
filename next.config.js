@@ -93,9 +93,18 @@ const nextConfig = {
 // PWA Configuration
 const withPWA = require("next-pwa")({
   dest: "public",
-  // disable: process.env.NODE_ENV === "development",
+  disable: process.env.NODE_ENV === "development",
   register: true,
   skipWaiting: true,
+  runtimeCaching: [
+    {
+      urlPattern: /\/api\/auth\/.*/i,
+      handler: "NetworkOnly",
+      options: {
+        cacheName: "auth-bypass",
+      },
+    },
+  ],
 });
 
 // Export configuration

@@ -6,15 +6,15 @@ import prisma from "@/libs/prisma";
 
 // Add helper function at the top
 const getRandomColor = () => {
-    const colors = [
-        '0088CC', // Blue
-        '00A36C', // Green
-        'CD5C5C', // Red
-        'FFB347', // Orange
-        '9370DB', // Purple
-        '40E0D0', // Turquoise
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
+  const colors = [
+    '0088CC', // Blue
+    '00A36C', // Green
+    'CD5C5C', // Red
+    'FFB347', // Orange
+    '9370DB', // Purple
+    '40E0D0', // Turquoise
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
 };
 
 export const authOptions = {
@@ -100,7 +100,7 @@ export const authOptions = {
 
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        // Get full user data including profile details
+        // Initial sign in - fetch full details
         const fullUser = await prisma.user.findUnique({
           where: { email: user.email },
           select: {
@@ -127,24 +127,36 @@ export const authOptions = {
           },
         })
 
-        // Add all user data to token
         token = { ...token, ...fullUser }
+      } else if (token?.email) {
+        // Subsequent requests - fetch fresh role/status only (Performance optimized)
+        try {
+          console.log("JWT_DEBUG: Fetching fresh user for", token.email);
+          const freshUser = await prisma.user.findUnique({
+            where: { email: token.email },
+            select: {
+              userRole: true,
+              isEmailVerified: true,
+            }
+          });
+
+          if (freshUser) {
+            console.log("JWT_DEBUG: Fresh user found:", freshUser.userRole);
+            token.userRole = freshUser.userRole;
+            token.role = freshUser.userRole; // Keep consistent
+            token.isEmailVerified = freshUser.isEmailVerified;
+          }
+        } catch (error) {
+          console.error("JWT_REFRESH_ERROR", error);
+          // Don't fail the session if this optimization fails
+        }
       }
 
-    //   if (trigger === 'update' && session?.user) {
-    //     token.avatar = session.user.avatar
-
-
-    //   }
-
-    //   return token
-    // },
-
-    if (trigger === "update") {
-      return { ...token, ...session.user };
-    }
-    return { ...token, ...user};
-  },
+      if (trigger === "update" && session?.user) {
+        return { ...token, ...session.user };
+      }
+      return token;
+    },
 
     async session({ token, session }) {
       if (token) {

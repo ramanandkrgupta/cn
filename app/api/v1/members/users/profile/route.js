@@ -19,7 +19,9 @@ const getRandomColor = () => {
 export async function PUT(req) {
   try {
     const session = await getServerSession(authOptions)
+    console.log("PROFILE_ROUTE_DEBUG_SESSION:", JSON.stringify(session, null, 2));
     if (!session?.user) {
+      console.log("PROFILE_ROUTE_ERROR: User not found in session");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -79,7 +81,14 @@ export async function PUT(req) {
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
+    console.log("PROFILE_GET_DEBUG_SESSION:", JSON.stringify(session, null, 2));
+
     if (!session?.user?.id) {
+      console.log("PROFILE_GET_ERROR: Session or User ID missing", {
+        hasSession: !!session,
+        hasUser: !!session?.user,
+        hasId: !!session?.user?.id
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

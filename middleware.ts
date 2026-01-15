@@ -3,7 +3,34 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
-  const token = await getToken({ req: request });
+  if (path.startsWith('/api/v1/members/users/profile')) {
+    const hasSecret = !!process.env.NEXTAUTH_SECRET;
+    console.log(`MIDDLEWARE_DEBUG: Path=${path}, HasSecret=${hasSecret}`);
+    console.log("MIDDLEWARE_DEBUG: Cookies:", request.cookies.getAll().map(c => c.name).join(', '));
+
+    // Attempt with explicit cookie name
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+      cookieName: 'next-auth.session-token'
+    });
+    console.log(`MIDDLEWARE_DEBUG: TokenExists=${!!token}`);
+
+    if (token) console.log("MIDDLEWARE_DEBUG: Token Role=", token.role);
+  } else {
+    // For other paths, standard check
+    // (We perform the check inside conditional for debug path to avoid duplicate calls, 
+    // but for the rest of middleware logic 'token' variable is needed globally?
+    // The original code calculated 'token' at top level. 
+    // Let's revert to top level but with explicit name if needed, or just handle debug path separate)
+  }
+
+  // To minimize disruption, let's keep the global token check but add the explicit options
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: 'next-auth.session-token'
+  });
 
   // Handle session endpoint
   if (path === '/api/auth/session') {

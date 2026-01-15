@@ -9,9 +9,15 @@ import { useSession } from 'next-auth/react'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
   const { data: session } = useSession()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const queryString = searchParams.toString()
+  const fullUrl = queryString ? `${pathname}?${queryString}` : pathname
+
   const [metrics, setMetrics] = useState({
     downloads: data.downloads || 0,
     likes: data.likes || 0,
@@ -185,15 +191,13 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
   const handleShare = async () => {
     const SharePost = {
       title: data.title || '',
-      content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${
-        data.course_name
-      }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
-        /\s/g,
-        ''
-      )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
-        data.id
-      }/${data.title.replace(/\s+/g, '-')}`,
+      content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${data.course_name
+        }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
+          /\s/g,
+          ''
+        )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${data.id
+        }/${data.title.replace(/\s+/g, '-')}`,
     }
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
@@ -353,14 +357,13 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
                         !session?.user
                           ? 'Login to Like'
                           : hasLiked
-                          ? 'Unlike'
-                          : 'Like'
+                            ? 'Unlike'
+                            : 'Like'
                       }
                     >
                       <HeartIcon
-                        className={`h-6 w-6 ${
-                          hasLiked ? 'text-white' : 'text-gray-300'
-                        }`}
+                        className={`h-6 w-6 ${hasLiked ? 'text-white' : 'text-gray-300'
+                          }`}
                       />
                     </button>
                     <button
@@ -381,7 +384,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
                         </p>
                         <div className="flex gap-2 justify-center">
                           <Link
-                            href="/login"
+                            href={`/login?callbackUrl=${encodeURIComponent(
+                              fullUrl
+                            )}`}
                             className="btn btn-primary btn-sm"
                           >
                             Login
@@ -409,7 +414,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
                             premium content.
                           </p>
                           <Link
-                            href="/plans"
+                            href={`/plans?callbackUrl=${encodeURIComponent(
+                              fullUrl
+                            )}`}
                             className="btn btn-warning btn-sm"
                           >
                             Upgrade to PRO

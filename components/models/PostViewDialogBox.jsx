@@ -9,14 +9,19 @@ import { useSession, signIn } from "next-auth/react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { FileSpreadsheet, Lock } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { handlesharebtn } from "@/libs/utils";
+
 
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  const fullUrl = queryString ? `${pathname}?${queryString}` : pathname;
 
   useEffect(() => {
     // console.log("Session in component:", session); // Debug log
@@ -179,56 +184,56 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
   // };
 
   const handleDownload = async (postId, filename) => {
-  try {
-    // Check if user is logged in
-    if (!session?.user) {
-      toast.error("Please login to download files");
-      return;
+    try {
+      // Check if user is logged in
+      if (!session?.user) {
+        toast.error("Please login to download files");
+        return;
+      }
+
+      // Additional check for premium content
+      if (data.premium && session.user.role !== "PRO") {
+        toast.error(
+          "This is a premium file. You need a premium membership to download it."
+        );
+        return;
+      }
+
+      setIsDownloading(true); // Start downloading
+
+      const response = await fetch("/api/v1/members/posts/secure-file", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postId: data.id }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to get file access");
+      }
+
+      const { fileUrl } = await response.json();
+
+      // Create a temporary anchor tag and trigger the download
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = `cn-${filename}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Update download metrics
+      await updateMetric("downloads");
+      toast.success("File downloaded successfully!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error(error.message || "Error downloading file");
+    } finally {
+      setIsDownloading(false); // Stop downloading regardless of success/failure
     }
-
-    // Additional check for premium content
-    if (data.premium && session.user.role !== "PRO") {
-      toast.error(
-        "This is a premium file. You need a premium membership to download it."
-      );
-      return;
-    }
-
-    setIsDownloading(true); // Start downloading
-
-    const response = await fetch("/api/v1/members/posts/secure-file", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ postId: data.id }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to get file access");
-    }
-
-    const { fileUrl } = await response.json();
-
-    // Create a temporary anchor tag and trigger the download
-    const link = document.createElement("a");
-    link.href = fileUrl;
-    link.download = `cn-${filename}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Update download metrics
-    await updateMetric("downloads");
-    toast.success("File downloaded successfully!");
-  } catch (error) {
-    console.error("Download error:", error);
-    toast.error(error.message || "Error downloading file");
-  } finally {
-    setIsDownloading(false); // Stop downloading regardless of success/failure
-  }
-};
+  };
 
 
   const handleLike = async () => {
@@ -321,15 +326,13 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
 
   const SharePost = {
     title: data.title || "",
-    content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${
-      data.course_name
-    }\n\n📕File Title 📕\n ${data.title} \n\n#${data.subject_name.replace(
-      /\s/g,
-      ""
-    )} #${data.course_name.replace(/\s/g, "")}\n\n 🚀 Download Link 🚀 \n`,
-    url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
-      data.id.slice(15)
-    }/${data.title.replace(/\s+/g, "-")}`,
+    content: `Hey! check out this notes for your best result in exams.\n\n🛂Course Name🛂\n ${data.course_name
+      }\n\n📕File Title 📕\n ${data.title} \n\n#${data.subject_name.replace(
+        /\s/g,
+        ""
+      )} #${data.course_name.replace(/\s/g, "")}\n\n 🚀 Download Link 🚀 \n`,
+    url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${data.id.slice(15)
+      }/${data.title.replace(/\s+/g, "-")}`,
   };
 
   return (
@@ -457,21 +460,19 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                         handleLike()
                       }}
                       disabled={hasLiked}
-                      className={`mt-4 p-2.5 rounded-full transition-all duration-300 ${
-                        hasLiked ? 'bg-red-500' : 'bg-black hover:bg-gray-700'
-                      }`}
+                      className={`mt-4 p-2.5 rounded-full transition-all duration-300 ${hasLiked ? 'bg-red-500' : 'bg-black hover:bg-gray-700'
+                        }`}
                       title={
                         !session?.user
                           ? 'Login to Like'
                           : hasLiked
-                          ? 'Already Liked'
-                          : 'Like'
+                            ? 'Already Liked'
+                            : 'Like'
                       }
                     >
                       <HeartIcon
-                        className={`h-6 w-6 ${
-                          hasLiked ? 'text-white' : 'text-gray-300'
-                        }`}
+                        className={`h-6 w-6 ${hasLiked ? 'text-white' : 'text-gray-300'
+                          }`}
                       />
                     </button>
 
@@ -508,7 +509,12 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                         </p>
                         <div className="flex gap-2 justify-center">
                           {/* // i want when user click on login then it should redirect to login page with callback to cuurent url */}
-                          <Link href="/login?callbackUrl=${router.asPath}" className="btn btn-primary btn-sm">
+                          <Link
+                            href={`/login?callbackUrl=${encodeURIComponent(
+                              fullUrl
+                            )}`}
+                            className="btn btn-primary btn-sm"
+                          >
                             Login
                           </Link>
                           <Link
@@ -534,7 +540,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
                             premium content.
                           </p>
                           <Link
-                            href="/account/plans"
+                            href={`/account/plans?callbackUrl=${encodeURIComponent(
+                              fullUrl
+                            )}`}
                             className="btn btn-warning btn-sm"
                           >
                             Upgrade to PRO
@@ -548,8 +556,8 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data }) => {
           </div>
         </div>
         <div className="mt-4">
-       
-      </div>
+
+        </div>
       </Dialog>
     </Transition>
   )

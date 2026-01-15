@@ -160,7 +160,7 @@ export default function PlansPage() {
           currency: "INR",
           receipt: `plan_${planId}_${Date.now()}`,
           notes: {
-            k1:"NM"
+            k1: "NM"
           },
           //prefill user data
         }),
@@ -180,7 +180,7 @@ export default function PlansPage() {
         currency: orderData.currency,
         name: "Notes Mates",
         description: `${orderData.id}`,
-        
+
 
         order_id: orderData.id,
         prefill: {
@@ -205,7 +205,14 @@ export default function PlansPage() {
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ plan: planId }),
+                  body: JSON.stringify({
+                    plan: planId,
+                    paymentDetails: {
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                    }
+                  }),
                 }
               );
               if (!updateResponse.ok) {
@@ -276,11 +283,10 @@ export default function PlansPage() {
         {plans.map((plan) => (
           <div
             key={plan.id}
-            className={`relative overflow-hidden rounded-lg border-2 p-6 ${
-              plan.id === "pro"
+            className={`relative overflow-hidden rounded-lg border-2 p-6 ${plan.id === "pro"
                 ? "border-primary bg-primary/5"
                 : "border-base-300 bg-base-200"
-            }`}
+              }`}
           >
             {plan.id === "pro" && (
               <div className="absolute top-4 right-4">
@@ -340,17 +346,16 @@ export default function PlansPage() {
             <button
               onClick={() => handleUpgrade(plan.id)}
               disabled={loading || currentPlan === plan.id}
-              className={`btn w-full ${
-                plan.id === "pro" ? "btn-primary" : "btn-outline"
-              }`}
+              className={`btn w-full ${plan.id === "pro" ? "btn-primary" : "btn-outline"
+                }`}
             >
               {loading
                 ? "Processing..."
                 : currentPlan === plan.id
-                ? "Current Plan"
-                : plan.id === "pro"
-                ? "Upgrade to PRO"
-                : "Stay Free"}
+                  ? "Current Plan"
+                  : plan.id === "pro"
+                    ? "Upgrade to PRO"
+                    : "Stay Free"}
             </button>
           </div>
         ))}

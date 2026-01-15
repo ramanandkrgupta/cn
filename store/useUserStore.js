@@ -6,17 +6,17 @@ const useUserStore = create(
     (set, get) => ({
       userData: null,
       isLoading: true,
-      setUserData: (data) => set({ 
+      setUserData: (data) => set({
         userData: {
           ...data,
           role: data.userRole
-        }, 
-        isLoading: false 
+        },
+        isLoading: false
       }),
       updateUser: (updates) => {
         const currentData = get().userData;
-        const newData = { 
-          ...currentData, 
+        const newData = {
+          ...currentData,
           ...updates,
           role: updates.userRole || updates.role || currentData?.role
         };
@@ -36,7 +36,8 @@ const useUserStore = create(
 export const initializeUserData = async () => {
   try {
     const response = await fetch('/api/v1/members/users/profile', {
-      cache: 'no-store'
+      cache: 'no-store',
+      credentials: 'include' // Ensure cookies are sent
     });
     if (response.ok) {
       const data = await response.json();
