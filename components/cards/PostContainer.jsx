@@ -10,6 +10,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
+import EzoicAdUnit from '@/components/ezoic/EzoicAdUnit'
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
   const { data: session } = useSession()
@@ -424,6 +425,9 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
                         </div>
                       </div>
                     )}
+                  <div className="mt-4">
+                    <EzoicAdUnit placeholderId="101" />
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

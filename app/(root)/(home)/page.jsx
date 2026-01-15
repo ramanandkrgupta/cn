@@ -10,8 +10,9 @@ import FAQ from './(faq)/faq'
 import Blog from './blog/page'
 import InstallPrompt from '@/components/InstallPrompt'
 import InstallButton from '@/components/InstallPrompt'
+import EzoicAdUnit from '@/components/ezoic/EzoicAdUnit'
 
-import AdUnit from '../../../components/googleads/AdUnit'
+// import AdUnit from '../../../components/googleads/AdUnit'
 
 export default function Home() {
   const { userData } = useUserStore()
@@ -47,7 +48,11 @@ export default function Home() {
         </div>
         {/* <Blog/> */}
       </section>
-      <AdUnit adSlot="4693914708" adFormat="auto" fullWidth={true} />
+      {/* <AdUnit adSlot="4693914708" adFormat="auto" fullWidth={true} /> */}
+
+      <div className="w-full flex justify-center my-5">
+        <EzoicAdUnit placeholderId="102" />
+      </div>
 
       {/* Or for in-article native ad */}
       {/* <AdUnit

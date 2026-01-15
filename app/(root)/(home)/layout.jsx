@@ -1,7 +1,7 @@
 // app/(root)/(home)/layout.jsx
 
 import { Navbar, Navigation, Sidebar } from '@/components/navigation'
-import AdUnit from '../../../components/googleads/AdUnit'
+// import AdUnit from '../../../components/googleads/AdUnit'
 
 export const metadata = {
   title: {
@@ -23,7 +23,7 @@ export default function HomeLayout({ children }) {
 
           {children}
 
-          <AdUnit adSlot="2575017820" adFormat="auto" fullWidth={true} />
+          {/* <AdUnit adSlot="2575017820" adFormat="auto" fullWidth={true} /> */}
         </div>
       </div>
     </section>

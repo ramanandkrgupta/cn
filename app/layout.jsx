@@ -32,15 +32,27 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/favicon/icon.svg" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Notes Mates"/>
+        <meta name="apple-mobile-web-app-title" content="Notes Mates" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
+        <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
+        <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+        <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+               window.ezstandalone = window.ezstandalone || {};
+               ezstandalone.cmd = ezstandalone.cmd || [];
+             `,
+          }}
+        />
+
         <meta name="google-adsense-account" content="ca-pub-7004515632237084"></meta>
 
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7004515632237084"
-     crossorigin="anonymous"></script>
+          crossorigin="anonymous"></script>
 
       </head>
       <body className={inter.className}>
@@ -48,8 +60,8 @@ export default function RootLayout({ children }) {
           <UserProvider>
             <Toaster />
             {children}
-             <Analytics />
-            <SpeedInsights /> 
+            <Analytics />
+            <SpeedInsights />
           </UserProvider>
         </AuthProvider>
 
