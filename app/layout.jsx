@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,22 +38,39 @@ export default function RootLayout({ children }) {
         <meta name="apple-touch-fullscreen" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-        <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
-        <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
-        <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-               window.ezstandalone = window.ezstandalone || {};
-               ezstandalone.cmd = ezstandalone.cmd || [];
-             `,
-          }}
+        <Script
+          id="gatekeeper-consent"
+          strategy="beforeInteractive"
+          data-cfasync="false"
+          src="https://cmp.gatekeeperconsent.com/min.js"
         />
+        <Script
+          id="gatekeeper-cmp"
+          strategy="beforeInteractive"
+          data-cfasync="false"
+          src="https://the.gatekeeperconsent.com/cmp.min.js"
+        />
+        <Script
+          id="ezoic-sa"
+          strategy="afterInteractive"
+          src="https://www.ezojs.com/ezoic/sa.min.js"
+        />
+        <Script id="ezoic-init" strategy="afterInteractive">
+          {`
+             window.ezstandalone = window.ezstandalone || {};
+             ezstandalone.cmd = ezstandalone.cmd || [];
+          `}
+        </Script>
 
         <meta name="google-adsense-account" content="ca-pub-7004515632237084"></meta>
 
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7004515632237084"
-          crossorigin="anonymous"></script>
+        <Script
+          id="adsense-init"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7004515632237084"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
 
       </head>
       <body className={inter.className}>
