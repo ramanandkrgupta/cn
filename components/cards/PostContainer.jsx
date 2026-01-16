@@ -11,6 +11,7 @@ import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import EzoicAdUnit from '@/components/ezoic/EzoicAdUnit'
+import { showRewardedAd } from '@/lib/rewardedAds' // Import helper
 
 const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
   const { data: session } = useSession()
@@ -96,6 +97,7 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
     }
   }
 
+
   const handleDownload = async (postId, filename) => {
     try {
       if (!session?.user) {
@@ -106,6 +108,11 @@ const PostViewDialogBox = ({ isOpen, setIsOpen, data, onUpdate }) => {
         toast.error('This is a premium file. Upgrade to PRO to download.')
         return
       }
+
+      // Show rewarded ad
+      const adResult = await showRewardedAd()
+      if (!adResult) return // User closed ad, stop download
+
       setIsDownloading(true)
       const response = await fetch('/api/v1/members/posts/secure-file', {
         method: 'POST',

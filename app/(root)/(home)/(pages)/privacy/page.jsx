@@ -169,6 +169,8 @@ export default function PrivacyPolicy() {
           </ul>
         </section>
 
+        <><span id="ezoic-privacy-policy-embed"></span></>
+
         <p className="text-sm">
           By using Notes Mates.in, you agree to this Privacy Policy. Thank you for trusting us with your data.
         </p>

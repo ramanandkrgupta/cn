@@ -1,23 +1,17 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import {
-  Users,
-  FileText,
-  BookOpen,
-  Download,
-  Upload,
-  Settings,
-  Bell,
-  TrendingUp,
-  TrendingDown,
-  Crown,
-  Heart,
-  Share2,
-} from "lucide-react";
-import Link from "next/link";
+import { Users, FileText, BookOpen, Download } from "lucide-react";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
+
+// Components
+import DashboardStatCard from "./components/DashboardStatCard";
+import DownloadsTrendChart from "./components/DownloadsTrendChart";
+import UserGrowthChart from "./components/UserGrowthChart";
+import RecentActivityTable from "./components/RecentActivityTable";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -56,191 +50,135 @@ export default function DashboardPage() {
     }
   };
 
-  const StatCard = ({
-    title,
-    value,
-    trend,
-    icon: Icon,
-    color,
-    subValue,
-    subLabel,
-  }) => (
-    <div className="bg-base-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${color} text-white`}>
-          <Icon className="w-6 h-6" />
-        </div>
-        {trend !== undefined && (
-          <div
-            className={`flex items-center ${
-              trend >= 0 ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {trend >= 0 ? (
-              <TrendingUp className="w-4 h-4 mr-1" />
-            ) : (
-              <TrendingDown className="w-4 h-4 mr-1" />
-            )}
-            <span>{Math.abs(trend)}%</span>
-          </div>
-        )}
-      </div>
-      <div>
-        <h3 className="text-3xl font-bold">{value.toLocaleString()}</h3>
-        <p className="text-gray-500">{title}</p>
-        {subValue !== undefined && (
-          <p className="text-sm mt-2">
-            <span className="font-medium">{subValue.toLocaleString()}</span>{" "}
-            <span className="text-gray-500">{subLabel}</span>
-          </p>
-        )}
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="flex justify-center items-center h-full">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">
-          Welcome back, {session?.user?.name}
-        </h1>
-        <p className="text-gray-500">
-          Here's what's happening with your platform
-        </p>
-      </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      {/* Welcome Section */}
+      {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+            Good Morning, {session?.user?.name}
+          </h1>
+          <p className="text-base-content/60 mt-1">
+            Here's what's happening with your platform today.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button className="btn btn-primary btn-sm">Generate Report</button>
+        </div>
+      </div> */}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
+        <DashboardStatCard
           title="Total Users"
-          value={stats.users.total}
-          trend={stats.users.trend}
+          value={stats.users.total.toLocaleString()}
+          subValue={`${stats.users.premium} PRO`}
           icon={Users}
-          color="bg-blue-500"
-          subValue={stats.users.premium}
-          subLabel="premium users"
+          color="primary"
+          trend="up"
+          trendValue={stats.users.trend}
+          description="Total registered users"
         />
-        <StatCard
-          title="Total Documents"
-          value={stats.documents.total}
-          trend={stats.documents.trend}
+        <DashboardStatCard
+          title="Documents"
+          value={stats.documents.total.toLocaleString()}
           icon={FileText}
-          color="bg-green-500"
-          subValue={stats.documents.premium}
-          subLabel="premium content"
+          color="secondary"
+          trend="up"
+          trendValue={stats.documents.trend}
+          description="Notes & papers"
         />
-        <StatCard
-          title="Total Subjects"
-          value={stats.subjects.total}
+        <DashboardStatCard
+          title="Subjects"
+          value={stats.subjects.total.toLocaleString()}
           icon={BookOpen}
-          color="bg-purple-500"
+          color="accent"
+          trend="neutral"
+          trendValue={0}
+          description="Active subjects"
         />
-        <StatCard
-          title="Engagement"
-          value={stats.engagement.downloads}
-          trend={stats.engagement.trend}
+        <DashboardStatCard
+          title="Downloads"
+          value={stats.engagement.downloads.toLocaleString()}
           icon={Download}
-          color="bg-yellow-500"
-          subValue={stats.engagement.likes + stats.engagement.shares}
-          subLabel="interactions"
+          color="info"
+          trend="down"
+          trendValue={Math.abs(stats.engagement.trend)}
+          description="Total downloads"
         />
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link
-          href="/dashboard/users"
-          className="bg-base-200 p-6 rounded-lg hover:shadow-lg transition-all hover:-translate-y-1"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Users className="w-5 h-5" />
-            <h3 className="font-semibold">Manage Users</h3>
-          </div>
-          <p className="text-sm text-gray-500">View and manage user accounts</p>
-        </Link>
-
-        <Link
-          href="/dashboard/posts"
-          className="bg-base-200 p-6 rounded-lg hover:shadow-lg transition-all hover:-translate-y-1"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <FileText className="w-5 h-5" />
-            <h3 className="font-semibold">Manage Documents</h3>
-          </div>
-          <p className="text-sm text-gray-500">
-            View and manage uploaded content
-          </p>
-        </Link>
-
-        <Link
-          href="/dashboard/subjects"
-          className="bg-base-200 p-6 rounded-lg hover:shadow-lg transition-all hover:-translate-y-1"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="w-5 h-5" />
-            <h3 className="font-semibold">Manage Subjects</h3>
-          </div>
-          <p className="text-sm text-gray-500">
-            View and manage course subjects
-          </p>
-        </Link>
-
-        <Link
-          href="/dashboard/settings"
-          className="bg-base-200 p-6 rounded-lg hover:shadow-lg transition-all hover:-translate-y-1"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Settings className="w-5 h-5" />
-            <h3 className="font-semibold">Settings</h3>
-          </div>
-          <p className="text-sm text-gray-500">Configure dashboard settings</p>
-        </Link>
+      {/* Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DownloadsTrendChart />
+        <UserGrowthChart />
       </div>
 
-      {/* Engagement Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-base-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Download className="w-5 h-5" />
-            <h3 className="font-semibold">Downloads</h3>
-          </div>
-          <p className="text-3xl font-bold mb-2">
-            {stats.engagement.downloads.toLocaleString()}
-          </p>
-          <p className="text-sm text-gray-500">Total document downloads</p>
+      {/* Recent Activity & Quick Actions */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2">
+          <RecentActivityTable />
         </div>
 
-        <div className="bg-base-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Heart className="w-5 h-5" />
-            <h3 className="font-semibold">Likes</h3>
-          </div>
-          <p className="text-3xl font-bold mb-2">
-            {stats.engagement.likes.toLocaleString()}
-          </p>
-          <p className="text-sm text-gray-500">Total document likes</p>
-        </div>
+        {/* Simple Quick Actions Panel */}
+        <div className="bg-base-100/50 backdrop-blur-md rounded-2xl p-6 border border-base-200 shadow-lg flex flex-col gap-4">
+          <h3 className="text-lg font-bold mb-2">Quick Actions</h3>
 
-        <div className="bg-base-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Share2 className="w-5 h-5" />
-            <h3 className="font-semibold">Shares</h3>
-          </div>
-          <p className="text-3xl font-bold mb-2">
-            {stats.engagement.shares.toLocaleString()}
-          </p>
-          <p className="text-sm text-gray-500">Total document shares</p>
+          <button onClick={() => router.push('/dashboard/users')} className="btn btn-outline justify-start gap-3 h-auto py-3">
+            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+              <Users size={20} />
+            </div>
+            <div className="text-left">
+              <div className="font-bold">Manage Users</div>
+              <div className="text-xs opacity-60">View and edit users</div>
+            </div>
+          </button>
+
+          <button onClick={() => router.push('/dashboard/posts')} className="btn btn-outline justify-start gap-3 h-auto py-3">
+            <div className="p-2 bg-secondary/10 rounded-lg text-secondary">
+              <FileText size={20} />
+            </div>
+            <div className="text-left">
+              <div className="font-bold">Review Posts</div>
+              <div className="text-xs opacity-60">Approve or reject content</div>
+            </div>
+          </button>
+
+          <button onClick={() => router.push('/dashboard/settings')} className="btn btn-outline justify-start gap-3 h-auto py-3">
+            <div className="p-2 bg-accent/10 rounded-lg text-accent">
+              <BookOpen size={20} /> // Using BookOpen as generic setting icon placeholder or change to Settings
+            </div>
+            <div className="text-left">
+              <div className="font-bold">System Settings</div>
+              <div className="text-xs opacity-60">Configure global preferences</div>
+            </div>
+          </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
+

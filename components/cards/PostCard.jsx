@@ -21,6 +21,7 @@ import Link from 'next/link'
 import PostViewDialogBox from '../models/PostViewDialogBox'
 import AddToCollection from '../collections/AddToCollection'
 import Modal from '@/components/Modal' // Import the new Modal component
+import { showRewardedAd } from '@/lib/rewardedAds' // Import helper
 
 // Import the category constant from your constants.
 import { category } from '@/constants/index'
@@ -121,7 +122,7 @@ const EditDocForm = ({ initialData, onSave, onCancel }) => {
 // ----------------------------
 // PostCard Component
 // ----------------------------
-const PostCard = ({ data, onUpdate = () => {} }) => {
+const PostCard = ({ data, onUpdate = () => { } }) => {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -177,6 +178,7 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     return await pdfDoc.save()
   }
 
+
   const handleDownload = async (e) => {
     e.stopPropagation()
     if (downloadInProgress.has(data.id)) return
@@ -191,6 +193,11 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         )
         return
       }
+
+      // Show rewarded ad
+      const adResult = await showRewardedAd()
+      if (!adResult) return // User closed ad, stop download
+
       setIsDownloading(true)
       setDownloadInProgress((prev) => new Set(prev).add(data.id))
       const response = await fetch('/api/v1/members/posts/secure-file', {
@@ -286,15 +293,13 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
     e.stopPropagation()
     const SharePost = {
       title: data.title || '',
-      content: `Hey! Check out these notes for your best result in exams.\n\n🛂Course Name🛂\n ${
-        data.course_name
-      }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
-        /\s/g,
-        ''
-      )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${
-        data.id
-      }/${data.title.replace(/\s+/g, '-')}`,
+      content: `Hey! Check out these notes for your best result in exams.\n\n🛂Course Name🛂\n ${data.course_name
+        }\n\n📕File Title 📕\n ${data.title}\n\n#${data.subject_name.replace(
+          /\s/g,
+          ''
+        )} #${data.course_name.replace(/\s/g, '')}\n\n🚀 Download Link 🚀\n`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/post/${data.id
+        }/${data.title.replace(/\s+/g, '-')}`,
     }
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
@@ -380,9 +385,8 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
 
   return (
     <div
-      className={`relative group bg-base-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg ${
-        isDeleting ? 'opacity-0 transition-opacity duration-500' : ''
-      }`}
+      className={`relative group bg-base-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg ${isDeleting ? 'opacity-0 transition-opacity duration-500' : ''
+        }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -405,14 +409,12 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
         <div className="flex gap-2">
           <button
             onClick={handleLike}
-            className={`btn btn-circle btn-sm ${
-              hasLiked ? 'bg-red-500' : 'bg-base-100/80 hover:bg-base-100'
-            }`}
+            className={`btn btn-circle btn-sm ${hasLiked ? 'bg-red-500' : 'bg-base-100/80 hover:bg-base-100'
+              }`}
           >
             <Heart
-              className={`w-4 h-4 ${
-                hasLiked ? 'fill-white text-white' : 'text-white'
-              }`}
+              className={`w-4 h-4 ${hasLiked ? 'fill-white text-white' : 'text-white'
+                }`}
             />
           </button>
           <button
@@ -443,9 +445,8 @@ const PostCard = ({ data, onUpdate = () => {} }) => {
             />
           </div>
           <div
-            className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center ${isHovered ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             <Eye className="w-8 h-8 text-white" />
           </div>

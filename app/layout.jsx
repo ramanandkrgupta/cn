@@ -50,17 +50,18 @@ export default function RootLayout({ children }) {
           data-cfasync="false"
           src="https://the.gatekeeperconsent.com/cmp.min.js"
         />
+        <Script id="ezoic-init" strategy="beforeInteractive">
+          {`
+             window._ezaq = window._ezaq || [];
+             window.ezstandalone = window.ezstandalone || {};
+             ezstandalone.cmd = ezstandalone.cmd || [];
+          `}
+        </Script>
         <Script
           id="ezoic-sa"
           strategy="afterInteractive"
           src="https://www.ezojs.com/ezoic/sa.min.js"
         />
-        <Script id="ezoic-init" strategy="afterInteractive">
-          {`
-             window.ezstandalone = window.ezstandalone || {};
-             ezstandalone.cmd = ezstandalone.cmd || [];
-          `}
-        </Script>
 
         <meta name="google-adsense-account" content="ca-pub-7004515632237084"></meta>
 

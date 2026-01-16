@@ -346,7 +346,7 @@ const ViewDoc = () => {
                           exit={{ opacity: 0, scale: 0.9 }}
                           transition={{ duration: 0.3 }}
                         >
-                          {/* <AdCard ad={ad} /> */}
+                          <AdCard ad={ad} />
                           {/* Ad Unit */}
                           {/* <AdUnit
                             adSlot="2575017820"

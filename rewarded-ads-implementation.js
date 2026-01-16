@@ -1,124 +1,76 @@
-(function() {
-  function initRewardedAds() {
+(function () {
+  var downloadButton = document.querySelector('div.min-h-screen.bg-base-100 > main > section > div > div.flex-1.max-sm\\:w-full.max-w-\\[1280px\\].mx-auto.sm\\:pr-2 > div.container > div.items-center > div.grid.grid-cols-2.lg\\:grid-cols-5.gap-3.sm\\:gap-4 > div:nth-child(1) > div > div.p-3.border-t.border-base-300.bg-base-100 > div.flex.md\\:flex-row.items-center.justify-between.gap-2 > div.flex.gap-2 > button.btn.btn-primary.btn-sm');
+
+  if (!downloadButton) {
+    console.warn('Rewarded Ads: Download button not found');
+    return;
+  }
+
+  var adShownFlag = false;
+  var originalOnClickHandlers = [];
+
+  function executeDownloadAction() {
     try {
-      const downloadButtonSelectors = [
-        'button[type="button"]',
-        'button.rounded-full',
-        'button:not([aria-label])',
-        'a[href*="download"]',
-        'button'
-      ];
-
-      let downloadButton = null;
-
-      for (const selector of downloadButtonSelectors) {
-        const elements = document.querySelectorAll(selector);
-        for (const element of elements) {
-          const text = element.textContent.toLowerCase();
-          if (text.includes('download') || 
-              element.classList.contains('download') ||
-              element.getAttribute('aria-label')?.toLowerCase().includes('download')) {
-            downloadButton = element;
-            break;
-          }
-        }
-        if (downloadButton) break;
+      if (downloadButton.onclick) {
+        downloadButton.onclick.call(downloadButton);
       }
 
-      if (!downloadButton) {
-        console.warn('[Ezoic Rewarded Ads] Download button not found, will retry in 2 seconds');
-        setTimeout(initRewardedAds, 2000);
-        return;
-      }
-
-      console.log('[Ezoic Rewarded Ads] Download button found:', downloadButton);
-
-      downloadButton.setAttribute('data-google-interstitial', 'false');
-
-      const originalOnClick = downloadButton.onclick;
-      const originalHref = downloadButton.href;
-
-      function handleDownloadClick(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-
-        if (!window.ezRewardedAds || !window.ezRewardedAds.ready) {
-          console.warn('[Ezoic Rewarded Ads] Rewarded ads not ready');
-          return;
-        }
-
-        try {
-          window.ezRewardedAds.requestWithOverlay(
-            function(result) {
-              if (result.status) {
-                if (result.reward) {
-                  console.log('[Ezoic Rewarded Ads] Reward granted, allowing download');
-                  grantDownloadAccess();
-                } else {
-                  console.log('[Ezoic Rewarded Ads] User closed ad early, keeping download locked');
-                }
-              } else {
-                console.warn('[Ezoic Rewarded Ads] Ad system error:', result.msg);
-              }
-            },
-            {
-              header: "Watch ad to download ?",
-              body: ["Support us to keep our website running .. "],
-              accept: "Watch 30 sec ad ",
-              cancel: "Cancel"
-            },
-            {
-              rewardName: "Download ",
-              rewardOnNoFill: false
-            }
-          );
-        } catch (error) {
-          console.error('[Ezoic Rewarded Ads] Error showing ad:', error);
-        }
-      }
-
-      function grantDownloadAccess() {
-        console.log('[Ezoic Rewarded Ads] Granting download access');
-        
-        try {
-          if (originalOnClick) {
-            originalOnClick.call(downloadButton);
-          } else if (originalHref) {
-            window.location.href = originalHref;
-          } else {
-            downloadButton.removeEventListener('click', handleDownloadClick, true);
-            downloadButton.click();
-            setTimeout(function() {
-              downloadButton.addEventListener('click', handleDownloadClick, true);
-            }, 100);
-          }
-        } catch (error) {
-          console.error('[Ezoic Rewarded Ads] Error executing original action:', error);
-        }
-      }
-
-      downloadButton.onclick = null;
-      if (downloadButton.href) {
-        downloadButton.removeAttribute('href');
-      }
-      
-      downloadButton.addEventListener('click', handleDownloadClick, true);
-
-      console.log('[Ezoic Rewarded Ads] Successfully initialized on download button');
-
+      var clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      downloadButton.dispatchEvent(clickEvent);
     } catch (error) {
-      console.error('[Ezoic Rewarded Ads] Initialization error:', error);
+      console.error('Rewarded Ads: Error executing download action:', error);
     }
   }
 
-  function executeWhenReady() {
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      initRewardedAds();
-    } else {
-      document.addEventListener('DOMContentLoaded', initRewardedAds);
+  function showRewardedAd(event) {
+    if (adShownFlag) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!window.ezRewardedAds || !window.ezRewardedAds.ready) {
+      console.warn('Rewarded Ads: API not ready, allowing download');
+      executeDownloadAction();
+      return;
+    }
+
+    try {
+      window.ezRewardedAds.requestWithOverlay(
+        function (result) {
+          if (result.status) {
+            if (result.reward) {
+              console.log('Rewarded Ads: User completed ad, granting download access');
+              adShownFlag = true;
+              executeDownloadAction();
+            } else {
+              console.log('Rewarded Ads: User closed ad early, keeping content locked');
+            }
+          } else {
+            console.warn('Rewarded Ads: Ad system error, granting download access:', result.msg);
+            executeDownloadAction();
+          }
+        },
+        {
+          body: ['Watch a short ad to unlock your download']
+        },
+        {
+          rewardOnNoFill: false,
+          alwaysCallback: true
+        }
+      );
+    } catch (error) {
+      console.error('Rewarded Ads: Error showing ad:', error);
+      executeDownloadAction();
     }
   }
 
-  executeWhenReady();
+  downloadButton.addEventListener('click', showRewardedAd, true);
+
+  console.log('Rewarded Ads: Download button integration complete');
 })();
