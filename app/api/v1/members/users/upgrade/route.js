@@ -71,11 +71,43 @@ export async function POST(req) {
       }
     }
 
-    // Update user with new role
+    // Calculate expiration date (e.g., 30 days)
+    // You might want to make this dynamic based on the plan (e.g. yearly vs monthly)
+    // For now assuming 30 days for 'pro'
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
+
+    // Fetch payment details to get UTR and Mobile
+    let mobile = null;
+    let utr = null;
+    try {
+      const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
+      mobile = paymentDetails.contact;
+      utr = paymentDetails.acquirer_data?.rrn || paymentDetails.acquirer_data?.upi_transaction_id;
+    } catch (e) {
+      console.error("Failed to fetch extra payment details", e);
+    }
+
+    // Update PaymentHistory
+    await prisma.paymentHistory.update({
+      where: { razorpayOrderId: razorpay_order_id },
+      data: {
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        status: 'paid',
+        startDate: new Date(),
+        endDate: expiresAt,
+        mobile: mobile,
+        utr: utr
+      }
+    });
+
+    // Update user with new role and expiration
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        userRole: planName.toUpperCase()
+        userRole: planName.toUpperCase(),
+        planExpiresAt: expiresAt
       },
       select: {
         id: true,
@@ -84,6 +116,7 @@ export async function POST(req) {
         userRole: true,
         avatar: true,
         isEmailVerified: true,
+        planExpiresAt: true,
       }
     });
 

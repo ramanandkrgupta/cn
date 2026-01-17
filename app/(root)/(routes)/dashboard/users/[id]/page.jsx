@@ -106,6 +106,43 @@ export default function UserDetailsPage() {
             <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
             {/* Add recent activity list here */}
           </div>
+
+          {/* Payment History */}
+          <div className="bg-base-200 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Payment History</h3>
+            {user?.paymentHistory && user.paymentHistory.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="table w-full">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Order ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {user.paymentHistory.map((payment) => (
+                      <tr key={payment.id}>
+                        <td>{new Date(payment.createdAt).toLocaleDateString()}</td>
+                        <td className="uppercase font-bold">{payment.planId}</td>
+                        <td>{payment.currency} {payment.amount}</td>
+                        <td>
+                          <span className={`badge ${payment.status === 'paid' ? 'badge-success' : 'badge-ghost'}`}>
+                            {payment.status}
+                          </span>
+                        </td>
+                        <td className="font-mono text-xs">{payment.razorpayOrderId}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-base-content/60 italic">No payment history found.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

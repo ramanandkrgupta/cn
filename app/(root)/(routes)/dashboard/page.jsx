@@ -169,7 +169,8 @@ export default function DashboardPage() {
 
           <button onClick={() => router.push('/dashboard/settings')} className="btn btn-outline justify-start gap-3 h-auto py-3">
             <div className="p-2 bg-accent/10 rounded-lg text-accent">
-              <BookOpen size={20} /> // Using BookOpen as generic setting icon placeholder or change to Settings
+              {/* Using BookOpen as generic setting icon placeholder or change to Settings */}
+              <BookOpen size={20} />
             </div>
             <div className="text-left">
               <div className="font-bold">System Settings</div>

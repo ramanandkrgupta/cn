@@ -23,6 +23,11 @@ export async function GET(req, { params }) {
             posts: true,
             downloads: true
           }
+        },
+        paymentHistory: {
+          orderBy: {
+            createdAt: 'desc'
+          }
         }
       }
     });

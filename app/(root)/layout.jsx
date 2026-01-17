@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
     <>
       <div className="min-h-screen bg-base-100">
         <Toaster position="top-center" />
-        <main className="pb-0 sm:pb-0">{children}</main>
+        <main className="pb-16 sm:pb-0">{children}</main>
         {/* Navigation handles its own visibility based on path in its own component usually, 
             but if not, we should wrap it. 
             Let's rely on CSS 'hidden lg:block' or similar if it's mobile only navigation? 

@@ -46,11 +46,6 @@ const nextConfig = {
         source: "/whatsapp2",
         destination: "https://chat.whatsapp.com/LSso4gdhnpXJIWI6VtE22a",
         permanent: true,
-      },
-      {
-        source: "/ads.txt",
-        destination: "https://srv.adstxtmanager.com/19390/notesmates.in",
-        permanent: true,
       }
     ];
   },

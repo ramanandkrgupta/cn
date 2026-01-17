@@ -30,6 +30,11 @@ const menuItems = [
     href: "/dashboard/users"
   },
   {
+    title: "Payments",
+    icon: <Briefcase className="w-4 h-4" />, // Reusing Briefcase or any suitable icon
+    href: "/dashboard/payments"
+  },
+  {
     title: "Documents",
     icon: <FileText className="w-4 h-4" />,
     href: "/dashboard/posts"
@@ -101,8 +106,8 @@ export default function DashboardSidebar({ user, collapsed = false, setCollapsed
                 key={item.href}
                 href={item.href}
                 className={`flex items-center ${collapsed ? 'justify-center px-2' : 'px-3'} py-2 rounded-md transition-colors ${isActive
-                    ? "bg-base-200 text-primary font-medium"
-                    : "text-base-content/70 hover:bg-base-100 hover:text-base-content"
+                  ? "bg-base-200 text-primary font-medium"
+                  : "text-base-content/70 hover:bg-base-100 hover:text-base-content"
                   }`}
                 title={collapsed ? item.title : ""}
               >

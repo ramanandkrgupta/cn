@@ -124,6 +124,7 @@ export const authOptions = {
             semester: true,
             location: true,
             links: true,
+            planExpiresAt: true,
           },
         })
 
@@ -137,14 +138,31 @@ export const authOptions = {
             select: {
               userRole: true,
               isEmailVerified: true,
+              planExpiresAt: true,
             }
           });
 
           if (freshUser) {
             console.log("JWT_DEBUG: Fresh user found:", freshUser.userRole);
+
+            // Check for Plan Expiration
+            if (freshUser.userRole === 'PRO' && freshUser.planExpiresAt && new Date() > new Date(freshUser.planExpiresAt)) {
+              console.log("JWT_DEBUG: User plan expired. Downgrading to USER.");
+              try {
+                await prisma.user.update({
+                  where: { email: token.email },
+                  data: { userRole: 'USER' }
+                });
+                freshUser.userRole = 'USER'; // Update local variable to reflect in token
+              } catch (updateError) {
+                console.error("Failed to downgrade user:", updateError);
+              }
+            }
+
             token.userRole = freshUser.userRole;
             token.role = freshUser.userRole; // Keep consistent
             token.isEmailVerified = freshUser.isEmailVerified;
+            token.planExpiresAt = freshUser.planExpiresAt;
           }
         } catch (error) {
           console.error("JWT_REFRESH_ERROR", error);
@@ -181,6 +199,7 @@ export const authOptions = {
           semester: token.semester,
           location: token.location,
           links: token.links,
+          planExpiresAt: token.planExpiresAt,
         }
       }
       return session

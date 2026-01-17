@@ -276,6 +276,13 @@ export default function PlansPage() {
             </div>
           )}
         </div>
+        {session?.user?.planExpiresAt && (
+          <div className="mt-4 pt-4 border-t border-base-300">
+            <p className="text-sm font-medium">
+              Plan Expires on: <span className="text-primary">{new Date(session.user.planExpiresAt).toLocaleDateString()}</span>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Plans Grid */}
@@ -284,8 +291,8 @@ export default function PlansPage() {
           <div
             key={plan.id}
             className={`relative overflow-hidden rounded-lg border-2 p-6 ${plan.id === "pro"
-                ? "border-primary bg-primary/5"
-                : "border-base-300 bg-base-200"
+              ? "border-primary bg-primary/5"
+              : "border-base-300 bg-base-200"
               }`}
           >
             {plan.id === "pro" && (
@@ -418,6 +425,69 @@ export default function PlansPage() {
           </table>
         </div>
       </div>
+      {/* Payment History */}
+      <div className="mt-12 mb-8">
+        <h2 className="text-xl font-bold mb-6">Payment History</h2>
+        <PaymentHistoryList />
+      </div>
+    </div>
+  );
+}
+
+function PaymentHistoryList() {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchHistory() {
+      try {
+        const res = await fetch("/api/user/payment/history");
+        if (res.ok) {
+          const data = await res.json();
+          setHistory(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch history", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHistory();
+  }, []);
+
+  if (loading) return <div className="text-center py-4">Loading history...</div>;
+  if (!history.length) return <div className="text-base-content/60 italic">No payment history found.</div>;
+
+  return (
+    <div className="overflow-x-auto bg-base-100 rounded-lg border border-base-200">
+      <table className="table w-full">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Plan</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Order ID</th>
+            <th>Receipt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {history.map((item) => (
+            <tr key={item.id}>
+              <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+              <td className="uppercase font-bold">{item.planId}</td>
+              <td>{item.currency} {item.amount}</td>
+              <td>
+                <span className={`badge ${item.status === 'paid' ? 'badge-success' : 'badge-ghost'}`}>
+                  {item.status}
+                </span>
+              </td>
+              <td className="font-mono text-xs">{item.razorpayOrderId}</td>
+              <td className="font-mono text-xs">{item.receipt}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -63,6 +63,8 @@ model User {
   resetTokenExpiry    DateTime?
   followedBy          Follows[]            @relation("following")
   following           Follows[]            @relation("follower")
+  planExpiresAt       DateTime?
+  paymentHistory      PaymentHistory[]
 }
 
 model subject {
@@ -499,3 +501,24 @@ model Internship {
 
 
 
+
+model PaymentHistory {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String   @db.ObjectId
+  razorpayOrderId     String   @unique
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  amount              Float
+  currency            String
+  status              String   @default("created") // created, paid, failed
+  planId              String
+  receipt             String?
+  notes               Json?
+  startDate           DateTime?
+  endDate             DateTime?
+  utr                 String?
+  mobile              String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id])
+}
